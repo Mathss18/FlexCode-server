@@ -1,0 +1,171 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Resources\Funcionario as FuncionarioResource;
+use App\Http\Resources\Usuario as UsuarioResource;
+use App\Models\Funcionario;
+use App\Models\Usuario;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+
+class FuncionarioController extends Controller
+{
+    public function index()
+    {
+        //$funcionarios = Funcionario::paginate(15);
+        //$funcionarios = Funcionario::all();
+        $funcionarios = Funcionario::with('grupo')->get();
+
+        return FuncionarioResource::collection($funcionarios);
+    }
+
+    public function show($id)
+    {
+        $funcionario = Funcionario::where('id', $id)->with(['grupo', 'usuario'])->first();
+
+        return new FuncionarioResource($funcionario);
+    }
+
+    public function store(Request $request)
+    {
+        $funcionario = new Funcionario;
+        $funcionario->situacao = $request->input('situacao');
+        $funcionario->nome = $request->input('nome');
+        $funcionario->cpf = $request->input('cpf');
+        $funcionario->rg = $request->input('rg');
+        $funcionario->dataNascimento = $request->input('dataNascimento');
+        $funcionario->sexo = $request->input('sexo');
+        $funcionario->email = $request->input('emailPessoal');
+        $funcionario->comissao = $request->input('comissao');
+        $funcionario->rua = $request->input('rua');
+        $funcionario->cidade = $request->input('cidade');
+        $funcionario->numero = $request->input('numero');
+        $funcionario->cep = $request->input('cep');
+        $funcionario->bairro = $request->input('bairro');
+        $funcionario->estado = $request->input('estado');
+        $funcionario->telefone = $request->input('telefone');
+        $funcionario->celular = $request->input('celular');
+        $funcionario->grupo_id = $request->input('grupo');
+
+        if (is_file($request->input('foto'))) {
+            $image = $request->input('foto');
+            $imageName = $funcionario->nome . $funcionario->cpf;
+            $folderName = "fotosFuncionarios";
+
+
+            if ($return = $this->upload($image, $imageName, $folderName)) {
+                $funcionario->foto = $return;
+            } else {
+                $funcionario->foto = $request->input('foto');
+            }
+        } else {
+            $funcionario->foto = $request->input('foto');
+        }
+
+
+        //Verifica se a senha foi passada pra criar um usuario para o funcionario
+        if ($request->input('senha') !== null) {
+            $usuario = new Usuario;
+            $usuario->nome = $request->input('nome');
+            $usuario->email = $request->input('email');
+            $usuario->senha = $request->input('senha');
+
+            //Verifica se o usuario foi salvo com sucesso e então atribui o usuario_id ao funcionario
+            if ($usuario->save()) {
+                $funcionario->usuario_id = $usuario->id;
+            }
+        }
+
+        if ($funcionario->save()) {
+            return new FuncionarioResource($funcionario);
+        }
+    }
+
+    public function update(Request $request)
+    {
+        $funcionario = Funcionario::findOrFail($request->id);
+
+        $funcionario->situacao = $request->input('situacao');
+        $funcionario->nome = $request->input('nome');
+        $funcionario->cpf = $request->input('cpf');
+        $funcionario->rg = $request->input('rg');
+        $funcionario->dataNascimento = $request->input('dataNascimento');
+        $funcionario->sexo = $request->input('sexo');
+        $funcionario->email = $request->input('emailPessoal');
+        $funcionario->comissao = $request->input('comissao');
+        $funcionario->rua = $request->input('rua');
+        $funcionario->cidade = $request->input('cidade');
+        $funcionario->numero = $request->input('numero');
+        $funcionario->cep = $request->input('cep');
+        $funcionario->bairro = $request->input('bairro');
+        $funcionario->estado = $request->input('estado');
+        $funcionario->telefone = $request->input('telefone');
+        $funcionario->celular = $request->input('celular');
+        $funcionario->grupo_id = $request->input('grupo');
+
+        $usuario = Usuario::find($request->usuario_id);
+
+        //Verifica se o funcionario tem um usuraio no sistema
+        if (!$usuario) {
+            //Se não, cria um novo usuario
+            $usuario = new Usuario;
+            $usuario->nome = $request->input('nome');
+            $usuario->email = $request->input('email');
+            $usuario->senha = $request->input('senha');
+        } else {
+            //Se sim, atualiza o usuario existente
+            $usuario->email = $request->input('email');
+            $usuario->senha = $request->input('senha');
+        }
+
+        //Verifica se o usuario foi salvo com sucesso e então atribui o usuario_id ao funcionario
+        if ($usuario->save()) {
+            $funcionario->usuario_id = $usuario->id;
+        }
+
+        if (is_file($request->input('foto'))) {
+
+            $image = $request->input('foto');
+            $imageName = $funcionario->nome . $funcionario->cpf;
+            $folderName = "fotosFuncionarios";
+
+
+            if ($return = $this->upload($image, $imageName, $folderName)) {
+                $funcionario->foto = $return;
+            } else {
+                $funcionario->foto = 'nada';
+            }
+        }
+
+        if ($funcionario->save()) {
+            return new FuncionarioResource($funcionario);
+        }
+    }
+
+    public function destroy($id)
+    {
+        $funcionario = Funcionario::findOrFail($id);
+        if ($funcionario->delete()) {
+            return new FuncionarioResource($funcionario);
+        }
+    }
+
+    protected function upload($file, $fileName, $folderName)
+    {
+        $extension = explode('/', explode(':', substr($file, 0, strpos($file, ';')))[1])[1];
+        $replace = substr($file, 0, strpos($file, ',') + 1);
+        $file = str_replace($replace, '', $file);
+        $file = str_replace(' ', '+', $file);
+
+        $imageName = Str::kebab($fileName) . '.' . $extension;
+        $fileUploaded = Storage::put('public/' . $folderName . '/' . $imageName, base64_decode($file));
+
+        if ($fileUploaded) {
+            $url = config('app.url') . ':' . config('app.port') . '/' . "storage/" . $folderName . '/' . $imageName;
+            return $url;
+        }
+        return $fileUploaded;
+    }
+}
