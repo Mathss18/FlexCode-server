@@ -47,9 +47,9 @@ class FuncionarioController extends Controller
         $funcionario->estado = $request->input('estado');
         $funcionario->telefone = $request->input('telefone');
         $funcionario->celular = $request->input('celular');
-        $funcionario->grupo_id = $request->input('grupo');
+        $funcionario->grupo_id = $request->input('grupo_id');
 
-        if (is_file($request->input('foto'))) {
+        if ($this->is_base64($request->input('foto'))) {
             $image = $request->input('foto');
             $imageName = $funcionario->nome . $funcionario->cpf;
             $folderName = "fotosFuncionarios";
@@ -71,6 +71,7 @@ class FuncionarioController extends Controller
             $usuario->nome = $request->input('nome');
             $usuario->email = $request->input('email');
             $usuario->senha = $request->input('senha');
+            $usuario->situacao = 1;
 
             //Verifica se o usuario foi salvo com sucesso e então atribui o usuario_id ao funcionario
             if ($usuario->save()) {
@@ -103,21 +104,28 @@ class FuncionarioController extends Controller
         $funcionario->estado = $request->input('estado');
         $funcionario->telefone = $request->input('telefone');
         $funcionario->celular = $request->input('celular');
-        $funcionario->grupo_id = $request->input('grupo');
+        $funcionario->grupo_id = $request->input('grupo_id');
 
         $usuario = Usuario::find($request->usuario_id);
-
-        //Verifica se o funcionario tem um usuraio no sistema
-        if (!$usuario) {
-            //Se não, cria um novo usuario
-            $usuario = new Usuario;
-            $usuario->nome = $request->input('nome');
-            $usuario->email = $request->input('email');
-            $usuario->senha = $request->input('senha');
+        file_put_contents("teste.txt",$request->input('usuarioAccess'));
+        //Verifica se o usuario tem acesseo, então remove seu acesso
+        if ($request->input('usuarioAccess') == 0) {
+            $usuario->situacao = 0;
         } else {
-            //Se sim, atualiza o usuario existente
-            $usuario->email = $request->input('email');
-            $usuario->senha = $request->input('senha');
+            $usuario->situacao = 1;
+            //Verifica se o funcionario tem um usuraio no sistema
+            if (!$usuario) {
+                //Se não, cria um novo usuario
+                $usuario = new Usuario;
+                $usuario->nome = $request->input('nome');
+                $usuario->email = $request->input('email');
+                $usuario->senha = $request->input('senha');
+                $usuario->situacao = 1;
+            } else {
+                //Se sim, atualiza o usuario existente
+                $usuario->email = $request->input('email');
+                $usuario->senha = $request->input('senha');
+            }
         }
 
         //Verifica se o usuario foi salvo com sucesso e então atribui o usuario_id ao funcionario
@@ -125,7 +133,7 @@ class FuncionarioController extends Controller
             $funcionario->usuario_id = $usuario->id;
         }
 
-        if (is_file($request->input('foto'))) {
+        if ($this->is_base64($request->input('foto'))) {
 
             $image = $request->input('foto');
             $imageName = $funcionario->nome . $funcionario->cpf;
@@ -167,5 +175,18 @@ class FuncionarioController extends Controller
             return $url;
         }
         return $fileUploaded;
+    }
+
+    protected function is_base64($file)
+    {
+        $replace = substr($file, 0, strpos($file, ',') + 1);
+        $file = str_replace($replace, '', $file);
+        $file = str_replace(' ', '+', $file);
+
+        if (base64_encode(base64_decode($file, true)) === $file) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
