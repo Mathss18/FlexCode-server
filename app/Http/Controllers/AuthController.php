@@ -12,7 +12,7 @@ class AuthController extends Controller
     {
         $credentials = $request->only(['email', 'senha']);
 
-        if (!$token = Auth::auth('api')->attempt($credentials)) {
+        if (!$token = auth('api')->attempt($credentials)) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
@@ -56,7 +56,7 @@ class AuthController extends Controller
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => Auth::factory('api')->getTTL() * 60
+            'expires_in' => 3600
         ]);
     }
 
