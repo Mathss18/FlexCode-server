@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ClienteController;
@@ -19,6 +20,10 @@ use App\Http\Controllers\UsuarioController;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+
+//============================ AUTH ==============================
+Route::post('login', [AuthController::class, 'login']);
+
 
 //============================ CLIENTES ==============================
 Route::get('clientes', [ClienteController::class, 'index']);
