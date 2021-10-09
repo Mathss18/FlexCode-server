@@ -19,14 +19,9 @@ class AuthController extends Controller
         return $this->respondWithToken($token);
     }
 
-    /**
-     * Get the authenticated User.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function me()
     {
-        return response()->json(Auth::users('api'));
+        return response()->json(auth('api')->user());
     }
 
     /**
@@ -36,7 +31,7 @@ class AuthController extends Controller
      */
     public function logout()
     {
-        Auth::logout('api');
+        auth('api')->logout();
 
         return response()->json(['message' => 'Successfully logged out']);
     }
@@ -48,15 +43,22 @@ class AuthController extends Controller
      */
     public function refresh()
     {
-        return $this->respondWithToken(Auth::refresh('api'));
+        return $this->respondWithToken(auth('api')->refresh());
     }
 
+    /**
+     * Get the token array structure.
+     *
+     * @param  string $token
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     protected function respondWithToken($token)
     {
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => 3600
+            'expires_in' => auth('api')->factory()->getTTL() * 60
         ]);
     }
 
