@@ -41,6 +41,6 @@ class Usuario extends Authenticatable implements JWTSubject
 
     public function getAuthPassword()
     {
-        return $this->senha;
+        return $this->attributes['senha'];
     }
 }
