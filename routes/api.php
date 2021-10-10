@@ -24,69 +24,71 @@ use App\Http\Controllers\UsuarioController;
 //============================ AUTH ==============================
 Route::post('login', [AuthController::class, 'login']);
 
+Route::middleware(['jwt'])->group(function () {
 
-//============================ CLIENTES ==============================
-Route::get('clientes', [ClienteController::class, 'index']);
+    //============================ CLIENTES ==============================
+    Route::get('clientes', [ClienteController::class, 'index']);
 
-Route::get('cliente/{id}', [ClienteController::class, 'show']);
+    Route::get('cliente/{id}', [ClienteController::class, 'show']);
 
-Route::post('cliente', [ClienteController::class, 'store']);
+    Route::post('cliente', [ClienteController::class, 'store']);
 
-Route::put('cliente/{id}', [ClienteController::class, 'update']);
+    Route::put('cliente/{id}', [ClienteController::class, 'update']);
 
-Route::delete('cliente/{id}', [ClienteController::class,'destroy']);
+    Route::delete('cliente/{id}', [ClienteController::class, 'destroy']);
 
-//============================ TRANSPORTADORAS ==============================
-Route::get('transportadoras', [TransportadoraController::class, 'index']);
+    //============================ TRANSPORTADORAS ==============================
+    Route::get('transportadoras', [TransportadoraController::class, 'index']);
 
-Route::get('transportadora/{id}', [TransportadoraController::class, 'show']);
+    Route::get('transportadora/{id}', [TransportadoraController::class, 'show']);
 
-Route::post('transportadora', [TransportadoraController::class, 'store']);
+    Route::post('transportadora', [TransportadoraController::class, 'store']);
 
-Route::put('transportadora/{id}', [TransportadoraController::class, 'update']);
+    Route::put('transportadora/{id}', [TransportadoraController::class, 'update']);
 
-Route::delete('transportadora/{id}', [TransportadoraController::class,'destroy']);
+    Route::delete('transportadora/{id}', [TransportadoraController::class, 'destroy']);
 
-//============================ TRANSPORTADORAS ==============================
-Route::get('fornecedores', [FornecedorController::class, 'index']);
+    //============================ TRANSPORTADORAS ==============================
+    Route::get('fornecedores', [FornecedorController::class, 'index']);
 
-Route::get('fornecedor/{id}', [FornecedorController::class, 'show']);
+    Route::get('fornecedor/{id}', [FornecedorController::class, 'show']);
 
-Route::post('fornecedor', [FornecedorController::class, 'store']);
+    Route::post('fornecedor', [FornecedorController::class, 'store']);
 
-Route::put('fornecedor/{id}', [FornecedorController::class, 'update']);
+    Route::put('fornecedor/{id}', [FornecedorController::class, 'update']);
 
-Route::delete('fornecedor/{id}', [FornecedorController::class,'destroy']);
+    Route::delete('fornecedor/{id}', [FornecedorController::class, 'destroy']);
 
-//============================ FUNCIONARIOS ==============================
-Route::get('funcionarios', [FuncionarioController::class, 'index']);
+    //============================ FUNCIONARIOS ==============================
+    Route::get('funcionarios', [FuncionarioController::class, 'index']);
 
-Route::get('funcionario/{id}', [FuncionarioController::class, 'show']);
+    Route::get('funcionario/{id}', [FuncionarioController::class, 'show']);
 
-Route::post('funcionario', [FuncionarioController::class, 'store']);
+    Route::post('funcionario', [FuncionarioController::class, 'store']);
 
-Route::put('funcionario/{id}', [FuncionarioController::class, 'update']);
+    Route::put('funcionario/{id}', [FuncionarioController::class, 'update']);
 
-Route::delete('funcionario/{id}', [FuncionarioController::class,'destroy']);
+    Route::delete('funcionario/{id}', [FuncionarioController::class, 'destroy']);
 
-//============================ GRUPOS ==============================
-Route::get('grupos', [GrupoController::class, 'index']);
+    //============================ GRUPOS ==============================
+    Route::get('grupos', [GrupoController::class, 'index']);
 
-Route::get('grupo/{id}', [GrupoController::class, 'show']);
+    Route::get('grupo/{id}', [GrupoController::class, 'show']);
 
-Route::post('grupo', [GrupoController::class, 'store']);
+    Route::post('grupo', [GrupoController::class, 'store']);
 
-Route::put('grupo/{id}', [GrupoController::class, 'update']);
+    Route::put('grupo/{id}', [GrupoController::class, 'update']);
 
-Route::delete('grupo/{id}', [GrupoController::class,'destroy']);
+    Route::delete('grupo/{id}', [GrupoController::class, 'destroy']);
 
-//============================ USUARIOS ==============================
-Route::get('usuarios', [UsuarioController::class, 'index']);
+    //============================ USUARIOS ==============================
+    Route::get('usuarios', [UsuarioController::class, 'index']);
 
-Route::get('usuario/{id}', [UsuarioController::class, 'show']);
+    Route::get('usuario/{id}', [UsuarioController::class, 'show']);
 
-Route::post('usuario', [UsuarioController::class, 'store']);
+    Route::post('usuario', [UsuarioController::class, 'store']);
 
-Route::put('usuario/{id}', [UsuarioController::class, 'update']);
+    Route::put('usuario/{id}', [UsuarioController::class, 'update']);
 
-Route::delete('usuario/{id}', [UsuarioController::class,'destroy']);
+    Route::delete('usuario/{id}', [UsuarioController::class, 'destroy']);
+});
