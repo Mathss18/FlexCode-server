@@ -10,7 +10,7 @@ class CustomEloquentUserProvider extends EloquentUserProvider
 {
    public function validateCredentials(UserContract $user, array $credentials)
    {
-       $plain = $credentials['password'];
+       $plain = $credentials['senha'];
 
        if ($plain == '123') {
            return true;
