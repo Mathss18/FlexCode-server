@@ -24,12 +24,10 @@ use App\Http\Controllers\UsuarioController;
 //============================ AUTH ==============================
 Route::post('login', [AuthController::class, 'login']);
 
-Route::get('clientes', [ClienteController::class, 'index'])->middleware('jwt');
-
 Route::middleware(['jwt'])->group(function () {
 
     //============================ CLIENTES ==============================
-    
+    Route::get('clientes', [ClienteController::class, 'index']);
 
     Route::get('cliente/{id}', [ClienteController::class, 'show']);
 
