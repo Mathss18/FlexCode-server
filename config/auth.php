@@ -73,7 +73,7 @@ return [
 
         'jwtauth' => [
             'driver' => 'jwtauth',
-            'model' => App\User::class,
+            'model' => App\Models\User::class,
         ]
 
         // 'users' => [
