@@ -10,7 +10,7 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $credentials = $request->only(['email', 'password']);
+        $credentials = $request->only(['email', 'senha']);
         $resp = auth('api')->attempt($credentials);
         //dd($resp);
 
