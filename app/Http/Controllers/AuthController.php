@@ -12,7 +12,7 @@ class AuthController extends Controller
     {
         $credentials = $request->only(['email', 'password']);
         $resp = auth('api')->attempt($credentials);
-        dd($resp);
+        //dd($resp);
 
         if (!$token = auth('api')->attempt($credentials)) {
             return response()->json(['error' => 'Unauthorized'], 401);
