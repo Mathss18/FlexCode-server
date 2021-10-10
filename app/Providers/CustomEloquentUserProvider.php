@@ -14,7 +14,7 @@ class CustomEloquentUserProvider extends EloquentUserProvider
         $email = $credentials['email'];
         $senha = $credentials['senha'];
 
-        $usuario = Usuario::where('email', $email)->where('senha', $senha)->where('situacao', 1)->firstOrFail();
+        $usuario = Usuario::where('email', $email)->where('senha', $senha)->where('situacao', 1)->first();
 
        if ($usuario) {
            return true;
