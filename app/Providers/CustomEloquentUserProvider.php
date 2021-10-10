@@ -5,14 +5,18 @@ namespace App\Providers;
 use Illuminate\Auth\EloquentUserProvider;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Auth\Authenticatable as UserContract;
+use App\Models\Usuario;
 
 class CustomEloquentUserProvider extends EloquentUserProvider
 {
    public function validateCredentials(UserContract $user, array $credentials)
    {
-       $plain = $credentials['senha'];
+        $email = $credentials['email'];
+        $senha = $credentials['senha'];
 
-       if ($plain == '123') {
+        $usuario = Usuario::where('email', $email)->where('senha', $senha)->where('situacao', 1)->firstOrFail();
+
+       if ($usuario) {
            return true;
        } else {
            return false;
