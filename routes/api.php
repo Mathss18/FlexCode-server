@@ -27,7 +27,7 @@ Route::post('login', [AuthController::class, 'login']);
 Route::middleware(['jwt'])->group(function () {
 
     //============================ CLIENTES ==============================
-    Route::get('clientes', [ClienteController::class, 'index']);
+    Route::get('clientes', [ClienteController::class, 'index'])->middleware('jwt');
 
     Route::get('cliente/{id}', [ClienteController::class, 'show']);
 
