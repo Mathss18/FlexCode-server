@@ -22,6 +22,7 @@ class ApiJwtRoutes extends BaseMiddleware
     {
         try {
             $user = JWTAuth::parseToken()->authenticate();
+            dd($user);
         } catch (Exception $exception) {
             if ($exception instanceof TokenInvalidException){
                 return response()->json(['status' => 'Token is Invalid']);
