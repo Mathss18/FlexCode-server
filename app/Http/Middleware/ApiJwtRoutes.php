@@ -20,6 +20,7 @@ class ApiJwtRoutes extends BaseMiddleware
      */
     public function handle($request, Closure $next)
     {
+        dd($request);
         try {
             $user = JWTAuth::parseToken()->authenticate();
         } catch (Exception $exception) {
