@@ -14,6 +14,7 @@ class Cliente extends JsonResource
      */
     public function toArray($request)
     {
+        dd($request);
         return parent::toArray($request);
     }
 }
