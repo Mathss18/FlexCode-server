@@ -23,12 +23,12 @@ class ApiJwtRoutes extends BaseMiddleware
         try {
             $user = JWTAuth::parseToken()->authenticate();
         } catch (Exception $exception) {
-            if ($exception instanceof TokenInvalidException){
-                return response(401)->json(['status' => 'Token is Invalid']);
-            }else if ($exception instanceof TokenExpiredException){
-                return response(401)->json(['status' => 'Token is Expired']);
-            }else{
-                return response(401)->json(['status' => 'Authorization Token not found']);
+            if ($exception instanceof TokenInvalidException) {
+                return response()->json(['status' => 'Token is Invalid'], 401);
+            } else if ($exception instanceof TokenExpiredException) {
+                return response()->json(['status' => 'Token is Expired'], 401);
+            } else {
+                return response()->json(['status' => 'Authorization Token not found'], 401);
             }
         }
         return $next($request);
