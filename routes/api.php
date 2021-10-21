@@ -7,6 +7,7 @@ use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\FornecedorController;
 use App\Http\Controllers\FuncionarioController;
 use App\Http\Controllers\GrupoController;
+use App\Http\Controllers\GrupoProdutoController;
 use App\Http\Controllers\TransportadoraController;
 use App\Http\Controllers\UsuarioController;
 
@@ -93,13 +94,13 @@ Route::middleware(['jwt'])->group(function () {
     Route::delete('usuario/{id}', [UsuarioController::class, 'destroy']);
 
     //============================ GRUPOS PRODUTOS ==============================
-    Route::get('grupos-produtos', [UsuarioController::class, 'index']);
+    Route::get('grupos-produtos', [GrupoProdutoController::class, 'index']);
 
-    Route::get('grupo-produto/{id}', [UsuarioController::class, 'show']);
+    Route::get('grupo-produto/{id}', [GrupoProdutoController::class, 'show']);
 
-    Route::post('grupo-produto', [UsuarioController::class, 'store']);
+    Route::post('grupo-produto', [GrupoProdutoController::class, 'store']);
 
-    Route::put('grupo-produto/{id}', [UsuarioController::class, 'update']);
+    Route::put('grupo-produto/{id}', [GrupoProdutoController::class, 'update']);
 
-    Route::delete('grupo-produto/{id}', [UsuarioController::class, 'destroy']);
+    Route::delete('grupo-produto/{id}', [GrupoProdutoController::class, 'destroy']);
 });
