@@ -91,4 +91,15 @@ Route::middleware(['jwt'])->group(function () {
     Route::put('usuario/{id}', [UsuarioController::class, 'update']);
 
     Route::delete('usuario/{id}', [UsuarioController::class, 'destroy']);
+
+    //============================ GRUPOS PRODUTOS ==============================
+    Route::get('grupos-produtos', [UsuarioController::class, 'index']);
+
+    Route::get('grupo-produto/{id}', [UsuarioController::class, 'show']);
+
+    Route::post('grupo-produto', [UsuarioController::class, 'store']);
+
+    Route::put('grupo-produto/{id}', [UsuarioController::class, 'update']);
+
+    Route::delete('grupo-produto/{id}', [UsuarioController::class, 'destroy']);
 });
