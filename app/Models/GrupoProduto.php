@@ -7,5 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class GrupoProduto extends Model
 {
+    private $table = 'grupos_produtos';
     use HasFactory;
 }
