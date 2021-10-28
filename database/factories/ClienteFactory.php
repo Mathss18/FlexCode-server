@@ -35,7 +35,7 @@ class ClienteFactory extends Factory
                 break;
         }
         return [
-            'tipoCliente' => $this->faker->randomElement(['pf', 'pj']),
+            'tipoCliente' => $tipoCliente,
             'situacao' => $this->faker->randomElement([1, 0]),
             'tipoContribuinte' => $this->faker->randomElement([1, 2, 9]),
             'inscricaoEstadual' => $this->faker->numerify('############'),
