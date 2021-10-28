@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\Usuario;
 use Illuminate\Database\Seeder;
-use Database\Factories\UsuarioFactory;
 
 class DatabaseSeeder extends Seeder
 {
@@ -14,6 +14,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        UsuarioFactory::factory(1)->create();
+        Usuario::factory(1)->create();
     }
 }
