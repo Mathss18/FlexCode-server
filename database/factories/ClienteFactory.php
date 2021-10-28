@@ -52,10 +52,6 @@ class ClienteFactory extends Factory
             'telefone' => $this->faker->numerify('##########'),
             'celular' => $this->faker->numerify('###########'),
             'codigoMunicipio' =>$this->faker->numerify('#######'),
-
-
-
-            'remember_token' => Str::random(10),
         ];
     }
 }
