@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateGruposProdutosTable extends Migration
+class CreateUnidadesProdutosTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,11 @@ class CreateGruposProdutosTable extends Migration
      */
     public function up()
     {
-        Schema::create('grupos_produtos', function (Blueprint $table) {
+        Schema::create('unidades_produtos', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('nome');
-            $table->integer('grupoPai')->nullable();
+            $table->string('sigla');
+            $table->boolean('padrao');
             $table->timestamps();
         });
     }
@@ -28,6 +29,6 @@ class CreateGruposProdutosTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('grupos_produtos');
+        Schema::dropIfExists('unidades_produtos');
     }
 }

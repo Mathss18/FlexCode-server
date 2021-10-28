@@ -1,0 +1,5 @@
+- Criar Migration:
+- Criar Model
+- Criar Resource
+- Criar Controller
+- Criar Rotas

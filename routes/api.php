@@ -8,7 +8,10 @@ use App\Http\Controllers\FornecedorController;
 use App\Http\Controllers\FuncionarioController;
 use App\Http\Controllers\GrupoController;
 use App\Http\Controllers\GrupoProdutoController;
+use App\Http\Controllers\NomeVariacaoProdutoController;
+use App\Http\Controllers\TipoVariacaoProdutoController;
 use App\Http\Controllers\TransportadoraController;
+use App\Http\Controllers\UnidadeProdutoController;
 use App\Http\Controllers\UsuarioController;
 
 /*
@@ -103,4 +106,37 @@ Route::middleware(['jwt'])->group(function () {
     Route::put('grupo-produto/{id}', [GrupoProdutoController::class, 'update']);
 
     Route::delete('grupo-produto/{id}', [GrupoProdutoController::class, 'destroy']);
+
+    //============================ UNIDADES PRODUTOS ==============================
+    Route::get('unidades-produtos', [UnidadeProdutoController::class, 'index']);
+
+    Route::get('unidade-produto/{id}', [UnidadeProdutoController::class, 'show']);
+
+    Route::post('unidade-produto', [UnidadeProdutoController::class, 'store']);
+
+    Route::put('unidade-produto/{id}', [UnidadeProdutoController::class, 'update']);
+
+    Route::delete('unidade-produto/{id}', [UnidadeProdutoController::class, 'destroy']);
+
+    //============================ TIPOS VARIACOES PRODUTOS ==============================
+    Route::get('tipos-variacoes-produtos', [TipoVariacaoProdutoController::class, 'index']);
+
+    Route::get('tipo-variacao-produto/{id}', [TipoVariacaoProdutoController::class, 'show']);
+
+    Route::post('tipo-variacao-produto', [TipoVariacaoProdutoController::class, 'store']);
+
+    Route::put('tipo-variacao-produto/{id}', [TipoVariacaoProdutoController::class, 'update']);
+
+    Route::delete('tipo-variacao-produto/{id}', [TipoVariacaoProdutoController::class, 'destroy']);
+
+    //============================ NOMES VARIACOES PRODUTOS ==============================
+    Route::get('nomes-variacoes-produtos', [NomeVariacaoProdutoController::class, 'index']);
+
+    Route::get('nome-variacao-produto/{id}', [NomeVariacaoProdutoController::class, 'show']);
+
+    Route::post('nome-variacao-produto', [NomeVariacaoProdutoController::class, 'store']);
+
+    Route::put('nome-variacao-produto/{id}', [NomeVariacaoProdutoController::class, 'update']);
+
+    Route::delete('nome-variacao-produto/{id}', [NomeVariacaoProdutoController::class, 'destroy']);
 });
