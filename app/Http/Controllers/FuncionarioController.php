@@ -16,7 +16,7 @@ class FuncionarioController extends Controller
     {
         //$funcionarios = Funcionario::paginate(15);
         //$funcionarios = Funcionario::all();
-        $funcionarios = Funcionario::with('grupo')->get();
+        $funcionarios = Funcionario::with(['grupo', 'usuario'])->get();
 
         return FuncionarioResource::collection($funcionarios);
     }
