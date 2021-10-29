@@ -107,7 +107,7 @@ class FuncionarioController extends Controller
         $funcionario->grupo_id = $request->input('grupo_id');
 
         $usuario = Usuario::find($request->usuario_id);
-        file_put_contents("teste.txt",$request->input('usuarioAccess'));
+
         //Verifica se o usuario tem acesseo, então remove seu acesso
         if ($request->input('usuarioAccess') == 0) {
             $usuario->situacao = 0;
@@ -124,7 +124,7 @@ class FuncionarioController extends Controller
             } else {
                 //Se sim, atualiza o usuario existente
                 $usuario->email = $request->input('email');
-                $usuario->senha = $request->input('senha');
+                $usuario->senha = $request->input('senha') ?? $usuario->senha;
             }
         }
 
