@@ -109,9 +109,10 @@ class FuncionarioController extends Controller
         $usuario = Usuario::find($request->usuario_id);
 
         //Verifica se o usuario tem acesseo, então remove seu acesso
-        if ($request->input('usuarioAccess') == 0) {
+        if ($request->input('situacao') == 0) {
             $usuario->situacao = 0;
-        } else {
+        }
+        else {
             $usuario->situacao = 1;
             //Verifica se o funcionario tem um usuraio no sistema
             if (!$usuario) {
@@ -124,9 +125,7 @@ class FuncionarioController extends Controller
             } else {
                 //Se sim, atualiza o usuario existente
                 $usuario->email = $request->input('email');
-                print_r($request->input('senha'));
-                die();
-                $usuario->senha = $request->input('senha') != null ? $request->input('senha') : $usuario->senha;
+                $usuario->senha = $request->input('senha') ?? $usuario->senha;
             }
         }
 
