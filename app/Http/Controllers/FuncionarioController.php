@@ -108,8 +108,6 @@ class FuncionarioController extends Controller
 
         $usuario = Usuario::find($request->usuario_id);
 
-        dd($usuario);
-
         // Verifica se o usuario tem acesso, se sim, atualiza os dados de acesso do usuario
         $usuario->situacao = $request->input('situacao') == 0 ? 0 : 1;
 
