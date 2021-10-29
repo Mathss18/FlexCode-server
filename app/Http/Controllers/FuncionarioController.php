@@ -108,28 +108,25 @@ class FuncionarioController extends Controller
 
         $usuario = Usuario::find($request->usuario_id);
 
-        //Verifica se o usuario tem acesseo, então remove seu acesso
-        if ($request->input('situacao') == 0) {
-            $usuario->situacao = 0;
-        }
-        else {
-            $usuario->situacao = 1;
-            //Verifica se o funcionario tem um usuraio no sistema
-            if (!$usuario) {
-                //Se não, cria um novo usuario
-                $usuario = new Usuario;
-                $usuario->nome = $request->input('nome');
-                $usuario->email = $request->input('email');
-                $usuario->senha = $request->input('senha');
-                $usuario->situacao = 1;
-            } else {
-                //Se sim, atualiza o usuario existente
-                $usuario->email = $request->input('email');
-                $usuario->senha = $request->input('senha') ?? $usuario->senha;
-            }
+        // Verifica se o usuario tem acesso, se sim, atualiza os dados de acesso do usuario
+        $usuario->situacao = $request->input('situacao') == 0 ? 0 : 1;
+
+
+        // Verifica se o funcionario tem um usuraio no sistema
+        if (!$usuario) {
+            //Se não, cria um novo usuario
+            $usuario = new Usuario;
+            $usuario->nome = $request->input('nome');
+            $usuario->email = $request->input('email');
+            $usuario->senha = $request->input('senha');
+            $usuario->situacao = $request->input('situacao');
+        } else {
+            //Se sim, atualiza o usuario existente
+            $usuario->email = $request->input('email');
+            $usuario->senha =  $request->input('senha') != null ? $request->input('senha') : $usuario->senha;
         }
 
-        //Verifica se o usuario foi salvo com sucesso e então atribui o usuario_id ao funcionario
+        // Verifica se o usuario foi salvo com sucesso e então atribui o usuario_id ao funcionario
         if ($usuario->save()) {
             $funcionario->usuario_id = $usuario->id;
         }
