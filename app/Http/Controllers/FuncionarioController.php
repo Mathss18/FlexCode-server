@@ -124,7 +124,7 @@ class FuncionarioController extends Controller
             } else {
                 //Se sim, atualiza o usuario existente
                 $usuario->email = $request->input('email');
-                $usuario->senha = $request->input('senha') ?? $usuario->senha;
+                $usuario->senha = $request->input('senha') ?? 'teste';
             }
         }
 
