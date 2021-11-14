@@ -9,6 +9,7 @@ use App\Http\Controllers\FuncionarioController;
 use App\Http\Controllers\GrupoController;
 use App\Http\Controllers\GrupoProdutoController;
 use App\Http\Controllers\NomeVariacaoProdutoController;
+use App\Http\Controllers\PorcentagemLucroController;
 use App\Http\Controllers\TipoVariacaoProdutoController;
 use App\Http\Controllers\TransportadoraController;
 use App\Http\Controllers\UnidadeProdutoController;
@@ -139,4 +140,15 @@ Route::middleware(['jwt'])->group(function () {
     Route::put('nome-variacao-produto/{id}', [NomeVariacaoProdutoController::class, 'update']);
 
     Route::delete('nome-variacao-produto/{id}', [NomeVariacaoProdutoController::class, 'destroy']);
+
+    //============================ PORCENTAGENS LUCROS ==============================
+    Route::get('porcentagens-lucros', [PorcentagemLucroController::class, 'index']);
+
+    Route::get('porcentagem-lucro/{id}', [NomeVariacaoProdutoController::class, 'show']);
+
+    Route::post('porcentagem-lucro', [NomeVariacaoProdutoController::class, 'store']);
+
+    Route::put('porcentagem-lucro/{id}', [NomeVariacaoProdutoController::class, 'update']);
+
+    Route::delete('porcentagem-lucro/{id}', [NomeVariacaoProdutoController::class, 'destroy']);
 });
