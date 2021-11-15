@@ -93,7 +93,7 @@ class ProdutoController extends Controller
         $produto->valorPixoPis = $request->input('valorPixoPis');
         $produto->valorFixoPisSt = $request->input('valorFixoPisSt');
         $produto->valorFixoCofins = $request->input('valorFixoCofins');
-        $produto->nomvalorFixoCofinsSte = $request->input('nomvalorFixoCofinsSte');
+        $produto->valorFixoCofinsSte = $request->input('valorFixoCofinsSte');
 
         if ($produto->save()) {
             return new Json($produto);
