@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\Usuario as UsuarioResource;
+use App\Http\Resources\Json;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
 
@@ -12,13 +12,13 @@ class UsuarioController extends Controller
     {
         //$usuarios = Usuario::paginate(15);
         $usuarios = Usuario::all();
-        return UsuarioResource::collection($usuarios);
+        return Json::collection($usuarios);
     }
 
     public function show($id)
     {
         $usuario = Usuario::findOrFail($id);
-        return new UsuarioResource($usuario);
+        return new Json($usuario);
     }
 
     public function store(Request $request)
@@ -29,7 +29,7 @@ class UsuarioController extends Controller
         $usuario->senha = $request->input('senha');
 
         if ($usuario->save()) {
-            return new UsuarioResource($usuario);
+            return new Json($usuario);
         }
     }
 
@@ -41,7 +41,7 @@ class UsuarioController extends Controller
         $usuario->senha = $request->input('senha');
 
         if ($usuario->save()) {
-            return new UsuarioResource($usuario);
+            return new Json($usuario);
         }
     }
 
@@ -49,7 +49,7 @@ class UsuarioController extends Controller
     {
         $usuario = Usuario::findOrFail($id);
         if ($usuario->delete()) {
-            return new UsuarioResource($usuario);
+            return new Json($usuario);
         }
     }
 }

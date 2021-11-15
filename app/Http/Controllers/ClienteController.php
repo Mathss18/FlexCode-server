@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Cliente as Cliente;
-use App\Http\Resources\Cliente as ClienteResource;
+use App\Models\Cliente;
+use App\Http\Resources\Json;
 
 class ClienteController extends Controller
 {
@@ -12,13 +12,13 @@ class ClienteController extends Controller
     {
         //$clientes = Cliente::paginate(15);
         $clientes = Cliente::all();
-        return ClienteResource::collection($clientes);
+        return Json::collection($clientes);
     }
 
     public function show($id)
     {
         $cliente = Cliente::findOrFail($id);
-        return new ClienteResource($cliente);
+        return new Json($cliente);
     }
 
     public function store(Request $request)
@@ -43,7 +43,7 @@ class ClienteController extends Controller
         $cliente->codigoMunicipio = $request->input('codigoMunicipio');
 
         if ($cliente->save()) {
-            return new ClienteResource($cliente);
+            return new Json($cliente);
         }
     }
 
@@ -69,7 +69,7 @@ class ClienteController extends Controller
         $cliente->codigoMunicipio = $request->input('codigoMunicipio');
 
         if ($cliente->save()) {
-            return new ClienteResource($cliente);
+            return new Json($cliente);
         }
     }
 
@@ -77,7 +77,7 @@ class ClienteController extends Controller
     {
         $cliente = Cliente::findOrFail($id);
         if ($cliente->delete()) {
-            return new ClienteResource($cliente);
+            return new Json($cliente);
         }
     }
 }

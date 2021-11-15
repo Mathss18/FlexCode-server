@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\TipoVariacaoProduto as TipoVariacaoProdutoResource;
+use App\Http\Resources\Json;
 use App\Models\TipoVariacaoProduto;
 use Illuminate\Http\Request;
 
@@ -12,13 +12,13 @@ class TipoVariacaoProdutoController extends Controller
     {
         //$tiposVariacoesProdutos = tipoVariacaoProduto::paginate(15);
         $tiposVariacoesProdutos = TipoVariacaoProduto::all();
-        return TipoVariacaoProdutoResource::collection($tiposVariacoesProdutos);
+        return Json::collection($tiposVariacoesProdutos);
     }
 
     public function show($id)
     {
         $tipoVariacaoProduto = TipoVariacaoProduto::findOrFail($id);
-        return new TipoVariacaoProdutoResource($tipoVariacaoProduto);
+        return new Json($tipoVariacaoProduto);
     }
 
     public function store(Request $request)
@@ -27,7 +27,7 @@ class TipoVariacaoProdutoController extends Controller
         $tipoVariacaoProduto->nome = $request->input('nome');
 
         if ($tipoVariacaoProduto->save()) {
-            return new TipoVariacaoProdutoResource($tipoVariacaoProduto);
+            return new Json($tipoVariacaoProduto);
         }
     }
 
@@ -37,7 +37,7 @@ class TipoVariacaoProdutoController extends Controller
         $tipoVariacaoProduto->nome = $request->input('nome');
 
         if ($tipoVariacaoProduto->save()) {
-            return new TipoVariacaoProdutoResource($tipoVariacaoProduto);
+            return new Json($tipoVariacaoProduto);
         }
     }
 
@@ -45,7 +45,7 @@ class TipoVariacaoProdutoController extends Controller
     {
         $tipoVariacaoProduto = TipoVariacaoProduto::findOrFail($id);
         if ($tipoVariacaoProduto->delete()) {
-            return new TipoVariacaoProdutoResource($tipoVariacaoProduto);
+            return new Json($tipoVariacaoProduto);
         }
     }
 }

@@ -2,8 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\Funcionario as FuncionarioResource;
-use App\Http\Resources\Usuario as UsuarioResource;
+use App\Http\Resources\Json;
 use App\Models\Funcionario;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
@@ -18,14 +17,14 @@ class FuncionarioController extends Controller
         //$funcionarios = Funcionario::all();
         $funcionarios = Funcionario::with(['grupo', 'usuario'])->get();
 
-        return FuncionarioResource::collection($funcionarios);
+        return Json::collection($funcionarios);
     }
 
     public function show($id)
     {
         $funcionario = Funcionario::where('id', $id)->with(['grupo', 'usuario'])->first();
 
-        return new FuncionarioResource($funcionario);
+        return new Json($funcionario);
     }
 
     public function store(Request $request)
@@ -80,7 +79,7 @@ class FuncionarioController extends Controller
         }
 
         if ($funcionario->save()) {
-            return new FuncionarioResource($funcionario);
+            return new Json($funcionario);
         }
     }
 
@@ -146,7 +145,7 @@ class FuncionarioController extends Controller
         }
 
         if ($funcionario->save()) {
-            return new FuncionarioResource($funcionario);
+            return new Json($funcionario);
         }
     }
 
@@ -154,7 +153,7 @@ class FuncionarioController extends Controller
     {
         $funcionario = Funcionario::findOrFail($id);
         if ($funcionario->delete()) {
-            return new FuncionarioResource($funcionario);
+            return new Json($funcionario);
         }
     }
 

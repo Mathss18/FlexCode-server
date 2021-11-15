@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\GrupoProduto as GrupoProdutoResource;
+use App\Http\Resources\Json;
 use App\Models\GrupoProduto;
 use Illuminate\Http\Request;
 
@@ -12,13 +12,13 @@ class GrupoProdutoController extends Controller
     {
         //$grupoProduto = grupoProduto::paginate(15);
         $grupoProduto = GrupoProduto::all();
-        return GrupoProdutoResource::collection($grupoProduto);
+        return Json::collection($grupoProduto);
     }
 
     public function show($id)
     {
         $grupoProduto = GrupoProduto::findOrFail($id);
-        return new GrupoProdutoResource($grupoProduto);
+        return new Json($grupoProduto);
     }
 
     public function store(Request $request)
@@ -28,7 +28,7 @@ class GrupoProdutoController extends Controller
         $grupoProduto->grupoPai = $request->input('grupoPai');
 
         if ($grupoProduto->save()) {
-            return new GrupoProdutoResource($grupoProduto);
+            return new Json($grupoProduto);
         }
     }
 
@@ -39,7 +39,7 @@ class GrupoProdutoController extends Controller
         $grupoProduto->grupoPai = $request->input('grupoPai');
 
         if ($grupoProduto->save()) {
-            return new GrupoProdutoResource($grupoProduto);
+            return new Json($grupoProduto);
         }
     }
 
@@ -47,7 +47,7 @@ class GrupoProdutoController extends Controller
     {
         $grupoProduto = GrupoProduto::findOrFail($id);
         if ($grupoProduto->delete()) {
-            return new GrupoProdutoResource($grupoProduto);
+            return new Json($grupoProduto);
         }
     }
 }

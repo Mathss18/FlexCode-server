@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Transportadora as Transportadora;
-use App\Http\Resources\Transportadora as TransportadoraResource;
+use App\Models\Transportadora;
+use App\Http\Resources\Json;
 
 class TransportadoraController extends Controller
 {
@@ -12,13 +12,13 @@ class TransportadoraController extends Controller
     {
         //$transportadoras = Transportadora::paginate(15);
         $transportadoras = Transportadora::all();
-        return TransportadoraResource::collection($transportadoras);
+        return Json::collection($transportadoras);
     }
 
     public function show($id)
     {
         $transportadora = Transportadora::findOrFail($id);
-        return new TransportadoraResource($transportadora);
+        return new Json($transportadora);
     }
 
     public function store(Request $request)
@@ -43,7 +43,7 @@ class TransportadoraController extends Controller
         $transportadora->codigoMunicipio = $request->input('codigoMunicipio');
 
         if ($transportadora->save()) {
-            return new TransportadoraResource($transportadora);
+            return new Json($transportadora);
         }
     }
 
@@ -69,7 +69,7 @@ class TransportadoraController extends Controller
         $transportadora->codigoMunicipio = $request->input('codigoMunicipio');
 
         if ($transportadora->save()) {
-            return new TransportadoraResource($transportadora);
+            return new Json($transportadora);
         }
     }
 
@@ -77,7 +77,7 @@ class TransportadoraController extends Controller
     {
         $transportadora = Transportadora::findOrFail($id);
         if ($transportadora->delete()) {
-            return new TransportadoraResource($transportadora);
+            return new Json($transportadora);
         }
     }
 }

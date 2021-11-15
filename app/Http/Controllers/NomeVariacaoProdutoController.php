@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\NomeVariacaoProduto as NomeVariacaoProdutoResource;
+use App\Http\Resources\Json;
 use App\Models\NomeVariacaoProduto;
 use Illuminate\Http\Request;
 
@@ -13,13 +13,13 @@ class NomeVariacaoProdutoController extends Controller
         // $nomesVariacoesProdutos = NomeVariacaoProduto::paginate(15);
         // $nomesVariacoesProdutos = NomeVariacaoProduto::all();
         $nomesVariacoesProdutos = NomeVariacaoProduto::with('tipo_variacao_produto')->get();
-        return NomeVariacaoProdutoResource::collection($nomesVariacoesProdutos);
+        return Json::collection($nomesVariacoesProdutos);
     }
 
     public function show($id)
     {
         $nomeVariacaoProduto = NomeVariacaoProduto::where('id', $id)->with('tipo_variacao_produto')->first();
-        return new NomeVariacaoProdutoResource($nomeVariacaoProduto);
+        return new Json($nomeVariacaoProduto);
     }
 
     public function store(Request $request)
@@ -29,7 +29,7 @@ class NomeVariacaoProdutoController extends Controller
         $nomeVariacaoProduto->tipo_variacao_produto_id = $request->input('tipo_variacao_produto_id');
 
         if ($nomeVariacaoProduto->save()) {
-            return new NomeVariacaoProdutoResource($nomeVariacaoProduto);
+            return new Json($nomeVariacaoProduto);
         }
     }
 
@@ -40,7 +40,7 @@ class NomeVariacaoProdutoController extends Controller
         $nomeVariacaoProduto->tipo_variacao_produto_id = $request->input('tipo_variacao_produto_id');
 
         if ($nomeVariacaoProduto->save()) {
-            return new NomeVariacaoProdutoResource($nomeVariacaoProduto);
+            return new Json($nomeVariacaoProduto);
         }
     }
 
@@ -48,7 +48,7 @@ class NomeVariacaoProdutoController extends Controller
     {
         $nomeVariacaoProduto = NomeVariacaoProduto::findOrFail($id);
         if ($nomeVariacaoProduto->delete()) {
-            return new NomeVariacaoProdutoResource($nomeVariacaoProduto);
+            return new Json($nomeVariacaoProduto);
         }
     }
 }

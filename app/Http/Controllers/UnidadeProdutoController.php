@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\UnidadeProduto as UnidadeProdutoResource;
+use App\Http\Resources\Json;
 use App\Models\UnidadeProduto;
 use Illuminate\Http\Request;
 
@@ -12,13 +12,13 @@ class UnidadeProdutoController extends Controller
     {
         //$unidadesProdutos = unidadeProduto::paginate(15);
         $unidadesProdutos = UnidadeProduto::all();
-        return UnidadeProdutoResource::collection($unidadesProdutos);
+        return Json::collection($unidadesProdutos);
     }
 
     public function show($id)
     {
         $unidadeProduto = UnidadeProduto::findOrFail($id);
-        return new UnidadeProdutoResource($unidadeProduto);
+        return new Json($unidadeProduto);
     }
 
     public function store(Request $request)
@@ -29,7 +29,7 @@ class UnidadeProdutoController extends Controller
         $unidadeProduto->padrao = $request->input('padrao');
 
         if ($unidadeProduto->save()) {
-            return new UnidadeProdutoResource($unidadeProduto);
+            return new Json($unidadeProduto);
         }
     }
 
@@ -41,7 +41,7 @@ class UnidadeProdutoController extends Controller
         $unidadeProduto->padrao = $request->input('padrao');
 
         if ($unidadeProduto->save()) {
-            return new UnidadeProdutoResource($unidadeProduto);
+            return new Json($unidadeProduto);
         }
     }
 
@@ -49,7 +49,7 @@ class UnidadeProdutoController extends Controller
     {
         $unidadeProduto = UnidadeProduto::findOrFail($id);
         if ($unidadeProduto->delete()) {
-            return new UnidadeProdutoResource($unidadeProduto);
+            return new Json($unidadeProduto);
         }
     }
 }

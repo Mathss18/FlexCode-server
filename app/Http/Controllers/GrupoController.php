@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\Grupo as GrupoResource;
+use App\Http\Resources\Json;
 use App\Models\Grupo;
 use Illuminate\Http\Request;
 
@@ -12,13 +12,13 @@ class GrupoController extends Controller
     {
         //$grupos = Grupo::paginate(15);
         $grupos = Grupo::all();
-        return GrupoResource::collection($grupos);
+        return Json::collection($grupos);
     }
 
     public function show($id)
     {
         $grupo = Grupo::findOrFail($id);
-        return new GrupoResource($grupo);
+        return new Json($grupo);
     }
 
     public function store(Request $request)
@@ -45,7 +45,7 @@ class GrupoController extends Controller
 
 
         if ($grupo->save()) {
-            return new GrupoResource($grupo);
+            return new Json($grupo);
         }
     }
 
@@ -72,7 +72,7 @@ class GrupoController extends Controller
         $grupo->nome = $request->input('usuarios');
 
         if ($grupo->save()) {
-            return new GrupoResource($grupo);
+            return new Json($grupo);
         }
     }
 
@@ -80,7 +80,7 @@ class GrupoController extends Controller
     {
         $grupo = Grupo::findOrFail($id);
         if ($grupo->delete()) {
-            return new GrupoResource($grupo);
+            return new Json($grupo);
         }
     }
 }

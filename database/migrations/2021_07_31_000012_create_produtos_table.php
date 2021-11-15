@@ -27,6 +27,24 @@ class CreateProdutosTable extends Migration
             $table->double('comprimento', 8, 4);
             $table->double('comissao', 8, 2);
             $table->string('descricao');
+            $table->double('valor_custo', 8, 2);
+            $table->double('despesasAdicionais', 8, 2);
+            $table->double('outras_despesas', 8, 2);
+            $table->double('custoFinal', 8, 2);
+            $table->double('estoqueMinimo', 8, 4);
+            $table->double('estoqueMaximo', 8, 4);
+            $table->double('quantidadeAtual', 8, 4);
+            $table->string('ncm');
+            $table->string('cest');
+            $table->string('origem');
+            $table->double('pesoLiquido', 8, 4);
+            $table->double('pesoBruto', 8, 4);
+            $table->double('numeroFci', 8, 4);
+            $table->double('valorAproxTribut', 8, 4);
+            $table->double('valorPixoPis', 8, 4);
+            $table->double('valorFixoPisSt', 8, 4);
+            $table->double('valorFixoCofins', 8, 4);
+            $table->double('valorFixoCofinsSt', 8, 4);
 
             $table->timestamps();
         });
@@ -39,6 +57,6 @@ class CreateProdutosTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('nomes_variacoes_produtos');
+        Schema::dropIfExists('produtos');
     }
 }

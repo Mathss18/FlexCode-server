@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\Fornecedor as FornecedorResource;
-use App\Models\Fornecedor as Fornecedor;
+use App\Http\Resources\Json;
+use App\Models\Fornecedor;
 use Illuminate\Http\Request;
 
 class FornecedorController extends Controller
@@ -12,13 +12,13 @@ class FornecedorController extends Controller
     {
         //$fornecedores = Fornecedor::paginate(15);
         $fornecedores = Fornecedor::all();
-        return FornecedorResource::collection($fornecedores);
+        return Json::collection($fornecedores);
     }
 
     public function show($id)
     {
         $fornecedor = Fornecedor::findOrFail($id);
-        return new FornecedorResource($fornecedor);
+        return new Json($fornecedor);
     }
 
     public function store(Request $request)
@@ -43,14 +43,14 @@ class FornecedorController extends Controller
         $fornecedor->codigoMunicipio = $request->input('codigoMunicipio');
 
         if ($fornecedor->save()) {
-            return new FornecedorResource($fornecedor);
+            return new Json($fornecedor);
         }
     }
 
     public function update(Request $request)
     {
         $fornecedor = Fornecedor::findOrFail($request->id);
-        
+
         $fornecedor->tipoFornecedor = $request->input('tipoFornecedor');
         $fornecedor->situacao = $request->input('situacao');
         $fornecedor->tipoContribuinte = $request->input('tipoContribuinte');
@@ -70,7 +70,7 @@ class FornecedorController extends Controller
         $fornecedor->codigoMunicipio = $request->input('codigoMunicipio');
 
         if ($fornecedor->save()) {
-            return new FornecedorResource($fornecedor);
+            return new Json($fornecedor);
         }
     }
 
@@ -78,7 +78,7 @@ class FornecedorController extends Controller
     {
         $fornecedor = Fornecedor::findOrFail($id);
         if ($fornecedor->delete()) {
-            return new FornecedorResource($fornecedor);
+            return new Json($fornecedor);
         }
     }
 }

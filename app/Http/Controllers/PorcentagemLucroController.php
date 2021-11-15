@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\Json as JsonResource;
+use App\Http\Resources\Json;
 use App\Models\PorcentagemLucro;
 use Illuminate\Http\Request;
 
@@ -12,26 +12,26 @@ class PorcentagemLucroController extends Controller
     {
         //$porcentagensLucros = PorcentagemLucro::paginate(15);
         $porcentagensLucros = PorcentagemLucro::all();
-        return JsonResource::collection($porcentagensLucros);
+        return Json::collection($porcentagensLucros);
     }
 
     public function show($id)
     {
         $porcentagemLucro = PorcentagemLucro::findOrFail($id);
-        return new JsonResource($porcentagemLucro);
+        return new Json($porcentagemLucro);
     }
 
     public function store(Request $request)
     {
         $porcentagemLucro = new PorcentagemLucro;
         $porcentagemLucro->descricao = $request->input('descricao');
-        $porcentagemLucro->porcentagem = $request->input('porcentagem');
+        $porcentagemLucro->porcentagem = $                                                                                                                                                                  request->input('porcentagem');
         $porcentagemLucro->favorito = $request->input('favorito');
 
 
 
         if ($porcentagemLucro->save()) {
-            return new JsonResource($porcentagemLucro);
+            return new Json($porcentagemLucro);
         }
     }
 
@@ -43,7 +43,7 @@ class PorcentagemLucroController extends Controller
         $porcentagemLucro->favorito = $request->input('favorito');
 
         if ($grupo->save()) {
-            return new JsonResource($grupo);
+            return new Json($grupo);
         }
     }
 
@@ -51,7 +51,7 @@ class PorcentagemLucroController extends Controller
     {
         $porcentagemLucro = PorcentagemLucro::findOrFail($id);
         if ($porcentagemLucro->delete()) {
-            return new JsonResource($porcentagemLucro);
+            return new Json($porcentagemLucro);
         }
     }
 }
