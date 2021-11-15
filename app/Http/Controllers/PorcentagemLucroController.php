@@ -43,8 +43,8 @@ class PorcentagemLucroController extends Controller
         $porcentagemLucro->porcentagem = $request->input('porcentagem');
         $porcentagemLucro->favorito = $request->input('favorito');
 
-        if ($grupo->save()) {
-            return new Json($grupo);
+        if ($porcentagemLucro->save()) {
+            return new Json($porcentagemLucro);
         }
     }
 
