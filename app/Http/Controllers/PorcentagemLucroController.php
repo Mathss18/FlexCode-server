@@ -25,7 +25,7 @@ class PorcentagemLucroController extends Controller
     {
         $porcentagemLucro = new PorcentagemLucro;
         $porcentagemLucro->descricao = $request->input('descricao');
-        $porcentagemLucro->porcentagem = $                                                                                                                                                                  request->input('porcentagem');
+        $porcentagemLucro->porcentagem = $request->input('porcentagem');                                                                                                                                                      request->input('porcentagem');
         $porcentagemLucro->favorito = $request->input('favorito');
 
 
@@ -38,6 +38,7 @@ class PorcentagemLucroController extends Controller
     public function update(Request $request)
     {
         $porcentagemLucro = PorcentagemLucro::findOrFail($request->id);
+
         $porcentagemLucro->descricao = $request->input('descricao');
         $porcentagemLucro->porcentagem = $request->input('porcentagem');
         $porcentagemLucro->favorito = $request->input('favorito');
