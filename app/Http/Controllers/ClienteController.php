@@ -42,8 +42,13 @@ class ClienteController extends Controller
         $cliente->celular = $request->input('celular');
         $cliente->codigoMunicipio = $request->input('codigoMunicipio');
 
-        if ($cliente->save()) {
-            return new Json($cliente);
+
+        try {
+            if ($cliente->save()) {
+                return new Json($cliente);
+            }
+        } catch (\Throwable $th) {
+            return new Json($th);
         }
     }
 
