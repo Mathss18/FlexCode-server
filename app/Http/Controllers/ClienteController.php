@@ -14,14 +14,26 @@ class ClienteController extends Controller
     public function index()
     {
         //$clientes = Cliente::paginate(15);
-        $clientes = Cliente::all();
-        return Json::collection($clientes);
+        try {
+            $clientes = Cliente::all();
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso', $clientes);
+            return response()->json($response, 200);
+        } catch (Exception  $ex) {
+            $response = APIHelper::APIResponse(false, 500, $ex->errorInfo[2]);
+            return response()->json($response, 500);
+        }
     }
 
     public function show($id)
     {
-        $cliente = Cliente::findOrFail($id);
-        return new Json($cliente);
+        try {
+            $cliente = Cliente::findOrFail($id);
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso', $cliente);
+            return response()->json($response, 200);
+        } catch (Exception  $ex) {
+            $response = APIHelper::APIResponse(false, 500, $ex->errorInfo[2]);
+            return response()->json($response, 500);
+        }
     }
 
     public function store(Request $request)
@@ -46,22 +58,14 @@ class ClienteController extends Controller
         $cliente->codigoMunicipio = $request->input('codigoMunicipio');
 
 
-        // try {
-        //     if ($cliente->save()) {
-        //         return new Json($cliente);
-        //     }
-        // } catch (\Throwable $th) {
-        //     return new Json($th);
-        // }
-
         try {
             $cliente->save();
-            return new Json($cliente);
-          } catch(Exception  $ex){
-            $response = APIHelper::APIResponse(false,500,$ex->errorInfo[2]);
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso ao cadastrar o cliente', $cliente);
+            return response()->json($response, 200);
+        } catch (Exception  $ex) {
+            $response = APIHelper::APIResponse(false, 500, $ex->errorInfo[2]);
             return response()->json($response, 500);
-            // dd($ex);
-          }
+        }
     }
 
     public function update(Request $request)
@@ -85,16 +89,26 @@ class ClienteController extends Controller
         $cliente->celular = $request->input('celular');
         $cliente->codigoMunicipio = $request->input('codigoMunicipio');
 
-        if ($cliente->save()) {
-            return new Json($cliente);
+        try {
+            $cliente->save();
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso ao editer o cliente', $cliente);
+            return response()->json($response, 200);
+        } catch (Exception  $ex) {
+            $response = APIHelper::APIResponse(false, 500, $ex->errorInfo[2]);
+            return response()->json($response, 500);
         }
     }
 
     public function destroy($id)
     {
-        $cliente = Cliente::findOrFail($id);
-        if ($cliente->delete()) {
-            return new Json($cliente);
+        try {
+            $cliente = Cliente::findOrFail($id);
+            $cliente->delete();
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso ao excluir o cliente', $cliente);
+            return response()->json($response, 200);
+        } catch (Exception  $ex) {
+            $response = APIHelper::APIResponse(false, 500, $ex->errorInfo[2]);
+            return response()->json($response, 500);
         }
     }
 }
