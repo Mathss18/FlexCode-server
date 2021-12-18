@@ -11,14 +11,27 @@ class FornecedorController extends Controller
     public function index()
     {
         //$fornecedores = Fornecedor::paginate(15);
-        $fornecedores = Fornecedor::all();
-        return Json::collection($fornecedores);
+        try {
+            $fornecedores = Fornecedor::all();
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso', $fornecedores);
+            return response()->json($response, 200);
+        } catch (Exception  $ex) {
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+            return response()->json($response, 500);
+        }
     }
 
     public function show($id)
     {
-        $fornecedor = Fornecedor::findOrFail($id);
-        return new Json($fornecedor);
+
+        try {
+            $fornecedor = Fornecedor::findOrFail($id);
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso', $fornecedor);
+            return response()->json($response, 200);
+        } catch (Exception  $ex) {
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+            return response()->json($response, 500);
+        }
     }
 
     public function store(Request $request)
@@ -42,8 +55,13 @@ class FornecedorController extends Controller
         $fornecedor->celular = $request->input('celular');
         $fornecedor->codigoMunicipio = $request->input('codigoMunicipio');
 
-        if ($fornecedor->save()) {
-            return new Json($fornecedor);
+        try {
+            $fornecedor->save();
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso ao cadastrar o fornecedor', $fornecedor);
+            return response()->json($response, 200);
+        } catch (Exception  $ex) {
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+            return response()->json($response, 500);
         }
     }
 
@@ -69,16 +87,26 @@ class FornecedorController extends Controller
         $fornecedor->celular = $request->input('celular');
         $fornecedor->codigoMunicipio = $request->input('codigoMunicipio');
 
-        if ($fornecedor->save()) {
-            return new Json($fornecedor);
+        try {
+            $fornecedor->save();
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso ao editar o fornecedor', $fornecedor);
+            return response()->json($response, 200);
+        } catch (Exception  $ex) {
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+            return response()->json($response, 500);
         }
     }
 
     public function destroy($id)
     {
-        $fornecedor = Fornecedor::findOrFail($id);
-        if ($fornecedor->delete()) {
-            return new Json($fornecedor);
+        try {
+            $fornecedor = Fornecedor::findOrFail($id);
+            $fornecedor->delete();
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso ao excluir o fornecedor', $fornecedor);
+            return response()->json($response, 200);
+        } catch (Exception  $ex) {
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+            return response()->json($response, 500);
         }
     }
 }

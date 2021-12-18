@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Helpers\APIHelper;
 use Illuminate\Http\Request;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use App\Models\Cliente;
 use App\Http\Resources\Json;
 use Exception;
@@ -19,7 +18,7 @@ class ClienteController extends Controller
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', $clientes);
             return response()->json($response, 200);
         } catch (Exception  $ex) {
-            $response = APIHelper::APIResponse(false, 500, $ex->getMessage());
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
             return response()->json($response, 500);
         }
     }
@@ -31,13 +30,7 @@ class ClienteController extends Controller
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', $cliente);
             return response()->json($response, 200);
         } catch (Exception  $ex) {
-            if(($ex instanceof ModelNotFoundException)){
-                $message = 'Cliente não encontrado';
-            }
-            else{
-                $message = $ex->getMessage();
-            }
-            $response = APIHelper::APIResponse(false, 500, $message);
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
             return response()->json($response, 500);
         }
     }
@@ -69,7 +62,7 @@ class ClienteController extends Controller
             $response = APIHelper::APIResponse(true, 200, 'Sucesso ao cadastrar o cliente', $cliente);
             return response()->json($response, 200);
         } catch (Exception  $ex) {
-            $response = APIHelper::APIResponse(false, 500, $ex->getMessage());
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
             return response()->json($response, 500);
         }
     }
@@ -100,7 +93,7 @@ class ClienteController extends Controller
             $response = APIHelper::APIResponse(true, 200, 'Sucesso ao editar o cliente', $cliente);
             return response()->json($response, 200);
         } catch (Exception  $ex) {
-            $response = APIHelper::APIResponse(false, 500, $ex->getMessage());
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
             return response()->json($response, 500);
         }
     }
@@ -113,7 +106,7 @@ class ClienteController extends Controller
             $response = APIHelper::APIResponse(true, 200, 'Sucesso ao excluir o cliente', $cliente);
             return response()->json($response, 200);
         } catch (Exception  $ex) {
-            $response = APIHelper::APIResponse(false, 500, $ex->getMessage());
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
             return response()->json($response, 500);
         }
     }
