@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Cliente;
 use App\Http\Resources\Json;
+use Exception;
 
 class ClienteController extends Controller
 {
@@ -50,6 +51,13 @@ class ClienteController extends Controller
         } catch (\Throwable $th) {
             return new Json($th);
         }
+
+        try {
+            $cliente->save();
+            return new Json($cliente);
+          } catch(Exception  $ex){
+            dd($ex->getMessage());
+          }
     }
 
     public function update(Request $request)
