@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Cliente;
 use App\Http\Resources\Json;
 use Exception;
+use stdClass;
 
 class ClienteController extends Controller
 {
@@ -56,8 +57,10 @@ class ClienteController extends Controller
             $cliente->save();
             return new Json($cliente);
           } catch(Exception  $ex){
-            // return $ex;
-            dd($ex);
+            $response = new stdClass();
+            $response->error = $ex->errorInfo[2];
+            return new Json($response);
+            // dd($ex);
           }
     }
 
