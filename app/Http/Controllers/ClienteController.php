@@ -59,7 +59,7 @@ class ClienteController extends Controller
           } catch(Exception  $ex){
             $response = new stdClass();
             $response->error = $ex->errorInfo[2];
-            return new Json($response);
+            return $response;
             // dd($ex);
           }
     }
