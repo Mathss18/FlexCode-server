@@ -58,7 +58,8 @@ class ClienteController extends Controller
             return new Json($cliente);
           } catch(Exception  $ex){
             $response = new stdClass();
-            $response->error = $ex->errorInfo[2];
+            $response->code = $ex->errorInfo[0];
+            $response->message = $ex->errorInfo[2];
             return $response;
             // dd($ex);
           }
