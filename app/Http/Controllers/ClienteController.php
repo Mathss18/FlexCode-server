@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\APIHelper;
 use Illuminate\Http\Request;
 use App\Models\Cliente;
 use App\Http\Resources\Json;
@@ -57,9 +58,7 @@ class ClienteController extends Controller
             $cliente->save();
             return new Json($cliente);
           } catch(Exception  $ex){
-            $response = new stdClass();
-            $response->code = $ex->errorInfo[0];
-            $response->message = $ex->errorInfo[2];
+            $response = APIHelper::APIResponse(false,500,$ex->errorInfo[2]);
             return response()->json($response, 500);
             // dd($ex);
           }
