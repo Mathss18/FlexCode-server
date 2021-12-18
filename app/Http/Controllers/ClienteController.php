@@ -31,7 +31,13 @@ class ClienteController extends Controller
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', $cliente);
             return response()->json($response, 200);
         } catch (Exception  $ex) {
-            $response = APIHelper::APIResponse(false, 500, $ex->getMessage());
+            if(($ex instanceof ModelNotFoundException)){
+                $message = 'Cliente não encontrado';
+            }
+            else{
+                $message = $ex->getMessage();
+            }
+            $response = APIHelper::APIResponse(false, 500, $message);
             return response()->json($response, 500);
         }
     }
@@ -91,7 +97,7 @@ class ClienteController extends Controller
 
         try {
             $cliente->save();
-            $response = APIHelper::APIResponse(true, 200, 'Sucesso ao editer o cliente', $cliente);
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso ao editar o cliente', $cliente);
             return response()->json($response, 200);
         } catch (Exception  $ex) {
             $response = APIHelper::APIResponse(false, 500, $ex->getMessage());
