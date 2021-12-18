@@ -44,13 +44,13 @@ class ClienteController extends Controller
         $cliente->codigoMunicipio = $request->input('codigoMunicipio');
 
 
-        try {
-            if ($cliente->save()) {
-                return new Json($cliente);
-            }
-        } catch (\Throwable $th) {
-            return new Json($th);
-        }
+        // try {
+        //     if ($cliente->save()) {
+        //         return new Json($cliente);
+        //     }
+        // } catch (\Throwable $th) {
+        //     return new Json($th);
+        // }
 
         try {
             $cliente->save();
