@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Helpers\APIHelper;
 use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use App\Models\Cliente;
 use App\Http\Resources\Json;
 use Exception;
-use stdClass;
 
 class ClienteController extends Controller
 {
