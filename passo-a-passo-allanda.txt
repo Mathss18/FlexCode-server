@@ -3,3 +3,6 @@
 - Criar Resource
 - Criar Controller
 - Criar Rotas
+
+- Conectar SSH 
+ssh -p 2222 smartm49@smartma.com.br

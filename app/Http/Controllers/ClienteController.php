@@ -60,7 +60,7 @@ class ClienteController extends Controller
             $response = new stdClass();
             $response->code = $ex->errorInfo[0];
             $response->message = $ex->errorInfo[2];
-            return $response;
+            return response()->json($response, 500);
             // dd($ex);
           }
     }
