@@ -21,6 +21,8 @@ class APIHelper
                     case 1048:
                         $errorMessage = 'Favor preencher todos os campos obrigatorios';
                         break;
+                    case 1366:
+                        $errorMessage = 'Favor preencher os campos corretamente';
                     default:
                         $errorMessage = $exeption->getMessage();
                         break;
