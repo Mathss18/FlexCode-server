@@ -56,7 +56,7 @@ class ClienteController extends Controller
             $cliente->save();
             return new Json($cliente);
           } catch(Exception  $ex){
-            return new Json($ex->errorInfo[2]);
+            return new Json($ex);
             // dd($ex);
           }
     }
