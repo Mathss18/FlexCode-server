@@ -19,7 +19,7 @@ class ClienteController extends Controller
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', $clientes);
             return response()->json($response, 200);
         } catch (Exception  $ex) {
-            $response = APIHelper::APIResponse(false, 500, $ex->errorInfo[2]);
+            $response = APIHelper::APIResponse(false, 500, $ex->getMessage());
             return response()->json($response, 500);
         }
     }
@@ -31,7 +31,7 @@ class ClienteController extends Controller
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', $cliente);
             return response()->json($response, 200);
         } catch (Exception  $ex) {
-            $response = APIHelper::APIResponse(false, 500, $ex->errorInfo[2]);
+            $response = APIHelper::APIResponse(false, 500, $ex->getMessage());
             return response()->json($response, 500);
         }
     }
@@ -63,7 +63,7 @@ class ClienteController extends Controller
             $response = APIHelper::APIResponse(true, 200, 'Sucesso ao cadastrar o cliente', $cliente);
             return response()->json($response, 200);
         } catch (Exception  $ex) {
-            $response = APIHelper::APIResponse(false, 500, $ex->errorInfo[2]);
+            $response = APIHelper::APIResponse(false, 500, $ex->getMessage());
             return response()->json($response, 500);
         }
     }
@@ -94,7 +94,7 @@ class ClienteController extends Controller
             $response = APIHelper::APIResponse(true, 200, 'Sucesso ao editer o cliente', $cliente);
             return response()->json($response, 200);
         } catch (Exception  $ex) {
-            $response = APIHelper::APIResponse(false, 500, $ex->errorInfo[2]);
+            $response = APIHelper::APIResponse(false, 500, $ex->getMessage());
             return response()->json($response, 500);
         }
     }
@@ -107,7 +107,7 @@ class ClienteController extends Controller
             $response = APIHelper::APIResponse(true, 200, 'Sucesso ao excluir o cliente', $cliente);
             return response()->json($response, 200);
         } catch (Exception  $ex) {
-            $response = APIHelper::APIResponse(false, 500, $ex->errorInfo[2]);
+            $response = APIHelper::APIResponse(false, 500, $ex->getMessage());
             return response()->json($response, 500);
         }
     }
