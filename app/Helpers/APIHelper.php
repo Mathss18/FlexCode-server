@@ -24,8 +24,11 @@ class APIHelper
                     case 1366:
                         $errorMessage = 'Favor preencher os campos corretamente';
                         break;
+                    case 1452:
+                        $errorMessage = 'Está ação têm dependencias de outra(s) tabela(s)';
+                        break;
                     default:
-                        dd($exeption);
+                        // dd($exeption);
                         $errorMessage = $exeption->getMessage();
                         break;
                 }
