@@ -25,6 +25,7 @@ class APIHelper
                         $errorMessage = 'Favor preencher os campos corretamente';
                         break;
                     default:
+                        dd($exeption);
                         $errorMessage = $exeption->getMessage();
                         break;
                 }
