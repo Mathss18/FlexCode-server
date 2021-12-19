@@ -15,16 +15,28 @@ class FuncionarioController extends Controller
     {
         //$funcionarios = Funcionario::paginate(15);
         //$funcionarios = Funcionario::all();
-        $funcionarios = Funcionario::with(['grupo', 'usuario'])->get();
+        try {
+            $funcionarios = Funcionario::with(['grupo', 'usuario'])->get();
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso', $funcionarios);
+            return response()->json($response, 200);
+        } catch (Exception  $ex) {
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+            return response()->json($response, 500);
+        }
 
-        return Json::collection($funcionarios);
     }
 
     public function show($id)
     {
-        $funcionario = Funcionario::where('id', $id)->with(['grupo', 'usuario'])->first();
 
-        return new Json($funcionario);
+        try {
+            $funcionario = Funcionario::where('id', $id)->with(['grupo', 'usuario'])->first();
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso', $funcionario);
+            return response()->json($response, 200);
+        } catch (Exception  $ex) {
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+            return response()->json($response, 500);
+        }
     }
 
     public function store(Request $request)
@@ -73,13 +85,22 @@ class FuncionarioController extends Controller
             $usuario->situacao = 1;
 
             //Verifica se o usuario foi salvo com sucesso e então atribui o usuario_id ao funcionario
-            if ($usuario->save()) {
+            try {
+                $usuario->save();
                 $funcionario->usuario_id = $usuario->id;
+            } catch (Exception  $ex) {
+                $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+                return response()->json($response, 500);
             }
         }
 
-        if ($funcionario->save()) {
-            return new Json($funcionario);
+        try {
+            $funcionario->save();
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso ao cadastrar o funcionario', $funcionario);
+            return response()->json($response, 200);
+        } catch (Exception  $ex) {
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+            return response()->json($response, 500);
         }
     }
 
@@ -105,7 +126,12 @@ class FuncionarioController extends Controller
         $funcionario->celular = $request->input('celular');
         $funcionario->grupo_id = $request->input('grupo_id');
 
-        $usuario = Usuario::find($request->usuario_id);
+        try {
+            $usuario = Usuario::find($request->usuario_id);
+        } catch (Exception  $ex) {
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+            return response()->json($response, 500);
+        }
 
         // Verifica se o usuario tem acesso, se sim, atualiza os dados de acesso do usuario
         $usuario->situacao = $request->input('situacao') == 0 ? 0 : 1;
@@ -126,8 +152,12 @@ class FuncionarioController extends Controller
         }
 
         // Verifica se o usuario foi salvo com sucesso e então atribui o usuario_id ao funcionario
-        if ($usuario->save()) {
+        try {
+            $usuario->save();
             $funcionario->usuario_id = $usuario->id;
+        } catch (Exception  $ex) {
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+            return response()->json($response, 500);
         }
 
         if ($this->is_base64($request->input('foto'))) {
@@ -144,16 +174,27 @@ class FuncionarioController extends Controller
             }
         }
 
-        if ($funcionario->save()) {
-            return new Json($funcionario);
+        // Edita o funcionario
+        try {
+            $funcionario->save();
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso ao editar o func$funcionario', $funcionario);
+            return response()->json($response, 200);
+        } catch (Exception  $ex) {
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+            return response()->json($response, 500);
         }
     }
 
     public function destroy($id)
     {
-        $funcionario = Funcionario::findOrFail($id);
-        if ($funcionario->delete()) {
-            return new Json($funcionario);
+        try {
+            $funcionario = Funcionario::findOrFail($id);
+            $funcionario->delete();
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso ao excluir o funcionario', $funcionario);
+            return response()->json($response, 200);
+        } catch (Exception  $ex) {
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+            return response()->json($response, 500);
         }
     }
 
