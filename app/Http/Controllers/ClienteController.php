@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Helpers\APIHelper;
 use Illuminate\Http\Request;
 use App\Models\Cliente;
-use App\Http\Resources\Json;
 use Exception;
 
 class ClienteController extends Controller

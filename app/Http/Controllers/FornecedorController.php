@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\Json;
 use App\Models\Fornecedor;
 use Illuminate\Http\Request;
 use App\Helpers\APIHelper;
+use Exception;
 
 class FornecedorController extends Controller
 {
