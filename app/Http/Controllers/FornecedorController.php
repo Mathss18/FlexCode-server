@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\Json;
 use App\Models\Fornecedor;
 use Illuminate\Http\Request;
+use App\Helpers\APIHelper;
 
 class FornecedorController extends Controller
 {
