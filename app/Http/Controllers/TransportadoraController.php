@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\APIHelper;
 use Illuminate\Http\Request;
 use App\Models\Transportadora;
-use App\Http\Resources\Json;
+use Exception;
 
 class TransportadoraController extends Controller
 {
@@ -12,13 +13,26 @@ class TransportadoraController extends Controller
     {
         //$transportadoras = Transportadora::paginate(15);
         $transportadoras = Transportadora::all();
-        return Json::collection($transportadoras);
+        try {
+            $transportadoras = Transportadora::all();
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso', $transportadoras);
+            return response()->json($response, 200);
+        } catch (Exception  $ex) {
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+            return response()->json($response, 500);
+        }
     }
 
     public function show($id)
     {
-        $transportadora = Transportadora::findOrFail($id);
-        return new Json($transportadora);
+        try {
+            $transportadora = Transportadora::findOrFail($id);
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso', $transportadora);
+            return response()->json($response, 200);
+        } catch (Exception  $ex) {
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+            return response()->json($response, 500);
+        }
     }
 
     public function store(Request $request)
@@ -42,8 +56,13 @@ class TransportadoraController extends Controller
         $transportadora->celular = $request->input('celular');
         $transportadora->codigoMunicipio = $request->input('codigoMunicipio');
 
-        if ($transportadora->save()) {
-            return new Json($transportadora);
+        try {
+            $transportadora->save();
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso ao cadastrar a transportadora', $transportadora);
+            return response()->json($response, 200);
+        } catch (Exception  $ex) {
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+            return response()->json($response, 500);
         }
     }
 
@@ -68,16 +87,27 @@ class TransportadoraController extends Controller
         $transportadora->celular = $request->input('celular');
         $transportadora->codigoMunicipio = $request->input('codigoMunicipio');
 
-        if ($transportadora->save()) {
-            return new Json($transportadora);
+        try {
+            $transportadora->save();
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso ao editar a transportadora', $transportadora);
+            return response()->json($response, 200);
+        } catch (Exception  $ex) {
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+            return response()->json($response, 500);
         }
+
     }
 
     public function destroy($id)
     {
-        $transportadora = Transportadora::findOrFail($id);
-        if ($transportadora->delete()) {
-            return new Json($transportadora);
+        try {
+            $transportadora = Transportadora::findOrFail($id);
+            $transportadora->delete();
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso ao excluir a transportadora', $transportadora);
+            return response()->json($response, 200);
+        } catch (Exception  $ex) {
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+            return response()->json($response, 500);
         }
     }
 }
