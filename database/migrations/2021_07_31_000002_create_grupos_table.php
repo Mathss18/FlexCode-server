@@ -16,7 +16,7 @@ class CreateGruposTable extends Migration
         Schema::create('grupos', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('nome');
-            
+
             $table->boolean('domingo');
             $table->boolean('segunda');
             $table->boolean('terca');
@@ -33,6 +33,7 @@ class CreateGruposTable extends Migration
             $table->string('grupos');
             $table->string('transportadoras');
             $table->string('usuarios');
+            $table->string('funcionarios');
             $table->timestamps();
         });
     }
