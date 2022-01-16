@@ -34,7 +34,10 @@ class APIHelper
                 }
             }
             else{
-                $errorMessage = $exeption->getMessage();
+                if(!$exeption == null)
+                    $errorMessage = $exeption->getMessage();
+                else
+                    $errorMessage = 'Erro desconhecido';
             }
 
             $response['success'] = $success;
