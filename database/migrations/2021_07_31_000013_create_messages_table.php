@@ -16,8 +16,10 @@ class CreateMessagesTable extends Migration
         Schema::create('messages', function (Blueprint $table) {
             $table->id();
             $table->text('message');
+            $table->boolean('vizualizado')->default(false);
             $table->foreignId('usuario_id')->nullable()->constrained('usuarios');
             $table->foreignId('usuario_receptor_id')->nullable()->constrained('usuarios');
+
             $table->timestamps();
         });
     }

@@ -76,4 +76,29 @@ class MessageController extends Controller
             return response()->json($response, 500);
         }
     }
+
+    public function getUnreadMessages()
+    {
+        try {
+            $messages = Message::where('vizualizado', false)->get();
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso ao trazer as mensagens não lidas', $messages);
+            return response()->json($response, 200);
+        } catch (Exception  $ex) {
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+            return response()->json($response, 500);
+        }
+    }
+
+    public function readMessages(Request $request)
+    {
+
+        try {
+            $messages = Message::where('usuario_id', $request->usuario_id)->where('vizualizado', false)->update(['vizualizado' => true]);
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso ao ler as mensagens', $messages);
+            return response()->json($response, 200);
+        } catch (Exception  $ex) {
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+            return response()->json($response, 500);
+        }
+    }
 }

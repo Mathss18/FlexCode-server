@@ -24,6 +24,7 @@ class Usuario extends Authenticatable implements JWTSubject
         'nome',
         'email',
         'senha',
+        'chat-status'
     ];
 
     /**

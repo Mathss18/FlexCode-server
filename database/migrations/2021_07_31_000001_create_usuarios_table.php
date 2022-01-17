@@ -16,6 +16,7 @@ class CreateUsuariosTable extends Migration
         Schema::create('usuarios', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('nome');
+            $table->string('chat-status')->default('offline');
             $table->string('email');
             $table->string('senha');
             $table->integer('situacao');
