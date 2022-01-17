@@ -80,7 +80,7 @@ class MessageController extends Controller
     public function getUnreadMessages()
     {
         try {
-            $messages = Message::where('vizualizado', false)->get();
+            $messages = Message::where('vizualizado', false)->where('usuario_receptor_id',auth()->user()->id)->get();
             $response = APIHelper::APIResponse(true, 200, 'Sucesso ao trazer as mensagens não lidas', $messages);
             return response()->json($response, 200);
         } catch (Exception  $ex) {
