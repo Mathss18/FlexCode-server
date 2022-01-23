@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
-class AuthController extends Controller 
+class AuthController extends Controller
 {
 
     public function login(Request $request)
@@ -57,10 +57,15 @@ class AuthController extends Controller
      */
     protected function respondWithToken($token)
     {
+        $userLoggedInfo = auth('api')->user()->getAttributes(); // oega o usuario logado
+        $userLoggedInfo = (object) $userLoggedInfo; // transforma em objeto
+        unset($userLoggedInfo->senha); // remove a senha do objeto para retornar
+
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => auth('api')->factory()->getTTL() * 600
+            'expires_in' => auth('api')->factory()->getTTL() * 600,
+            'user' => $userLoggedInfo
         ]);
     }
 

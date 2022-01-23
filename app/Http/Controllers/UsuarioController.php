@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\APIHelper;
 use App\Http\Resources\Json;
 use App\Models\Usuario;
+use Exception;
 use Illuminate\Http\Request;
 
 class UsuarioController extends Controller
@@ -50,6 +52,18 @@ class UsuarioController extends Controller
         $usuario = Usuario::findOrFail($id);
         if ($usuario->delete()) {
             return new Json($usuario);
+        }
+    }
+
+    public function trocarChatStatus(Request $request)
+    {
+        try {
+            $usuario = Usuario::where('id', $request->id)->update(['chat-status' => $request->status]);
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso ao trocar status', $usuario);
+            return response()->json($response, 200);
+        } catch (Exception  $ex) {
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+            return response()->json($response, 500);
         }
     }
 }

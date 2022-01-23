@@ -8,6 +8,7 @@ use App\Http\Controllers\FornecedorController;
 use App\Http\Controllers\FuncionarioController;
 use App\Http\Controllers\GrupoController;
 use App\Http\Controllers\GrupoProdutoController;
+use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NomeVariacaoProdutoController;
 use App\Http\Controllers\PorcentagemLucroController;
 use App\Http\Controllers\ProdutoController;
@@ -98,6 +99,9 @@ Route::middleware(['jwt'])->group(function () {
 
     Route::delete('usuario/{id}', [UsuarioController::class, 'destroy']);
 
+    Route::put('trocar-chat-status', [UsuarioController::class, 'trocarChatStatus']);
+
+
     //============================ GRUPOS PRODUTOS ==============================
     Route::get('grupos-produtos', [GrupoProdutoController::class, 'index']);
 
@@ -163,4 +167,19 @@ Route::middleware(['jwt'])->group(function () {
     Route::put('produto/{id}', [ProdutoController::class, 'update']);
 
     Route::delete('produto/{id}', [ProdutoController::class, 'destroy']);
+
+    //============================ MESSAGES ==============================
+    Route::get('messages', [MessageController::class, 'fetchMessages']);
+
+    Route::post('message', [MessageController::class, 'sendMessage']);
+
+    Route::get('mensagens-privadas/{id}', [MessageController::class, 'fetchPrivateMessages']);
+
+    Route::post('mensagem-privada', [MessageController::class, 'sendPrivateMessage']);
+
+    Route::put('ler-mensagens', [MessageController::class, 'readMessages']);
+
+    Route::get('mensagens-nao-lidas', [MessageController::class, 'getUnreadMessages']);
+
+
 });
