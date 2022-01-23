@@ -36,9 +36,9 @@ class ProdutoController extends Controller
         $produto->comprimento = $request->input('comprimento');
         $produto->comissao = $request->input('comissao');
         $produto->descricao = $request->input('descricao');
-        $produto->valor_custo = $request->input('valor_custo');
+        $produto->valorCusto = $request->input('valorCusto');
         $produto->despesasAdicionais = $request->input('despesasAdicionais');
-        $produto->outras_despesas = $request->input('outras_despesas');
+        $produto->outrasDespesas = $request->input('outrasDespesas');
         $produto->custoFinal = $request->input('custoFinal');
         $produto->estoqueMinimo = $request->input('estoqueMinimo');
         $produto->estoqueMaximo = $request->input('estoqueMaximo');
@@ -76,9 +76,9 @@ class ProdutoController extends Controller
         $produto->comprimento = $request->input('comprimento');
         $produto->comissao = $request->input('comissao');
         $produto->descricao = $request->input('descricao');
-        $produto->valor_custo = $request->input('valor_custo');
+        $produto->valorCusto = $request->input('valorCusto');
         $produto->despesasAdicionais = $request->input('despesasAdicionais');
-        $produto->outras_despesas = $request->input('outras_despesas');
+        $produto->outrasDespesas = $request->input('outrasDespesas');
         $produto->custoFinal = $request->input('custoFinal');
         $produto->estoqueMinimo = $request->input('estoqueMinimo');
         $produto->estoqueMaximo = $request->input('estoqueMaximo');
