@@ -28,17 +28,10 @@ class CreateProdutosTable extends Migration
             $table->double('comprimento', 8, 4);
             $table->double('comissao', 8, 2);
             $table->string('descricao');
-<<<<<<< HEAD
             $table->double('valorCusto', 8, 2);
             $table->double('despesasAdicionais', 8, 2);
             $table->double('outrasDespesas', 8, 2);
             $table->double('custoFinal', 8, 2);
-=======
-            $table->double('valorCusto', 8, 4);
-            $table->double('despesasAdicionais', 8, 4);
-            $table->double('outrasDespesas', 8, 4);
-            $table->double('custoFinal', 8, 4);
->>>>>>> b28f1b86581d67aacfde2720382266dd60cd7caf
             $table->double('estoqueMinimo', 8, 4);
             $table->double('estoqueMaximo', 8, 4);
             $table->double('quantidadeAtual', 8, 4);
