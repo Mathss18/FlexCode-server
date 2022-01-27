@@ -13,9 +13,9 @@ class CreatePorcentagensLucrosProdutosTable extends Migration
      */
     public function up()
     {
-        Schema::create('porcentages_lucros_produtos', function (Blueprint $table) {
+        Schema::create('porcentagens_lucros_produtos', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('porcentagem_lucro_id')->nullable()->constrained('porcentages_lucros');
+            $table->foreignId('porcentagem_lucro_id')->nullable()->constrained('porcentagens_lucros');
             $table->foreignId('produto_id')->nullable()->constrained('produtos');
 
             $table->timestamps();
@@ -29,6 +29,6 @@ class CreatePorcentagensLucrosProdutosTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('porcentages_lucros_produtos');
+        Schema::dropIfExists('porcentagens_lucros_produtos');
     }
 }
