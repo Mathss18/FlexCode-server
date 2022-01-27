@@ -23,8 +23,11 @@ class ProdutoController extends Controller
 
     public function store(Request $request)
     {
+
         $produto = new Produto;
         $produto->nome = $request->input('nome');
+        $produto->fotos = $request->input('fotos');
+        $produto->fotoPrincipal = $request->input('fotoPrincipal');
         $produto->codigoInterno = $request->input('codigoInterno');
         $produto->grupo_produto_id = $request->input('grupo_produto_id');
         $produto->movimentaEstoque = $request->input('movimentaEstoque');
@@ -36,9 +39,9 @@ class ProdutoController extends Controller
         $produto->comprimento = $request->input('comprimento');
         $produto->comissao = $request->input('comissao');
         $produto->descricao = $request->input('descricao');
-        $produto->valor_custo = $request->input('valor_custo');
+        $produto->valorCusto = $request->input('valorCusto');
         $produto->despesasAdicionais = $request->input('despesasAdicionais');
-        $produto->outras_despesas = $request->input('outras_despesas');
+        $produto->outrasDespesas = $request->input('outrasDespesas');
         $produto->custoFinal = $request->input('custoFinal');
         $produto->estoqueMinimo = $request->input('estoqueMinimo');
         $produto->estoqueMaximo = $request->input('estoqueMaximo');
@@ -55,10 +58,13 @@ class ProdutoController extends Controller
         $produto->valorFixoCofins = $request->input('valorFixoCofins');
         $produto->valorFixoCofinsSt = $request->input('valorFixoCofinsSt');
 
+        dd($produto);
+        exit;
 
-        if ($produto->save()) {
-            return new Json($produto);
-        }
+
+        // if ($produto->save()) {
+        //     return new Json($produto);
+        // }
     }
 
     public function update(Request $request)
@@ -66,6 +72,7 @@ class ProdutoController extends Controller
         $produto = new Produto;
         $produto->nome = $request->input('nome');
         $produto->codigoInterno = $request->input('codigoInterno');
+        $produto->fotoPrincipal = $request->input('fotoPrincipal');
         $produto->grupo_produto_id = $request->input('grupo_produto_id');
         $produto->movimentaEstoque = $request->input('movimentaEstoque');
         $produto->habilitaNotaFiscal = $request->input('habilitaNotaFiscal');
@@ -76,9 +83,9 @@ class ProdutoController extends Controller
         $produto->comprimento = $request->input('comprimento');
         $produto->comissao = $request->input('comissao');
         $produto->descricao = $request->input('descricao');
-        $produto->valor_custo = $request->input('valor_custo');
+        $produto->valorCusto = $request->input('valorCusto');
         $produto->despesasAdicionais = $request->input('despesasAdicionais');
-        $produto->outras_despesas = $request->input('outras_despesas');
+        $produto->outrasDespesas = $request->input('outrasDespesas');
         $produto->custoFinal = $request->input('custoFinal');
         $produto->estoqueMinimo = $request->input('estoqueMinimo');
         $produto->estoqueMaximo = $request->input('estoqueMaximo');
