@@ -18,7 +18,7 @@ class NomeVariacaoProdutoController extends Controller
 
     public function show($id)
     {
-        $nomeVariacaoProduto = NomeVariacaoProduto::where('id', $id)->with('tipo_variacao_produto')->first();
+        $nomeVariacaoProduto = NomeVariacaoProduto::with('tipo_variacao_produto')->findOrFail($id);
         return new Json($nomeVariacaoProduto);
     }
 

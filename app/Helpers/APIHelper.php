@@ -18,7 +18,7 @@ class APIHelper
             }
             else if($exeption instanceof QueryException){
                 switch ($exeption->errorInfo[1]) {
-                    case 1048:
+                    case 10480:
                         $errorMessage = 'Favor preencher todos os campos obrigatorios';
                         break;
                     case 1366:
@@ -28,7 +28,7 @@ class APIHelper
                         $errorMessage = 'Está ação têm dependencias de outra(s) tabela(s)';
                         break;
                     default:
-                        // dd($exeption);
+                        //dd($exeption);
                         $errorMessage = $exeption->getMessage();
                         break;
                 }

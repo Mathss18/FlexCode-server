@@ -19,9 +19,11 @@ class CreateProdutosTable extends Migration
             $table->string('codigoInterno');
             $table->string('fotoPrincipal');
             $table->foreignId('grupo_produto_id')->nullable()->constrained('grupos_produtos');
+            $table->foreignId('unidade_produto_id')->nullable()->constrained('unidades_produtos');
+            $table->foreignId('cliente_id')->nullable()->constrained('clientes');
             $table->boolean('movimentaEstoque');
             $table->boolean('habilitaNotaFiscal');
-            $table->boolean('possuiVariacoes');
+            $table->string('codigoBarras');
             $table->double('peso', 8, 4);
             $table->double('largura', 8, 4);
             $table->double('altura', 8, 4);

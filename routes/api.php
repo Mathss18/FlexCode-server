@@ -12,6 +12,7 @@ use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NomeVariacaoProdutoController;
 use App\Http\Controllers\PorcentagemLucroController;
 use App\Http\Controllers\ProdutoController;
+use App\Http\Controllers\ServicoController;
 use App\Http\Controllers\TipoVariacaoProdutoController;
 use App\Http\Controllers\TransportadoraController;
 use App\Http\Controllers\UnidadeProdutoController;
@@ -36,68 +37,68 @@ Route::middleware(['jwt'])->group(function () {
     //============================ CLIENTES ==============================
     Route::get('clientes', [ClienteController::class, 'index']);
 
-    Route::get('cliente/{id}', [ClienteController::class, 'show']);
+    Route::get('clientes/{id}', [ClienteController::class, 'show']);
 
-    Route::post('cliente', [ClienteController::class, 'store']);
+    Route::post('clientes', [ClienteController::class, 'store']);
 
-    Route::put('cliente/{id}', [ClienteController::class, 'update']);
+    Route::put('clientes/{id}', [ClienteController::class, 'update']);
 
-    Route::delete('cliente/{id}', [ClienteController::class, 'destroy']);
+    Route::delete('clientes/{id}', [ClienteController::class, 'destroy']);
 
     //============================ TRANSPORTADORAS ==============================
     Route::get('transportadoras', [TransportadoraController::class, 'index']);
 
-    Route::get('transportadora/{id}', [TransportadoraController::class, 'show']);
+    Route::get('transportadoras/{id}', [TransportadoraController::class, 'show']);
 
-    Route::post('transportadora', [TransportadoraController::class, 'store']);
+    Route::post('transportadoras', [TransportadoraController::class, 'store']);
 
-    Route::put('transportadora/{id}', [TransportadoraController::class, 'update']);
+    Route::put('transportadoras/{id}', [TransportadoraController::class, 'update']);
 
-    Route::delete('transportadora/{id}', [TransportadoraController::class, 'destroy']);
+    Route::delete('transportadoras/{id}', [TransportadoraController::class, 'destroy']);
 
     //============================ TRANSPORTADORAS ==============================
     Route::get('fornecedores', [FornecedorController::class, 'index']);
 
-    Route::get('fornecedor/{id}', [FornecedorController::class, 'show']);
+    Route::get('fornecedores/{id}', [FornecedorController::class, 'show']);
 
-    Route::post('fornecedor', [FornecedorController::class, 'store']);
+    Route::post('fornecedores', [FornecedorController::class, 'store']);
 
-    Route::put('fornecedor/{id}', [FornecedorController::class, 'update']);
+    Route::put('fornecedores/{id}', [FornecedorController::class, 'update']);
 
-    Route::delete('fornecedor/{id}', [FornecedorController::class, 'destroy']);
+    Route::delete('fornecedores/{id}', [FornecedorController::class, 'destroy']);
 
     //============================ FUNCIONARIOS ==============================
     Route::get('funcionarios', [FuncionarioController::class, 'index']);
 
-    Route::get('funcionario/{id}', [FuncionarioController::class, 'show']);
+    Route::get('funcionarios/{id}', [FuncionarioController::class, 'show']);
 
-    Route::post('funcionario', [FuncionarioController::class, 'store']);
+    Route::post('funcionarios', [FuncionarioController::class, 'store']);
 
-    Route::put('funcionario/{id}', [FuncionarioController::class, 'update']);
+    Route::put('funcionarios/{id}', [FuncionarioController::class, 'update']);
 
-    Route::delete('funcionario/{id}', [FuncionarioController::class, 'destroy']);
+    Route::delete('funcionarios/{id}', [FuncionarioController::class, 'destroy']);
 
     //============================ GRUPOS ==============================
     Route::get('grupos', [GrupoController::class, 'index']);
 
-    Route::get('grupo/{id}', [GrupoController::class, 'show']);
+    Route::get('grupos/{id}', [GrupoController::class, 'show']);
 
-    Route::post('grupo', [GrupoController::class, 'store']);
+    Route::post('grupos', [GrupoController::class, 'store']);
 
-    Route::put('grupo/{id}', [GrupoController::class, 'update']);
+    Route::put('grupos/{id}', [GrupoController::class, 'update']);
 
-    Route::delete('grupo/{id}', [GrupoController::class, 'destroy']);
+    Route::delete('grupos/{id}', [GrupoController::class, 'destroy']);
 
     //============================ USUARIOS ==============================
     Route::get('usuarios', [UsuarioController::class, 'index']);
 
-    Route::get('usuario/{id}', [UsuarioController::class, 'show']);
+    Route::get('usuarios/{id}', [UsuarioController::class, 'show']);
 
-    Route::post('usuario', [UsuarioController::class, 'store']);
+    Route::post('usuarios', [UsuarioController::class, 'store']);
 
-    Route::put('usuario/{id}', [UsuarioController::class, 'update']);
+    Route::put('usuarios/{id}', [UsuarioController::class, 'update']);
 
-    Route::delete('usuario/{id}', [UsuarioController::class, 'destroy']);
+    Route::delete('usuarios/{id}', [UsuarioController::class, 'destroy']);
 
     Route::put('trocar-chat-status', [UsuarioController::class, 'trocarChatStatus']);
 
@@ -105,68 +106,79 @@ Route::middleware(['jwt'])->group(function () {
     //============================ GRUPOS PRODUTOS ==============================
     Route::get('grupos-produtos', [GrupoProdutoController::class, 'index']);
 
-    Route::get('grupo-produto/{id}', [GrupoProdutoController::class, 'show']);
+    Route::get('grupo-produtos/{id}', [GrupoProdutoController::class, 'show']);
 
-    Route::post('grupo-produto', [GrupoProdutoController::class, 'store']);
+    Route::post('grupo-produtos', [GrupoProdutoController::class, 'store']);
 
-    Route::put('grupo-produto/{id}', [GrupoProdutoController::class, 'update']);
+    Route::put('grupo-produtos/{id}', [GrupoProdutoController::class, 'update']);
 
-    Route::delete('grupo-produto/{id}', [GrupoProdutoController::class, 'destroy']);
+    Route::delete('grupo-produtos/{id}', [GrupoProdutoController::class, 'destroy']);
 
     //============================ UNIDADES PRODUTOS ==============================
     Route::get('unidades-produtos', [UnidadeProdutoController::class, 'index']);
 
-    Route::get('unidade-produto/{id}', [UnidadeProdutoController::class, 'show']);
+    Route::get('unidades-produtos/{id}', [UnidadeProdutoController::class, 'show']);
 
-    Route::post('unidade-produto', [UnidadeProdutoController::class, 'store']);
+    Route::post('unidades-produtos', [UnidadeProdutoController::class, 'store']);
 
-    Route::put('unidade-produto/{id}', [UnidadeProdutoController::class, 'update']);
+    Route::put('unidades-produtos/{id}', [UnidadeProdutoController::class, 'update']);
 
-    Route::delete('unidade-produto/{id}', [UnidadeProdutoController::class, 'destroy']);
+    Route::delete('unidades-produtos/{id}', [UnidadeProdutoController::class, 'destroy']);
 
     //============================ TIPOS VARIACOES PRODUTOS ==============================
     Route::get('tipos-variacoes-produtos', [TipoVariacaoProdutoController::class, 'index']);
 
-    Route::get('tipo-variacao-produto/{id}', [TipoVariacaoProdutoController::class, 'show']);
+    Route::get('tipos-variacoes-produtos/{id}', [TipoVariacaoProdutoController::class, 'show']);
 
-    Route::post('tipo-variacao-produto', [TipoVariacaoProdutoController::class, 'store']);
+    Route::post('tipos-variacoes-produtos', [TipoVariacaoProdutoController::class, 'store']);
 
-    Route::put('tipo-variacao-produto/{id}', [TipoVariacaoProdutoController::class, 'update']);
+    Route::put('tipos-variacoes-produtos/{id}', [TipoVariacaoProdutoController::class, 'update']);
 
-    Route::delete('tipo-variacao-produto/{id}', [TipoVariacaoProdutoController::class, 'destroy']);
+    Route::delete('tipos-variacoes-produtos/{id}', [TipoVariacaoProdutoController::class, 'destroy']);
 
     //============================ NOMES VARIACOES PRODUTOS ==============================
     Route::get('nomes-variacoes-produtos', [NomeVariacaoProdutoController::class, 'index']);
 
-    Route::get('nome-variacao-produto/{id}', [NomeVariacaoProdutoController::class, 'show']);
+    Route::get('nomes-variacoes-produtos/{id}', [NomeVariacaoProdutoController::class, 'show']);
 
-    Route::post('nome-variacao-produto', [NomeVariacaoProdutoController::class, 'store']);
+    Route::post('nomes-variacoes-produtos', [NomeVariacaoProdutoController::class, 'store']);
 
-    Route::put('nome-variacao-produto/{id}', [NomeVariacaoProdutoController::class, 'update']);
+    Route::put('nomes-variacoes-produtos/{id}', [NomeVariacaoProdutoController::class, 'update']);
 
-    Route::delete('nome-variacao-produto/{id}', [NomeVariacaoProdutoController::class, 'destroy']);
+    Route::delete('nomes-variacoes-produtos/{id}', [NomeVariacaoProdutoController::class, 'destroy']);
 
     //============================ PORCENTAGENS LUCROS ==============================
     Route::get('porcentagens-lucros', [PorcentagemLucroController::class, 'index']);
 
-    Route::get('porcentagem-lucro/{id}', [PorcentagemLucroController::class, 'show']);
+    Route::get('porcentagens-lucros/{id}', [PorcentagemLucroController::class, 'show']);
 
-    Route::post('porcentagem-lucro', [PorcentagemLucroController::class, 'store']);
+    Route::post('porcentagens-lucros', [PorcentagemLucroController::class, 'store']);
 
-    Route::put('porcentagem-lucro/{id}', [PorcentagemLucroController::class, 'update']);
+    Route::put('porcentagens-lucros/{id}', [PorcentagemLucroController::class, 'update']);
 
-    Route::delete('porcentagem-lucro/{id}', [PorcentagemLucroController::class, 'destroy']);
+    Route::delete('porcentagens-lucros/{id}', [PorcentagemLucroController::class, 'destroy']);
 
     //============================ PRODUTOS ==============================
     Route::get('produtos', [ProdutoController::class, 'index']);
 
-    Route::get('produto/{id}', [ProdutoController::class, 'show']);
+    Route::get('produtos/{id}', [ProdutoController::class, 'show']);
 
-    Route::post('produto', [ProdutoController::class, 'store']);
+    Route::post('produtos', [ProdutoController::class, 'store']);
 
-    Route::put('produto/{id}', [ProdutoController::class, 'update']);
+    Route::put('produtos/{id}', [ProdutoController::class, 'update']);
 
-    Route::delete('produto/{id}', [ProdutoController::class, 'destroy']);
+    Route::delete('produtos/{id}', [ProdutoController::class, 'destroy']);
+
+    //============================ SERVICOS ==============================
+    Route::get('servicos', [ServicoController::class, 'index']);
+
+    Route::get('servicos/{id}', [ServicoController::class, 'show']);
+
+    Route::post('servicos', [ServicoController::class, 'store']);
+
+    Route::put('servicos/{id}', [ServicoController::class, 'update']);
+
+    Route::delete('servicos/{id}', [ServicoController::class, 'destroy']);
 
     //============================ MESSAGES ==============================
     Route::get('messages', [MessageController::class, 'fetchMessages']);

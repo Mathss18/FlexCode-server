@@ -2,34 +2,54 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\APIHelper;
 use App\Http\Resources\Json;
+use App\Models\FotoProduto;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use App\Models\Produto;
+use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ProdutoController extends Controller
 {
     public function index()
     {
         //$produtos = Produto::paginate(15);
-        $produtos = Produto::all();
-        return Json::collection($produtos);
+        try {
+            $produtos = Produto::with(['foto_produto','fornecedores','cliente'])->get();
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso', $produtos);
+            return response()->json($response, 200);
+        } catch (Exception  $ex) {
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+            return response()->json($response, 500);
+        }
     }
 
     public function show($id)
     {
-        $produto = Produto::findOrFail($id);
-        return new Json($produto);
+        try {
+            $produto = Produto::with(['foto_produto','fornecedores','cliente'])->findOrFail($id);
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso', $produto);
+            return response()->json($response, 200);
+        } catch (Exception  $ex) {
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+            return response()->json($response, 500);
+        }
     }
 
     public function store(Request $request)
     {
 
         $produto = new Produto;
+
         $produto->nome = $request->input('nome');
-        $produto->fotos = $request->input('fotos');
-        $produto->fotoPrincipal = $request->input('fotoPrincipal');
         $produto->codigoInterno = $request->input('codigoInterno');
+        $produto->fotoPrincipal = '';
         $produto->grupo_produto_id = $request->input('grupo_produto_id');
+        $produto->unidade_produto_id = $request->input('unidade_produto_id');
         $produto->movimentaEstoque = $request->input('movimentaEstoque');
         $produto->habilitaNotaFiscal = $request->input('habilitaNotaFiscal');
         $produto->possuiVariacoes = $request->input('possuiVariacoes');
@@ -57,23 +77,76 @@ class ProdutoController extends Controller
         $produto->valorFixoPisSt = $request->input('valorFixoPisSt');
         $produto->valorFixoCofins = $request->input('valorFixoCofins');
         $produto->valorFixoCofinsSt = $request->input('valorFixoCofinsSt');
+        $produto->cliente_id = $request->input('cliente_id')['value'] ?? null;
 
-        dd($produto);
-        exit;
+        // Cadastra o produto
+        try {
+            $produto->save();
+        } catch (Exception  $ex) {
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+            return response()->json($response, 500);
+        }
 
+        // Cadastra a foto principal do produto
+        if ($this->is_base64($request->input('fotoPrincipal')['foto'])) {
+            $image = $request->input('fotoPrincipal')['foto'];
+            $imageName = $request->input('fotoPrincipal')['nome'];
+            $folderName = "produtos/" . $produto->id; // ID do produto que foi cadastrado
 
-        // if ($produto->save()) {
-        //     return new Json($produto);
-        // }
+            if ($return = $this->upload($image, $imageName, $folderName)) {
+                $produto->fotoPrincipal = $return;
+            }
+        }
+
+        // Cadastra as demais fotos do produto
+        foreach ($request->input('foto_produto') as $key => $value) {
+            if ($this->is_base64($value['foto'])) {
+                $image = $value['foto'];
+                $imageName = $value['nome'];
+                $folderName = "produtos/" . $produto->id; // ID do produto que foi cadastrado
+
+                if ($return = $this->upload($image, $imageName, $folderName)) {
+                    $fotoProduto = new FotoProduto;
+                    $fotoProduto->nome = $value['nome'];
+                    $fotoProduto->tamanho = $value['tamanho'];
+                    $fotoProduto->produto_id = $produto->id;
+                    $fotoProduto->foto = $return;
+                    try {
+                        $fotoProduto->save();
+                    } catch (Exception  $ex) {
+                        $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+                        return response()->json($response, 500);
+                    }
+                }
+            }
+        }
+
+        // Cadastra os fornecedores do produto
+        foreach ($request->input('fornecedores_id') as $key => $value) {
+            try {
+                DB::table('fornecedores_produtos')->insert(
+                    [
+                        'fornecedor_id' => $value['value'],
+                        'produto_id' => $produto->id,
+                        'created_at' => Carbon::now(),
+                        'updated_at' => Carbon::now()
+                    ]
+                );
+            } catch (Exception  $ex) {
+                $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+            }
+        }
     }
 
     public function update(Request $request)
     {
-        $produto = new Produto;
+
+        $produto = Produto::findOrFail($request->id);
         $produto->nome = $request->input('nome');
         $produto->codigoInterno = $request->input('codigoInterno');
-        $produto->fotoPrincipal = $request->input('fotoPrincipal');
+        $produto->fotoPrincipal = '';
         $produto->grupo_produto_id = $request->input('grupo_produto_id');
+        $produto->unidade_produto_id = $request->input('unidade_produto_id');
         $produto->movimentaEstoque = $request->input('movimentaEstoque');
         $produto->habilitaNotaFiscal = $request->input('habilitaNotaFiscal');
         $produto->possuiVariacoes = $request->input('possuiVariacoes');
@@ -101,9 +174,88 @@ class ProdutoController extends Controller
         $produto->valorFixoPisSt = $request->input('valorFixoPisSt');
         $produto->valorFixoCofins = $request->input('valorFixoCofins');
         $produto->valorFixoCofinsSt = $request->input('valorFixoCofinsSt');
+        $produto->cliente_id = $request->input('cliente_id')['value'] ?? null;
 
-        if ($produto->save()) {
-            return new Json($produto);
+
+        // Edita a foto principal do produto
+        if (is_array($request->input('fotoPrincipal')) && $this->is_base64($request->input('fotoPrincipal')['foto'])) {
+            $image = $request->input('fotoPrincipal')['foto'];
+            $imageName = $request->input('fotoPrincipal')['nome'];
+            $folderName = "produtos/" . $produto->id; // ID do produto que foi cadastrado
+
+            if ($return = $this->upload($image, $imageName, $folderName)) {
+                $produto->fotoPrincipal = $return;
+            }
+        } else if (is_array($request->input('fotoPrincipal'))) {
+            $produto->fotoPrincipal = $request->input('fotoPrincipal')['foto'];
+        } else {
+            $produto->fotoPrincipal = $request->input('fotoPrincipal');
+        }
+
+        // Edita as demais fotos do produto
+        DB::table('fotos_produtos')->where('produto_id', $produto->id)->delete();
+        foreach ($request->input('foto_produto') as $key => $value) {
+
+            if ($this->is_base64($value['foto'])) {
+                $image = $value['foto'];
+                $imageName = $value['nome'];
+                $folderName = "produtos/" . $produto->id; // ID do produto que foi editado
+
+                if ($return = $this->upload($image, $imageName, $folderName)) {
+                    $fotoProduto = new FotoProduto;
+                    $fotoProduto->nome = $value['nome'];
+                    $fotoProduto->tamanho = $value['tamanho'];
+                    $fotoProduto->produto_id = $produto->id;
+                    $fotoProduto->foto = $return;
+                    try {
+                        $fotoProduto->save();
+                    } catch (Exception  $ex) {
+                        $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+                        return response()->json($response, 500);
+                    }
+                }
+            } else {
+                // return response($request->input('foto_produto'), 500);
+                $fotoProduto = new FotoProduto;
+                $fotoProduto->nome = $value['nome'];
+                $fotoProduto->tamanho = $value['tamanho'];
+                $fotoProduto->produto_id = $produto->id;
+                $fotoProduto->foto = $value['foto'];
+                try {
+                    $fotoProduto->save();
+                } catch (Exception  $ex) {
+                    $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+                    return response()->json($response, 500);
+                }
+            }
+        }
+
+        // Edita os fornecedores do produto
+        DB::table('fornecedores_produtos')->where('produto_id', $produto->id)->delete();
+        foreach ($request->input('fornecedores_id') as $key => $value) {
+            try {
+                DB::table('fornecedores_produtos')->insert(
+                    [
+                        'fornecedor_id' => $value['value'],
+                        'produto_id' => $produto->id,
+                        'created_at' => Carbon::now(),
+                        'updated_at' => Carbon::now()
+                    ]
+                );
+            } catch (Exception  $ex) {
+                $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+            }
+        }
+
+        // dd($produto);
+
+        try {
+            $produto->save();
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso ao cadastrar o produto', $produto);
+            return response()->json($response, 200);
+        } catch (Exception  $ex) {
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+            return response()->json($response, 500);
         }
     }
 
@@ -112,6 +264,37 @@ class ProdutoController extends Controller
         $produto = Produto::findOrFail($id);
         if ($produto->delete()) {
             return new Json($produto);
+        }
+    }
+
+
+    protected function upload($file, $fileName, $folderName)
+    {
+        $extension = explode('/', explode(':', substr($file, 0, strpos($file, ';')))[1])[1];
+        $replace = substr($file, 0, strpos($file, ',') + 1);
+        $file = str_replace($replace, '', $file);
+        $file = str_replace(' ', '+', $file);
+
+        $imageName = Str::kebab($fileName) . '.' . $extension;
+        $fileUploaded = Storage::put('public/' . $folderName . '/' . $imageName, base64_decode($file));
+
+        if ($fileUploaded) {
+            $url = config('app.url') . ':' . config('app.port') . '/' . "storage/" . $folderName . '/' . $imageName;
+            return $url;
+        }
+        return $fileUploaded;
+    }
+
+    protected function is_base64($file)
+    {
+        $replace = substr($file, 0, strpos($file, ',') + 1);
+        $file = str_replace($replace, '', $file);
+        $file = str_replace(' ', '+', $file);
+
+        if (base64_encode(base64_decode($file, true)) === $file) {
+            return true;
+        } else {
+            return false;
         }
     }
 }

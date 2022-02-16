@@ -31,7 +31,7 @@ class FuncionarioController extends Controller
     {
 
         try {
-            $funcionario = Funcionario::where('id', $id)->with(['grupo', 'usuario'])->first();
+            $funcionario = Funcionario::with(['grupo', 'usuario'])->findOrFail($id);
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', $funcionario);
             return response()->json($response, 200);
         } catch (Exception  $ex) {

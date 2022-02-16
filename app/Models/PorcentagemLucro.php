@@ -11,8 +11,9 @@ class PorcentagemLucro extends Model
     protected $table = "porcentagens_lucros";
     use HasFactory;
 
-    public function porcentagem_lucro_produto()
+    public function grupo_produto()
     {
-        return $this->hasMany(Produto::class);
+        return $this->belongsToMany(GrupoProduto::class, 'porcentagens_lucros_grupos_produtos');
     }
+
 }

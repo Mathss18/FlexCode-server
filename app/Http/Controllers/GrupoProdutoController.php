@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Helpers\APIHelper;
 use App\Models\GrupoProduto;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class GrupoProdutoController extends Controller
 {
@@ -13,7 +15,7 @@ class GrupoProdutoController extends Controller
     {
         //$grupoProduto = grupoProduto::paginate(15);
         try {
-            $gruposProdutos = GrupoProduto::all();
+            $gruposProdutos = GrupoProduto::with('porcentagem_lucro')->get();
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', $gruposProdutos);
             return response()->json($response, 200);
         } catch (Exception  $ex) {
@@ -25,7 +27,7 @@ class GrupoProdutoController extends Controller
     public function show($id)
     {
         try {
-            $grupoProduto = GrupoProduto::findOrFail($id);
+            $grupoProduto = GrupoProduto::with('porcentagem_lucro')->findOrFail($id);
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', $grupoProduto);
             return response()->json($response, 200);
         } catch (Exception  $ex) {
@@ -43,11 +45,28 @@ class GrupoProdutoController extends Controller
         try {
             $grupoProduto->save();
             $response = APIHelper::APIResponse(true, 200, 'Sucesso ao cadastrar o grupo', $grupoProduto);
-            return response()->json($response, 200);
         } catch (Exception  $ex) {
             $response = APIHelper::APIResponse(false, 500, null, null, $ex);
             return response()->json($response, 500);
         }
+
+
+        // Cadastra as porcentagens de lucro do grupo de produto
+        foreach ($request->input('porcentagensLucros') as $key => $value) {
+            $porcentagemLucroProdutos = [];
+            $porcentagemLucroProdutos['porcentagem_lucro_id'] = $value['id'];
+            $porcentagemLucroProdutos['grupo_produto_produto_id'] = $grupoProduto->id; // ID do grupo de produto que foi cadastrado
+            DB::table('porcentagens_lucros_grupos_produtos')->insert(
+                [
+                    'porcentagem_lucro_id' => $value['id'],
+                    'grupo_produto_id' => $grupoProduto->id,
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now()
+                ]
+            );
+        }
+
+        return response()->json($response, 200);
     }
 
     public function update(Request $request)
@@ -55,6 +74,23 @@ class GrupoProdutoController extends Controller
         $grupoProduto = GrupoProduto::findOrFail($request->id);
         $grupoProduto->nome = $request->input('nome');
         $grupoProduto->grupoPai = $request->input('grupoPai');
+
+        // Edita as porcentagens de lucro do grupo de produto
+        DB::table('porcentagens_lucros_grupos_produtos')->where('grupo_produto_id', $grupoProduto->id)->delete();
+
+        foreach ($request->input('porcentagensLucros') as $key => $value) {
+            $porcentagemLucroProdutos = [];
+            $porcentagemLucroProdutos['porcentagem_lucro_id'] = $value['id'];
+            $porcentagemLucroProdutos['grupo_produto_produto_id'] = $grupoProduto->id; // ID do grupo de produto que foi cadastrado
+            DB::table('porcentagens_lucros_grupos_produtos')->insert(
+                [
+                    'porcentagem_lucro_id' => $value['id'],
+                    'grupo_produto_id' => $grupoProduto->id,
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now()
+                ]
+            );
+        }
 
         try {
             $grupoProduto->save();
