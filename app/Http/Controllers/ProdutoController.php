@@ -52,7 +52,7 @@ class ProdutoController extends Controller
         $produto->unidade_produto_id = $request->input('unidade_produto_id');
         $produto->movimentaEstoque = $request->input('movimentaEstoque');
         $produto->habilitaNotaFiscal = $request->input('habilitaNotaFiscal');
-        $produto->possuiVariacoes = $request->input('possuiVariacoes');
+        $produto->codigoBarras = $request->input('codigoBarras');
         $produto->peso = $request->input('peso');
         $produto->largura = $request->input('largura');
         $produto->altura = $request->input('altura');
@@ -124,7 +124,7 @@ class ProdutoController extends Controller
         // Cadastra os fornecedores do produto
         foreach ($request->input('fornecedores_id') as $key => $value) {
             try {
-                DB::table('fornecedores_produtos')->insert(
+                DB::table('produtos_fornecedores')->insert(
                     [
                         'fornecedor_id' => $value['value'],
                         'produto_id' => $produto->id,
@@ -149,7 +149,7 @@ class ProdutoController extends Controller
         $produto->unidade_produto_id = $request->input('unidade_produto_id');
         $produto->movimentaEstoque = $request->input('movimentaEstoque');
         $produto->habilitaNotaFiscal = $request->input('habilitaNotaFiscal');
-        $produto->possuiVariacoes = $request->input('possuiVariacoes');
+        $produto->codigoBarras = $request->input('codigoBarras');
         $produto->peso = $request->input('peso');
         $produto->largura = $request->input('largura');
         $produto->altura = $request->input('altura');
@@ -193,7 +193,7 @@ class ProdutoController extends Controller
         }
 
         // Edita as demais fotos do produto
-        DB::table('fotos_produtos')->where('produto_id', $produto->id)->delete();
+        DB::table('produtos_fotos')->where('produto_id', $produto->id)->delete();
         foreach ($request->input('foto_produto') as $key => $value) {
 
             if ($this->is_base64($value['foto'])) {
@@ -231,10 +231,10 @@ class ProdutoController extends Controller
         }
 
         // Edita os fornecedores do produto
-        DB::table('fornecedores_produtos')->where('produto_id', $produto->id)->delete();
+        DB::table('produtos_fornecedores')->where('produto_id', $produto->id)->delete();
         foreach ($request->input('fornecedores_id') as $key => $value) {
             try {
-                DB::table('fornecedores_produtos')->insert(
+                DB::table('produtos_fornecedores')->insert(
                     [
                         'fornecedor_id' => $value['value'],
                         'produto_id' => $produto->id,

@@ -17,6 +17,7 @@ use App\Http\Controllers\TipoVariacaoProdutoController;
 use App\Http\Controllers\TransportadoraController;
 use App\Http\Controllers\UnidadeProdutoController;
 use App\Http\Controllers\UsuarioController;
+use App\Http\Controllers\OrdemServicoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -106,13 +107,13 @@ Route::middleware(['jwt'])->group(function () {
     //============================ GRUPOS PRODUTOS ==============================
     Route::get('grupos-produtos', [GrupoProdutoController::class, 'index']);
 
-    Route::get('grupo-produtos/{id}', [GrupoProdutoController::class, 'show']);
+    Route::get('grupos-produtos/{id}', [GrupoProdutoController::class, 'show']);
 
-    Route::post('grupo-produtos', [GrupoProdutoController::class, 'store']);
+    Route::post('grupos-produtos', [GrupoProdutoController::class, 'store']);
 
-    Route::put('grupo-produtos/{id}', [GrupoProdutoController::class, 'update']);
+    Route::put('grupos-produtos/{id}', [GrupoProdutoController::class, 'update']);
 
-    Route::delete('grupo-produtos/{id}', [GrupoProdutoController::class, 'destroy']);
+    Route::delete('grupos-produtos/{id}', [GrupoProdutoController::class, 'destroy']);
 
     //============================ UNIDADES PRODUTOS ==============================
     Route::get('unidades-produtos', [UnidadeProdutoController::class, 'index']);
@@ -193,5 +194,15 @@ Route::middleware(['jwt'])->group(function () {
 
     Route::get('mensagens-nao-lidas', [MessageController::class, 'getUnreadMessages']);
 
+    //============================ ORDENS SERVICOS ==============================
+    Route::get('ordens-servicos', [OrdemServicoController::class, 'index']);
+
+    Route::get('ordens-servicos/{id}', [OrdemServicoController::class, 'show']);
+
+    Route::post('ordens-servicos', [OrdemServicoController::class, 'store']);
+
+    Route::put('ordens-servicos/{id}', [OrdemServicoController::class, 'update']);
+
+    Route::delete('ordens-servicos/{id}', [OrdemServicoController::class, 'destroy']);
 
 });

@@ -2,18 +2,18 @@
 
 namespace Database\Factories;
 
-use App\Models\Cliente;
+use App\Models\Fornecedor;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
-class ClienteFactory extends Factory
+class FornecedorFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
      *
      * @var string
      */
-    protected $model = Cliente::class;
+    protected $model = Fornecedor::class;
 
     /**
      * Define the model's default state.
@@ -22,8 +22,8 @@ class ClienteFactory extends Factory
      */
     public function definition()
     {
-        $tipoCliente = $this->faker->randomElement(['pf', 'pj']);
-        switch ($tipoCliente) {
+        $tipoFornecedor = $this->faker->randomElement(['pf', 'pj']);
+        switch ($tipoFornecedor) {
             case 'pf':
                 $cpfCnpj = $this->faker->numerify('###########');
                 break;
@@ -35,7 +35,7 @@ class ClienteFactory extends Factory
                 break;
         }
         return [
-            'tipoCliente' => $tipoCliente,
+            'tipoFornecedor' => $tipoFornecedor,
             'situacao' => $this->faker->randomElement([1, 0]),
             'tipoContribuinte' => $this->faker->randomElement([1, 2, 9]),
             'inscricaoEstadual' => $this->faker->numerify('############'),

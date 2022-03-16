@@ -15,7 +15,7 @@ class AuthController extends Controller
         //dd($resp);
 
         if (!$token = auth('api')->attempt($credentials)) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['error' => 'Unauthorized'], 403);
         }
 
         return $this->respondWithToken($token);
@@ -57,7 +57,7 @@ class AuthController extends Controller
      */
     protected function respondWithToken($token)
     {
-        $userLoggedInfo = auth('api')->user()->getAttributes(); // oega o usuario logado
+        $userLoggedInfo = auth('api')->user()->getAttributes(); // pega o usuario logado
         $userLoggedInfo = (object) $userLoggedInfo; // transforma em objeto
         unset($userLoggedInfo->senha); // remove a senha do objeto para retornar
 
