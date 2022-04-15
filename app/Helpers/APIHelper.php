@@ -18,7 +18,7 @@ class APIHelper
             }
             else if($exeption instanceof QueryException){
                 switch ($exeption->errorInfo[1]) {
-                    case 1048:
+                    case 10480:
                         $errorMessage = 'Favor preencher todos os campos obrigatorios';
                         break;
                     case 1366:

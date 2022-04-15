@@ -10,6 +10,7 @@ use App\Http\Controllers\GrupoController;
 use App\Http\Controllers\GrupoProdutoController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NomeVariacaoProdutoController;
+use App\Http\Controllers\OrcamentoController;
 use App\Http\Controllers\PorcentagemLucroController;
 use App\Http\Controllers\ProdutoController;
 use App\Http\Controllers\ServicoController;
@@ -204,5 +205,16 @@ Route::middleware(['jwt'])->group(function () {
     Route::put('ordens-servicos/{id}', [OrdemServicoController::class, 'update']);
 
     Route::delete('ordens-servicos/{id}', [OrdemServicoController::class, 'destroy']);
+
+    //============================ ORCAMENTOS ==============================
+    Route::get('orcamentos', [OrcamentoController::class, 'index']);
+
+    Route::get('orcamentos/{id}', [OrcamentoController::class, 'show']);
+
+    Route::post('orcamentos', [OrcamentoController::class, 'store']);
+
+    Route::put('orcamentos/{id}', [OrcamentoController::class, 'update']);
+
+    Route::delete('orcamentos/{id}', [OrcamentoController::class, 'destroy']);
 
 });
