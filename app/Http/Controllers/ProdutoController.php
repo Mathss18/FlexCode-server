@@ -19,7 +19,7 @@ class ProdutoController extends Controller
     {
         //$produtos = Produto::paginate(15);
         try {
-            $produtos = Produto::with(['foto_produto','fornecedores','cliente'])->get();
+            $produtos = Produto::with(['foto_produto','fornecedores','cliente','unidade_produto'])->get();
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', $produtos);
             return response()->json($response, 200);
         } catch (Exception  $ex) {
@@ -31,7 +31,7 @@ class ProdutoController extends Controller
     public function show($id)
     {
         try {
-            $produto = Produto::with(['foto_produto','fornecedores','cliente'])->findOrFail($id);
+            $produto = Produto::with(['foto_produto','fornecedores','cliente','unidade_produto'])->findOrFail($id);
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', $produto);
             return response()->json($response, 200);
         } catch (Exception  $ex) {

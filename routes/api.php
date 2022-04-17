@@ -19,6 +19,7 @@ use App\Http\Controllers\TransportadoraController;
 use App\Http\Controllers\UnidadeProdutoController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\OrdemServicoController;
+use App\Http\Controllers\OrdemServicoFuncionarioController;
 
 /*
 |--------------------------------------------------------------------------
@@ -205,6 +206,17 @@ Route::middleware(['jwt'])->group(function () {
     Route::put('ordens-servicos/{id}', [OrdemServicoController::class, 'update']);
 
     Route::delete('ordens-servicos/{id}', [OrdemServicoController::class, 'destroy']);
+
+     //============================ ORDENS SERVICOS FUNCIOARIOS ==============================
+     Route::get('ordens-servicos-funcionarios', [OrdemServicoFuncionarioController::class, 'index']);
+
+     Route::get('ordens-servicos-funcionarios/{id}', [OrdemServicoFuncionarioController::class, 'show']);
+
+     Route::post('ordens-servicos-funcionarios', [OrdemServicoFuncionarioController::class, 'store']);
+
+     Route::put('ordens-servicos-funcionarios/{id}', [OrdemServicoFuncionarioController::class, 'update']);
+
+     Route::delete('ordens-servicos-funcionarios/{id}', [OrdemServicoFuncionarioController::class, 'destroy']);
 
     //============================ ORCAMENTOS ==============================
     Route::get('orcamentos', [OrcamentoController::class, 'index']);

@@ -3,6 +3,7 @@
 namespace App\Models;
 use App\Models\FotoProduto;
 use App\Models\Fornecedor;
+use App\Models\UnidadeProduto;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -24,6 +25,11 @@ class Produto extends Model
     public function cliente()
     {
         return $this->belongsTo(Cliente::class);
+    }
+
+    public function unidade_produto()
+    {
+        return $this->belongsTo(UnidadeProduto::class);
     }
 
 }
