@@ -15,7 +15,7 @@ class CreateOrcamentosTable extends Migration
     {
         Schema::create('orcamentos', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->integer('numero');
+            $table->integer('numero')->unique();
             $table->foreignId('cliente_id')->nullable()->constrained('clientes');
             $table->foreignId('transportadora_id')->nullable()->constrained('transportadoras');
             $table->integer('situacao');
@@ -24,8 +24,8 @@ class CreateOrcamentosTable extends Migration
             $table->double('outros', 8, 2);
             $table->double('desconto', 8, 2);
             $table->double('total', 8, 2);
-            $table->string('observacao');
-            $table->string('observacaoInterna');
+            $table->string('observacao')->nullable();
+            $table->string('observacaoInterna')->nullable();
             $table->timestamps();
         });
     }

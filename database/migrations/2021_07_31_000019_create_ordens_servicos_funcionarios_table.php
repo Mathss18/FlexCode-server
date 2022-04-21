@@ -17,7 +17,7 @@ class CreateOrdensServicosFuncionariosTable extends Migration
             $table->bigIncrements('id');
             $table->foreignId('funcionario_id')->nullable()->constrained('funcionarios');
             $table->foreignId('ordem_servico_id')->nullable()->constrained('ordens_servicos');
-            $table->boolean('finalizado')->default(false);
+            $table->integer('status')->default(0);
             $table->string('dataFinalizado')->nullable();
             $table->string('observacao')->nullable();
             $table->timestamps();

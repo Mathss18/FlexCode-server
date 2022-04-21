@@ -35,6 +35,8 @@ use App\Http\Controllers\OrdemServicoFuncionarioController;
 //============================ AUTH ==============================
 Route::post('login', [AuthController::class, 'login']);
 
+Route::get('ordens-servicos-acompanhar/{idOrdemServico}', [OrdemServicoFuncionarioController::class, 'getAcompanhemntoOrdemServico']);
+
 Route::middleware(['jwt'])->group(function () {
 
     //============================ CLIENTES ==============================
@@ -210,7 +212,11 @@ Route::middleware(['jwt'])->group(function () {
      //============================ ORDENS SERVICOS FUNCIOARIOS ==============================
      Route::get('ordens-servicos-funcionarios', [OrdemServicoFuncionarioController::class, 'index']);
 
-     Route::get('ordens-servicos-funcionarios/{id}', [OrdemServicoFuncionarioController::class, 'show']);
+     Route::get('ordens-servicos-funcionarios/{idUsuario}/abertas', [OrdemServicoFuncionarioController::class, 'showAbertas']);
+
+     Route::get('ordens-servicos-funcionarios/{idUsuario}/fazendo', [OrdemServicoFuncionarioController::class, 'showFazendo']);
+
+     Route::get('ordens-servicos-funcionarios/{idUsuario}/finalizadas', [OrdemServicoFuncionarioController::class, 'showFinalizadas']);
 
      Route::post('ordens-servicos-funcionarios', [OrdemServicoFuncionarioController::class, 'store']);
 

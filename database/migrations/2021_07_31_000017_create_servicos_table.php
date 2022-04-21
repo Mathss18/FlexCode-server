@@ -15,8 +15,8 @@ class CreateServicosTable extends Migration
     {
         Schema::create('servicos', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('nome');
-            $table->string('codigoInterno');
+            $table->string('nome')->unique();
+            $table->string('codigoInterno')->unique();
             $table->double('valor', 8, 4);
             $table->double('comissao', 8, 2);
             $table->string('descricao');

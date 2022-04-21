@@ -15,7 +15,7 @@ class CreateGruposProdutosTable extends Migration
     {
         Schema::create('grupos_produtos', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('nome');
+            $table->string('nome')->unique();
             $table->integer('grupoPai')->nullable();
             $table->timestamps();
         });

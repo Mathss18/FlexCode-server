@@ -178,7 +178,7 @@ class FuncionarioController extends Controller
         // Edita o funcionario
         try {
             $funcionario->save();
-            $response = APIHelper::APIResponse(true, 200, 'Sucesso ao editar o func$funcionario', $funcionario);
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso ao editar o funcionario', $funcionario);
             return response()->json($response, 200);
         } catch (Exception  $ex) {
             $response = APIHelper::APIResponse(false, 500, null, null, $ex);

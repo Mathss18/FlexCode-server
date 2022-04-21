@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\APIHelper;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
@@ -15,7 +16,8 @@ class AuthController extends Controller
         //dd($resp);
 
         if (!$token = auth('api')->attempt($credentials)) {
-            return response()->json(['error' => 'Unauthorized'], 403);
+            $response = APIHelper::APIResponse(false, 403, 'Unauthorized');
+            return response()->json($response, 403);
         }
 
         return $this->respondWithToken($token);

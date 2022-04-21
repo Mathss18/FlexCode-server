@@ -15,9 +15,9 @@ class CreateUnidadesProdutosTable extends Migration
     {
         Schema::create('unidades_produtos', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('nome');
-            $table->string('sigla');
-            $table->boolean('padrao');
+            $table->string('nome')->unique();
+            $table->string('sigla')->unique();
+            $table->boolean('padrao')->nullable();
             $table->timestamps();
         });
     }

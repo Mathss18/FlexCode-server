@@ -89,7 +89,7 @@ class OrdemServicoController extends Controller
                             'quantidade' => $servico['quantidade'],
                             'preco' => $servico['preco'],
                             'total' => $servico['total'],
-                            'observacao' => $produto['observacao'],
+                            'observacao' => $servico['observacao'],
                             'created_at' => Carbon::now(),
                             'updated_at' => Carbon::now(),
                         ]
@@ -99,11 +99,22 @@ class OrdemServicoController extends Controller
 
             // Cadastra os funcionários da ordem de serviço
             if ($funcionarios) {
+                $stausOrdemServicoFuncionario = 0;
+
+                if($ordensServicos->situacao == 0){
+                    $stausOrdemServicoFuncionario = 0;
+                }
+                else if($ordensServicos->situacao == 1){
+                    $stausOrdemServicoFuncionario = 2;
+                }
+                else if($ordensServicos->situacao == 3){
+                    $stausOrdemServicoFuncionario = 2;
+                }
                 foreach ($funcionarios as $funcionario) {
                     $ordensServicos->funcionarios()->attach(
                         $funcionario['value'],
                         [
-                            'finalizado' => false,
+                            'status' => $stausOrdemServicoFuncionario,
                             'dataFinalizado' => null,
                             'observacao' => null,
                             'created_at' => Carbon::now(),
@@ -194,13 +205,24 @@ class OrdemServicoController extends Controller
 
             // Cadastra os funcionários da ordem de serviço
             if ($funcionarios) {
+                $stausOrdemServicoFuncionario = 0;
+
+                if($ordensServicos->situacao == 0){
+                    $stausOrdemServicoFuncionario = 0;
+                }
+                else if($ordensServicos->situacao == 1){
+                    $stausOrdemServicoFuncionario = 2;
+                }
+                else if($ordensServicos->situacao == 3){
+                    $stausOrdemServicoFuncionario = 2;
+                }
                 $ordensServicos->funcionarios()->detach();
                 foreach ($funcionarios as $funcionario) {
                     // DB::table('ordens_servicos_funcionarios')->where('funcionario_id', $funcionario['value'])->delete();
                     $ordensServicos->funcionarios()->attach(
                         $funcionario['value'],
                         [
-                            'finalizado' => false,
+                            'status' => $stausOrdemServicoFuncionario,
                             'dataFinalizado' => null,
                             'observacao' => null,
                             'created_at' => Carbon::now(),

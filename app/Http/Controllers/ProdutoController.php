@@ -80,23 +80,29 @@ class ProdutoController extends Controller
         $produto->cliente_id = $request->input('cliente_id')['value'] ?? null;
 
         // Cadastra o produto
+        DB::beginTransaction();
+
         try {
             $produto->save();
         } catch (Exception  $ex) {
+            DB::rollBack();
             $response = APIHelper::APIResponse(false, 500, null, null, $ex);
             return response()->json($response, 500);
         }
 
         // Cadastra a foto principal do produto
-        if ($this->is_base64($request->input('fotoPrincipal')['foto'])) {
-            $image = $request->input('fotoPrincipal')['foto'];
-            $imageName = $request->input('fotoPrincipal')['nome'];
-            $folderName = "produtos/" . $produto->id; // ID do produto que foi cadastrado
+        if($request->input('fotoPrincipal')){
+            if ($this->is_base64($request->input('fotoPrincipal')['foto'])) {
+                $image = $request->input('fotoPrincipal')['foto'];
+                $imageName = $request->input('fotoPrincipal')['nome'];
+                $folderName = "produtos/" . $produto->id; // ID do produto que foi cadastrado
 
-            if ($return = $this->upload($image, $imageName, $folderName)) {
-                $produto->fotoPrincipal = $return;
+                if ($return = $this->upload($image, $imageName, $folderName)) {
+                    $produto->fotoPrincipal = $return;
+                }
             }
         }
+
 
         // Cadastra as demais fotos do produto
         foreach ($request->input('foto_produto') as $key => $value) {
@@ -114,6 +120,7 @@ class ProdutoController extends Controller
                     try {
                         $fotoProduto->save();
                     } catch (Exception  $ex) {
+                        DB::rollBack();
                         $response = APIHelper::APIResponse(false, 500, null, null, $ex);
                         return response()->json($response, 500);
                     }
@@ -122,20 +129,28 @@ class ProdutoController extends Controller
         }
 
         // Cadastra os fornecedores do produto
-        foreach ($request->input('fornecedores_id') as $key => $value) {
-            try {
-                DB::table('produtos_fornecedores')->insert(
-                    [
-                        'fornecedor_id' => $value['value'],
-                        'produto_id' => $produto->id,
-                        'created_at' => Carbon::now(),
-                        'updated_at' => Carbon::now()
-                    ]
-                );
-            } catch (Exception  $ex) {
-                $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+        if(count($request->input('fornecedores_id')) > 0 && $request->input('fornecedores_id')[0]['value'] != null){
+            foreach ($request->input('fornecedores_id') as $key => $value) {
+                try {
+                    DB::table('produtos_fornecedores')->insert(
+                        [
+                            'fornecedor_id' => $value['value'],
+                            'produto_id' => $produto->id,
+                            'created_at' => Carbon::now(),
+                            'updated_at' => Carbon::now()
+                        ]
+                    );
+                } catch (Exception  $ex) {
+                    DB::rollBack();
+                    $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+                    return response()->json($response, 500);
+                }
             }
         }
+
+        DB::commit();
+        $response = APIHelper::APIResponse(true, 200, "Produto cadastrado com sucesso", $produto);
+        return response()->json($response, 200);
     }
 
     public function update(Request $request)
@@ -177,6 +192,8 @@ class ProdutoController extends Controller
         $produto->cliente_id = $request->input('cliente_id')['value'] ?? null;
 
 
+        DB::beginTransaction();
+
         // Edita a foto principal do produto
         if (is_array($request->input('fotoPrincipal')) && $this->is_base64($request->input('fotoPrincipal')['foto'])) {
             $image = $request->input('fotoPrincipal')['foto'];
@@ -210,6 +227,7 @@ class ProdutoController extends Controller
                     try {
                         $fotoProduto->save();
                     } catch (Exception  $ex) {
+                        DB::rollBack();
                         $response = APIHelper::APIResponse(false, 500, null, null, $ex);
                         return response()->json($response, 500);
                     }
@@ -224,6 +242,7 @@ class ProdutoController extends Controller
                 try {
                     $fotoProduto->save();
                 } catch (Exception  $ex) {
+                    DB::rollBack();
                     $response = APIHelper::APIResponse(false, 500, null, null, $ex);
                     return response()->json($response, 500);
                 }
@@ -243,17 +262,19 @@ class ProdutoController extends Controller
                     ]
                 );
             } catch (Exception  $ex) {
+                DB::rollBack();
                 $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+                return response()->json($response, 500);
             }
         }
 
-        // dd($produto);
-
         try {
             $produto->save();
-            $response = APIHelper::APIResponse(true, 200, 'Sucesso ao cadastrar o produto', $produto);
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso ao editar o produto', $produto);
+            DB::commit();
             return response()->json($response, 200);
         } catch (Exception  $ex) {
+            DB::rollBack();
             $response = APIHelper::APIResponse(false, 500, null, null, $ex);
             return response()->json($response, 500);
         }

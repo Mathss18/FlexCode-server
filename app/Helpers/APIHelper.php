@@ -17,18 +17,31 @@ class APIHelper
                 $errorMessage = 'Não foi possivel encontrar';
             }
             else if($exeption instanceof QueryException){
+                // dd($exeption);
                 switch ($exeption->errorInfo[1]) {
-                    case 10480:
-                        $errorMessage = 'Favor preencher todos os campos obrigatorios';
+                    case 1048:
+                        $errorMessage = 'Favor preencher todos os campos obrigatorios: '.$exeption->errorInfo[2];
+                        break;
+                    case 1264:
+                        $errorMessage = 'Favor preencher todos os campos corretamente: '.$exeption->errorInfo[2];
                         break;
                     case 1366:
-                        $errorMessage = 'Favor preencher os campos corretamente';
+                        $errorMessage = 'Favor preencher os campos corretamente: '.$exeption->errorInfo[2];
+                        break;
+                    case 1451:
+                        $errorMessage = 'Esta ação têm dependencias de outra(s) tabela(s): '.$exeption->errorInfo[2];
                         break;
                     case 1452:
-                        $errorMessage = 'Esta ação têm dependencias de outra(s) tabela(s)';
+                        $errorMessage = 'Esta ação têm dependencias de outra(s) tabela(s): '.$exeption->errorInfo[2];
+                        break;
+                    case 1446:
+                        $errorMessage = 'Esta tabela(s) não existe: '.$exeption->errorInfo[2];
+                        break;
+                    case 1062:
+                        $errorMessage = 'Este registro já foi cadastrado: '.$exeption->errorInfo[2];
                         break;
                     default:
-                        //dd($exeption);
+                        return response($exeption,500);
                         $errorMessage = $exeption->getMessage();
                         break;
                 }

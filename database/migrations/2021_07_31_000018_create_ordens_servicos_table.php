@@ -15,7 +15,7 @@ class CreateOrdensServicosTable extends Migration
     {
         Schema::create('ordens_servicos', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->integer('numero');
+            $table->integer('numero')->unique();
             $table->foreignId('cliente_id')->nullable()->constrained('clientes');
             $table->integer('situacao');
             $table->string('dataEntrada');
@@ -26,8 +26,8 @@ class CreateOrdensServicosTable extends Migration
             $table->double('outros', 8, 2);
             $table->double('desconto', 8, 2);
             $table->double('total', 8, 2);
-            $table->string('observacao');
-            $table->string('observacaoInterna');
+            $table->string('observacao')->nullable();
+            $table->string('observacaoInterna')->nullable();
             $table->timestamps();
         });
     }
