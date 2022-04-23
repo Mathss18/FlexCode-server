@@ -210,7 +210,7 @@ class FuncionarioController extends Controller
         $fileUploaded = Storage::put('public/' . $folderName . '/' . $imageName, base64_decode($file));
 
         if ($fileUploaded) {
-            $url = config('app.url') . ':' . config('app.port') . '/' . "storage/" . $folderName . '/' . $imageName;
+            $url = config('app.url') . config('app.port') . '/' . "storage/" . $folderName . '/' . $imageName;
             return $url;
         }
         return $fileUploaded;
