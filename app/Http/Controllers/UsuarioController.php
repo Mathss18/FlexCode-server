@@ -13,45 +13,72 @@ class UsuarioController extends Controller
     public function index()
     {
         //$usuarios = Usuario::paginate(15);
-        $usuarios = Usuario::all();
-        return Json::collection($usuarios);
+        try {
+            $usuarios = Usuario::all();
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso', $usuarios);
+            return response()->json($response, 200);
+        } catch (Exception  $ex) {
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+            return response()->json($response, 500);
+        }
     }
 
     public function show($id)
     {
-        $usuario = Usuario::findOrFail($id);
-        return new Json($usuario);
+        try {
+            $usuarios = Usuario::findOrFail($id);
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso', $usuarios);
+            return response()->json($response, 200);
+        } catch (Exception  $ex) {
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+            return response()->json($response, 500);
+        }
     }
 
     public function store(Request $request)
     {
-        $usuario = new Usuario;
-        $usuario->nome = $request->input('nome');
-        $usuario->email = $request->input('email');
-        $usuario->senha = $request->input('senha');
+        $usuarios = new Usuario;
+        $usuarios->nome = $request->input('nome');
+        $usuarios->email = $request->input('email');
+        $usuarios->senha = $request->input('senha');
 
-        if ($usuario->save()) {
-            return new Json($usuario);
+        try {
+            $usuarios->save();
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso ao editar o usuario', $usuarios);
+            return response()->json($response, 200);
+        } catch (Exception  $ex) {
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+            return response()->json($response, 500);
         }
     }
 
     public function update(Request $request)
     {
-        $usuario = Usuario::findOrFail($request->id);
-        $usuario->nome = $request->input('nome');
-        $usuario->email = $request->input('email');
-        $usuario->senha = $request->input('senha');
+        $usuarios = Usuario::findOrFail($request->id);
+        $usuarios->nome = $request->input('nome');
+        $usuarios->email = $request->input('email');
+        $usuarios->senha = $request->input('senha');
 
-        if ($usuario->save()) {
-            return new Json($usuario);
+        try {
+            $usuarios->save();
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso ao editar o usuario', $usuarios);
+            return response()->json($response, 200);
+        } catch (Exception  $ex) {
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+            return response()->json($response, 500);
         }
     }
 
     public function destroy($id)
     {
-        $usuario = Usuario::findOrFail($id);
-        if ($usuario->delete()) {
-            return new Json($usuario);
+        try {
+            $usuarios = Usuario::findOrFail($id);
+            $usuarios->delete();
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso ao excluir o usuario', $usuarios);
+            return response()->json($response, 200);
+        } catch (Exception  $ex) {
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+            return response()->json($response, 500);
         }
     }
 
