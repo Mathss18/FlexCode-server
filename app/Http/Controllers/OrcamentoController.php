@@ -58,6 +58,8 @@ class OrcamentoController extends Controller
         $servicos = $request->input('servicos');
 
         try {
+            DB::beginTransaction();
+
             $orcamentos->save();
 
             // Cadastra os produtos da ordem de serviço
@@ -86,7 +88,7 @@ class OrcamentoController extends Controller
                             'quantidade' => $servico['quantidade'],
                             'preco' => $servico['preco'],
                             'total' => $servico['total'],
-                            'observacao' => $produto['observacao'],
+                            'observacao' => $servico['observacao'],
                             'created_at' => Carbon::now(),
                             'updated_at' => Carbon::now(),
                         ]
@@ -95,8 +97,10 @@ class OrcamentoController extends Controller
             }
 
             $response = APIHelper::APIResponse(true, 200, 'Sucesso ao criar o orçamento', $orcamentos);
+            DB::commit();
             return response()->json($response, 200);
         } catch (Exception  $ex) {
+            DB::rollBack();
             $response = APIHelper::APIResponse(false, 500, null, null, $ex);
             return response()->json($response, 500);
         }

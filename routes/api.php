@@ -20,6 +20,7 @@ use App\Http\Controllers\UnidadeProdutoController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\OrdemServicoController;
 use App\Http\Controllers\OrdemServicoFuncionarioController;
+use App\Http\Controllers\PedidoCompraController;
 
 /*
 |--------------------------------------------------------------------------
@@ -234,5 +235,16 @@ Route::middleware(['jwt'])->group(function () {
     Route::put('orcamentos/{id}', [OrcamentoController::class, 'update']);
 
     Route::delete('orcamentos/{id}', [OrcamentoController::class, 'destroy']);
+
+    //============================ PEDIDOS COMPRAS ==============================
+    Route::get('pedidos-compras', [PedidoCompraController::class, 'index']);
+
+    Route::get('pedidos-compras/{id}', [PedidoCompraController::class, 'show']);
+
+    Route::post('pedidos-compras', [PedidoCompraController::class, 'store']);
+
+    Route::put('pedidos-compras/{id}', [PedidoCompraController::class, 'update']);
+
+    Route::delete('pedidos-compras/{id}', [PedidoCompraController::class, 'destroy']);
 
 });
