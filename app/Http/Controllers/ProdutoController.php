@@ -12,6 +12,7 @@ use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class ProdutoController extends Controller
 {
@@ -150,18 +151,20 @@ class ProdutoController extends Controller
 
         // Se o produto movimenta estoque, lança uma entrada
         if($produto->movimentaEstoque == true){
+            $user = JWTAuth::user();
             try {
                 DB::table('entradas_produtos')->insert(
                     [
                         'produto_id'    => $produto->id,
                         'quantidade'    => $produto->quantidadeAtual ?? 0,
                         'preco'         => $produto->custoFinal,
-                        'nome_usuario'  => null,
+                        'nome_usuario'  => $user->nome,
                         'observacao'    => 'Produto cadastrado',
                         'created_at'    => Carbon::now(),
                         'updated_at'    => Carbon::now()
                     ]
                 );
+
             } catch (Exception  $ex) {
                 DB::rollBack();
                 $response = APIHelper::APIResponse(false, 500, null, null, $ex);
@@ -293,13 +296,14 @@ class ProdutoController extends Controller
 
         // Se o produto não movimentava estoque mas agora movimenta, lança uma entrada
         if($oldProduto->movimentaEstoque == false && $produto->movimentaEstoque == true){
+            $user = JWTAuth::user();
             try {
                 DB::table('entradas_produtos')->insert(
                     [
                         'produto_id'    => $produto->id,
                         'quantidade'    => $produto->quantidadeAtual ?? 0,
                         'preco'         => $produto->custoFinal,
-                        'nome_usuario'  => null,
+                        'nome_usuario'  => $user->nome,
                         'observacao'    => 'Produto não movimentava estoque, agora movimenta',
                         'created_at'    => Carbon::now(),
                         'updated_at'    => Carbon::now()
