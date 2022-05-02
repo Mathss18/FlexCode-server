@@ -17,7 +17,7 @@ class CreateProdutosTable extends Migration
             $table->bigIncrements('id');
             $table->string('nome');
             $table->string('codigoInterno')->unique();
-            $table->string('fotoPrincipal');
+            $table->string('fotoPrincipal')->nullable();
             $table->foreignId('grupo_produto_id')->constrained('grupos_produtos');
             $table->foreignId('unidade_produto_id')->nullable()->constrained('unidades_produtos');
             $table->foreignId('cliente_id')->nullable()->constrained('clientes');

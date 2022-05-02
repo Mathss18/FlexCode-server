@@ -148,6 +148,28 @@ class ProdutoController extends Controller
             }
         }
 
+        // Se o produto movimenta estoque, lança uma entrada
+        if($produto->movimentaEstoque == true){
+            try {
+                DB::table('entradas_produtos')->insert(
+                    [
+                        'produto_id'    => $produto->id,
+                        'quantidade'    => $produto->quantidadeAtual ?? 0,
+                        'preco'         => $produto->custoFinal,
+                        'nome_usuario'  => null,
+                        'observacao'    => 'Produto cadastrado',
+                        'created_at'    => Carbon::now(),
+                        'updated_at'    => Carbon::now()
+                    ]
+                );
+            } catch (Exception  $ex) {
+                DB::rollBack();
+                $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+                return response()->json($response, 500);
+            }
+
+        }
+
         DB::commit();
         $response = APIHelper::APIResponse(true, 200, "Produto cadastrado com sucesso", $produto);
         return response()->json($response, 200);
@@ -157,6 +179,7 @@ class ProdutoController extends Controller
     {
 
         $produto = Produto::findOrFail($request->id);
+        $oldProduto = $produto;
         $produto->nome = $request->input('nome');
         $produto->codigoInterno = $request->input('codigoInterno');
         $produto->fotoPrincipal = '';
@@ -267,6 +290,28 @@ class ProdutoController extends Controller
                 return response()->json($response, 500);
             }
         }
+
+        // Se o produto não movimentava estoque mas agora movimenta, lança uma entrada
+        if($oldProduto->movimentaEstoque == false && $produto->movimentaEstoque == true){
+            try {
+                DB::table('entradas_produtos')->insert(
+                    [
+                        'produto_id'    => $produto->id,
+                        'quantidade'    => $produto->quantidadeAtual ?? 0,
+                        'preco'         => $produto->custoFinal,
+                        'nome_usuario'  => null,
+                        'observacao'    => 'Produto não movimentava estoque, agora movimenta',
+                        'created_at'    => Carbon::now(),
+                        'updated_at'    => Carbon::now()
+                    ]
+                );
+            } catch (Exception  $ex) {
+                DB::rollBack();
+                $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+                return response()->json($response, 500);
+            }
+        }
+
 
         try {
             $produto->save();
