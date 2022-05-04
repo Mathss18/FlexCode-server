@@ -93,8 +93,8 @@ class ProdutoController extends Controller
 
         // Cadastra a foto principal do produto
         if($request->input('fotoPrincipal')){
-            if ($this->is_base64($request->input('fotoPrincipal')['foto'])) {
-                $image = $request->input('fotoPrincipal')['foto'];
+            if ($this->is_base64($request->input('fotoPrincipal')['url'])) {
+                $image = $request->input('fotoPrincipal')['url'];
                 $imageName = $request->input('fotoPrincipal')['nome'];
                 $folderName = "produtos/" . $produto->id; // ID do produto que foi cadastrado
 
@@ -107,8 +107,8 @@ class ProdutoController extends Controller
 
         // Cadastra as demais fotos do produto
         foreach ($request->input('foto_produto') as $key => $value) {
-            if ($this->is_base64($value['foto'])) {
-                $image = $value['foto'];
+            if ($this->is_base64($value['url'])) {
+                $image = $value['url'];
                 $imageName = $value['nome'];
                 $folderName = "produtos/" . $produto->id; // ID do produto que foi cadastrado
 
@@ -221,8 +221,8 @@ class ProdutoController extends Controller
         DB::beginTransaction();
 
         // Edita a foto principal do produto
-        if (is_array($request->input('fotoPrincipal')) && $this->is_base64($request->input('fotoPrincipal')['foto'])) {
-            $image = $request->input('fotoPrincipal')['foto'];
+        if (is_array($request->input('fotoPrincipal')) && $this->is_base64($request->input('fotoPrincipal')['url'])) {
+            $image = $request->input('fotoPrincipal')['url'];
             $imageName = $request->input('fotoPrincipal')['nome'];
             $folderName = "produtos/" . $produto->id; // ID do produto que foi cadastrado
 
@@ -230,7 +230,7 @@ class ProdutoController extends Controller
                 $produto->fotoPrincipal = $return;
             }
         } else if (is_array($request->input('fotoPrincipal'))) {
-            $produto->fotoPrincipal = $request->input('fotoPrincipal')['foto'];
+            $produto->fotoPrincipal = $request->input('fotoPrincipal')['url'];
         } else {
             $produto->fotoPrincipal = $request->input('fotoPrincipal');
         }
@@ -239,8 +239,8 @@ class ProdutoController extends Controller
         DB::table('produtos_fotos')->where('produto_id', $produto->id)->delete();
         foreach ($request->input('foto_produto') as $key => $value) {
 
-            if ($this->is_base64($value['foto'])) {
-                $image = $value['foto'];
+            if ($this->is_base64($value['url'])) {
+                $image = $value['url'];
                 $imageName = $value['nome'];
                 $folderName = "produtos/" . $produto->id; // ID do produto que foi editado
 
@@ -264,7 +264,7 @@ class ProdutoController extends Controller
                 $fotoProduto->nome = $value['nome'];
                 $fotoProduto->tamanho = $value['tamanho'];
                 $fotoProduto->produto_id = $produto->id;
-                $fotoProduto->foto = $value['foto'];
+                $fotoProduto->foto = $value['url'];
                 try {
                     $fotoProduto->save();
                 } catch (Exception  $ex) {
@@ -349,7 +349,7 @@ class ProdutoController extends Controller
         $fileUploaded = Storage::put('public/' . $folderName . '/' . $imageName, base64_decode($file));
 
         if ($fileUploaded) {
-            $url = config('app.url') . ':' . config('app.port') . '/' . "storage/" . $folderName . '/' . $imageName;
+            $url = config('app.url') . config('app.port') . '/' . "storage/" . $folderName . '/' . $imageName;
             return $url;
         }
         return $fileUploaded;

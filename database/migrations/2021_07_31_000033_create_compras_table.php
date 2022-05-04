@@ -16,14 +16,25 @@ class CreateComprasTable extends Migration
         Schema::create('compras', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->integer('numero')->unique();
-            $table->foreignId('cliente_id')->nullable()->constrained('clientes');
-            $table->foreignId('transportadora_id')->nullable()->constrained('transportadoras');
-            $table->integer('situacao');
+            $table->foreignId('fornecedor_id')->constrained('fornecedores');
             $table->string('dataEntrada');
+            $table->string('numeroNF')->nullable();
+            $table->integer('situacao');
+
+            $table->foreignId('transportadora_id')->nullable()->constrained('transportadoras');
+            $table->boolean('somarFreteAoTotal')->default(true);
+
             $table->double('frete', 8, 2);
             $table->double('impostos', 8, 2);
             $table->double('desconto', 8, 2);
             $table->double('total', 8, 2);
+
+            $table->foreignId('forma_pagamento_id')->constrained('formas_pagamentos');
+            $table->integer('tipoFormaPagamento'); // 0 - A VISTA, 1 - A PRAZO
+            $table->integer('intervaloParcelas');
+            $table->integer('quantidadeParcelas');
+            $table->string('dataPrimeiraParcela');
+
             $table->string('observacao')->nullable();
             $table->string('observacaoInterna')->nullable();
             $table->timestamps();

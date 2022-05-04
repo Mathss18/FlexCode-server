@@ -20,7 +20,9 @@ use App\Http\Controllers\UnidadeProdutoController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\OrdemServicoController;
 use App\Http\Controllers\OrdemServicoFuncionarioController;
-use App\Http\Controllers\PedidoCompraController;
+use App\Http\Controllers\FormaPagamentoController;
+use App\Http\Controllers\ContaBancariaController;
+use App\Http\Controllers\CompraController;
 
 /*
 |--------------------------------------------------------------------------
@@ -210,20 +212,20 @@ Route::middleware(['jwt'])->group(function () {
 
     Route::delete('ordens-servicos/{id}', [OrdemServicoController::class, 'destroy']);
 
-     //============================ ORDENS SERVICOS FUNCIOARIOS ==============================
-     Route::get('ordens-servicos-funcionarios', [OrdemServicoFuncionarioController::class, 'index']);
+    //============================ ORDENS SERVICOS FUNCIOARIOS ==============================
+    Route::get('ordens-servicos-funcionarios', [OrdemServicoFuncionarioController::class, 'index']);
 
-     Route::get('ordens-servicos-funcionarios/{idUsuario}/abertas', [OrdemServicoFuncionarioController::class, 'showAbertas']);
+    Route::get('ordens-servicos-funcionarios/{idUsuario}/abertas', [OrdemServicoFuncionarioController::class, 'showAbertas']);
 
-     Route::get('ordens-servicos-funcionarios/{idUsuario}/fazendo', [OrdemServicoFuncionarioController::class, 'showFazendo']);
+    Route::get('ordens-servicos-funcionarios/{idUsuario}/fazendo', [OrdemServicoFuncionarioController::class, 'showFazendo']);
 
-     Route::get('ordens-servicos-funcionarios/{idUsuario}/finalizadas', [OrdemServicoFuncionarioController::class, 'showFinalizadas']);
+    Route::get('ordens-servicos-funcionarios/{idUsuario}/finalizadas', [OrdemServicoFuncionarioController::class, 'showFinalizadas']);
 
-     Route::post('ordens-servicos-funcionarios', [OrdemServicoFuncionarioController::class, 'store']);
+    Route::post('ordens-servicos-funcionarios', [OrdemServicoFuncionarioController::class, 'store']);
 
-     Route::put('ordens-servicos-funcionarios/{id}', [OrdemServicoFuncionarioController::class, 'update']);
+    Route::put('ordens-servicos-funcionarios/{id}', [OrdemServicoFuncionarioController::class, 'update']);
 
-     Route::delete('ordens-servicos-funcionarios/{id}', [OrdemServicoFuncionarioController::class, 'destroy']);
+    Route::delete('ordens-servicos-funcionarios/{id}', [OrdemServicoFuncionarioController::class, 'destroy']);
 
     //============================ ORCAMENTOS ==============================
     Route::get('orcamentos', [OrcamentoController::class, 'index']);
@@ -236,15 +238,36 @@ Route::middleware(['jwt'])->group(function () {
 
     Route::delete('orcamentos/{id}', [OrcamentoController::class, 'destroy']);
 
-    //============================ PEDIDOS COMPRAS ==============================
-    Route::get('pedidos-compras', [PedidoCompraController::class, 'index']);
+    //============================ FORMAS PAGAMENTOS ==============================
+    Route::get('formas-pagamentos', [FormaPagamentoController::class, 'index']);
 
-    Route::get('pedidos-compras/{id}', [PedidoCompraController::class, 'show']);
+    Route::get('formas-pagamentos/{id}', [FormaPagamentoController::class, 'show']);
 
-    Route::post('pedidos-compras', [PedidoCompraController::class, 'store']);
+    Route::post('formas-pagamentos', [FormaPagamentoController::class, 'store']);
 
-    Route::put('pedidos-compras/{id}', [PedidoCompraController::class, 'update']);
+    Route::put('formas-pagamentos/{id}', [FormaPagamentoController::class, 'update']);
 
-    Route::delete('pedidos-compras/{id}', [PedidoCompraController::class, 'destroy']);
+    Route::delete('formas-pagamentos/{id}', [FormaPagamentoController::class, 'destroy']);
 
+    //============================ CONTAS BANCARIAS ==============================
+    Route::get('contas-bancarias', [ContaBancariaController::class, 'index']);
+
+    Route::get('contas-bancarias/{id}', [ContaBancariaController::class, 'show']);
+
+    Route::post('contas-bancarias', [ContaBancariaController::class, 'store']);
+
+    Route::put('contas-bancarias/{id}', [ContaBancariaController::class, 'update']);
+
+    Route::delete('contas-bancarias/{id}', [ContaBancariaController::class, 'destroy']);
+
+    //============================ COMPRAS ==============================
+    Route::get('compras', [CompraController::class, 'index']);
+
+    Route::get('compras/{id}', [CompraController::class, 'show']);
+
+    Route::post('compras', [CompraController::class, 'store']);
+
+    Route::put('compras/{id}', [CompraController::class, 'update']);
+
+    Route::delete('compras/{id}', [CompraController::class, 'destroy']);
 });

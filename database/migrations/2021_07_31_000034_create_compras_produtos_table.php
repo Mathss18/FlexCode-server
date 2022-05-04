@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreatePedidosComprasProdutosTable extends Migration
+class CreateComprasProdutosTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,10 @@ class CreatePedidosComprasProdutosTable extends Migration
      */
     public function up()
     {
-        Schema::create('pedidos_compras_produtos', function (Blueprint $table) {
+        Schema::create('compras_produtos', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->foreignId('produto_id')->nullable()->constrained('produtos');
-            $table->foreignId('pedido_compra_id')->nullable()->constrained('pedidos_compras');
+            $table->foreignId('produto_id')->constrained('produtos');
+            $table->foreignId('compra_id')->constrained('compras');
             $table->double('quantidade', 8, 2);
             $table->double('preco', 8, 2);
             $table->double('total', 8, 2);
@@ -32,6 +32,6 @@ class CreatePedidosComprasProdutosTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('pedidos_compras_produtos');
+        Schema::dropIfExists('compras_produtos');
     }
 }
