@@ -15,7 +15,7 @@ class CreateComprasAnexosTable extends Migration
     {
         Schema::create('compras_anexos', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('anexo');
+            $table->string('url');
             $table->string('nome');
             $table->string('tamanho');
             $table->foreignId('compra_id')->constrained('compras');

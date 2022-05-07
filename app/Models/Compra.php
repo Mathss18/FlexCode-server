@@ -21,12 +21,12 @@ class Compra extends Model
 
     public function anexos()
     {
-        return $this->hasMany(CompraAnexo::class, 'compras_anexos');
+        return $this->hasMany(CompraAnexo::class);
     }
 
     public function parcelas()
     {
-        return $this->hasMany(CompraParcela::class, 'compras_parcelas');
+        return $this->hasMany(CompraParcela::class);
     }
 
     public function fornecedor()

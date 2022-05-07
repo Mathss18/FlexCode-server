@@ -4,17 +4,33 @@ namespace App\Http\Controllers;
 
 use App\Helpers\APIHelper;
 use Illuminate\Http\Request;
-use App\Models\Cliente;
+use App\Models\Estoque;
 use Exception;
+use Illuminate\Support\Facades\DB;
 
-class ClienteController extends Controller
+class EstoqueController extends Controller
 {
     public function index()
     {
-        //$clientes = Cliente::paginate(15);
+        //$estoques = Cliente::paginate(15);
         try {
-            $clientes = Cliente::orderBy('id', 'desc')->get();
-            $response = APIHelper::APIResponse(true, 200, 'Sucesso', $clientes);
+            $estoques = Estoque::with(['produto', 'produto.grupo_produto', 'produto.cliente', 'produto.fornecedores', 'produto.unidade_produto'])->orderBy('id', 'desc')->get();
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso', $estoques);
+            return response()->json($response, 200);
+        } catch (Exception  $ex) {
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+            return response()->json($response, 500);
+        }
+    }
+
+    public function movimentacoes(Request $request, $id)
+    {
+        $from = date($request->query('startDate').' 00:00:00');
+        $to = date($request->query('endDate').' 23:59:59');
+        try {
+            $first = DB::table('entradas_produtos')->where('produto_id', $id)->whereBetween('created_at', [$from, $to]);
+            $second = DB::table('saidas_produtos')->where('produto_id', $id)->whereBetween('created_at', [$from, $to])->union($first)->orderBy('created_at','desc')->get();
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso', $second);
             return response()->json($response, 200);
         } catch (Exception  $ex) {
             $response = APIHelper::APIResponse(false, 500, null, null, $ex);
@@ -25,7 +41,7 @@ class ClienteController extends Controller
     public function show($id)
     {
         try {
-            $cliente = Cliente::findOrFail($id);
+            $cliente = Estoque::findOrFail($id);
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', $cliente);
             return response()->json($response, 200);
         } catch (Exception  $ex) {
@@ -36,7 +52,7 @@ class ClienteController extends Controller
 
     public function store(Request $request)
     {
-        $cliente = new Cliente;
+        $cliente = new Estoque;
         $cliente->tipoCliente = $request->input('tipoCliente');
         $cliente->situacao = $request->input('situacao');
         $cliente->tipoContribuinte = $request->input('tipoContribuinte');
@@ -68,7 +84,7 @@ class ClienteController extends Controller
 
     public function update(Request $request)
     {
-        $cliente = Cliente::findOrFail($request->id);
+        $cliente = Estoque::findOrFail($request->id);
         $cliente->tipoCliente = $request->input('tipoCliente');
         $cliente->situacao = $request->input('situacao');
         $cliente->tipoContribuinte = $request->input('tipoContribuinte');
@@ -100,7 +116,7 @@ class ClienteController extends Controller
     public function destroy($id)
     {
         try {
-            $cliente = Cliente::findOrFail($id);
+            $cliente = Estoque::findOrFail($id);
             $cliente->delete();
             $response = APIHelper::APIResponse(true, 200, 'Sucesso ao excluir o cliente', $cliente);
             return response()->json($response, 200);

@@ -14,7 +14,7 @@ class UsuarioController extends Controller
     {
         //$usuarios = Usuario::paginate(15);
         try {
-            $usuarios = Usuario::all();
+            $usuarios = Usuario::orderBy('id', 'desc')->get();
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', $usuarios);
             return response()->json($response, 200);
         } catch (Exception  $ex) {

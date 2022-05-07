@@ -23,6 +23,8 @@ use App\Http\Controllers\OrdemServicoFuncionarioController;
 use App\Http\Controllers\FormaPagamentoController;
 use App\Http\Controllers\ContaBancariaController;
 use App\Http\Controllers\CompraController;
+use App\Http\Controllers\EstoqueController;
+use App\Http\Controllers\VendaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -270,4 +272,28 @@ Route::middleware(['jwt'])->group(function () {
     Route::put('compras/{id}', [CompraController::class, 'update']);
 
     Route::delete('compras/{id}', [CompraController::class, 'destroy']);
+
+    //============================ VENDAS ==============================
+    Route::get('vendas', [VendaController::class, 'index']);
+
+    Route::get('vendas/{id}', [VendaController::class, 'show']);
+
+    Route::post('vendas', [VendaController::class, 'store']);
+
+    Route::put('vendas/{id}', [VendaController::class, 'update']);
+
+    Route::delete('vendas/{id}', [VendaController::class, 'destroy']);
+
+    //============================ ESTOQUES ==============================
+    Route::get('estoques', [EstoqueController::class, 'index']);
+
+    Route::get('estoques/{id}', [EstoqueController::class, 'show']);
+
+    Route::get('estoques/movimentacoes/{id}', [EstoqueController::class, 'movimentacoes']);
+
+    Route::post('estoques', [EstoqueController::class, 'store']);
+
+    Route::put('estoques/{id}', [EstoqueController::class, 'update']);
+
+    Route::delete('estoques/{id}', [EstoqueController::class, 'destroy']);
 });

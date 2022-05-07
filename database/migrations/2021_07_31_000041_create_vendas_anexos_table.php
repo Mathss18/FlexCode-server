@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateProdutosFotosTable extends Migration
+class CreateVendasAnexosTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,12 @@ class CreateProdutosFotosTable extends Migration
      */
     public function up()
     {
-        Schema::create('produtos_fotos', function (Blueprint $table) {
-            $table->id();
+        Schema::create('vendas_anexos', function (Blueprint $table) {
+            $table->bigIncrements('id');
             $table->string('url');
             $table->string('nome');
             $table->string('tamanho');
-            $table->foreignId('produto_id')->nullable()->constrained('produtos');
-
+            $table->foreignId('venda_id')->constrained('vendas');
             $table->timestamps();
         });
     }
@@ -31,6 +30,6 @@ class CreateProdutosFotosTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('produtos_fotos');
+        Schema::dropIfExists('vendas_anexos');
     }
 }

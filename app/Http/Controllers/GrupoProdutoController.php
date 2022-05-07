@@ -15,7 +15,7 @@ class GrupoProdutoController extends Controller
     {
         //$grupoProduto = grupoProduto::paginate(15);
         try {
-            $gruposProdutos = GrupoProduto::with('porcentagem_lucro')->get();
+            $gruposProdutos = GrupoProduto::with('porcentagem_lucro')->orderBy('id', 'desc')->get();
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', $gruposProdutos);
             return response()->json($response, 200);
         } catch (Exception  $ex) {

@@ -14,7 +14,7 @@ class ServicoController extends Controller
     {
         //$servicos = Servico::paginate(15);
         try {
-            $servicos = Servico::all();
+            $servicos = Servico::orderBy('id', 'desc')->get();
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', $servicos);
             return response()->json($response, 200);
         } catch (Exception  $ex) {

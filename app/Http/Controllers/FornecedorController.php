@@ -13,7 +13,7 @@ class FornecedorController extends Controller
     {
         //$fornecedores = Fornecedor::paginate(15);
         try {
-            $fornecedores = Fornecedor::all();
+            $fornecedores = Fornecedor::orderBy('id', 'desc')->get();
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', $fornecedores);
             return response()->json($response, 200);
         } catch (Exception  $ex) {

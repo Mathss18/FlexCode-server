@@ -17,7 +17,7 @@ class FuncionarioController extends Controller
         //$funcionarios = Funcionario::paginate(15);
         //$funcionarios = Funcionario::all();
         try {
-            $funcionarios = Funcionario::with(['grupo', 'usuario'])->get();
+            $funcionarios = Funcionario::with(['grupo', 'usuario'])->orderBy('id', 'desc')->get();
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', $funcionarios);
             return response()->json($response, 200);
         } catch (Exception  $ex) {

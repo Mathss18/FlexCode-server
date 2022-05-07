@@ -15,11 +15,16 @@ class CreateEntradasProdutosTable extends Migration
     {
         Schema::create('entradas_produtos', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->foreignId('produto_id')->nullable()->constrained('produtos');
+            $table->foreignId('produto_id')->constrained('produtos');
+            $table->foreignId('cliente_id')->nullable()->constrained('clientes');
+            $table->foreignId('fornecedor_id')->nullable()->constrained('fornecedores');
+            $table->foreignId('usuario_id')->nullable()->constrained('usuarios');
             $table->double('quantidade', 8, 4);
+            $table->double('quantidadeMomento', 8, 4);
             $table->double('preco', 8, 4);
             $table->string('nome_usuario')->nullable();
             $table->string('observacao')->nullable();
+            $table->string('tipo')->default('entrada');
             $table->timestamps();
         });
     }

@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\FormaPagamento;
 
-class CompraParcela extends Model
+class VendaParcela extends Model
 {
     use HasFactory;
-    protected $table = 'compras_parcelas';
-    protected $fillable = ['compra_id', 'parcela', 'dataVencimento', 'valorParcela', 'forma_pagamento_id','observacao'];
+    protected $table = 'vendas_parcelas';
+    protected $fillable = ['venda_id', 'parcela', 'dataVencimento', 'valorParcela', 'forma_pagamento_id','observacao'];
 
     public function forma_pagamento()
     {

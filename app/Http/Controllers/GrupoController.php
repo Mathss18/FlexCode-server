@@ -13,7 +13,7 @@ class GrupoController extends Controller
     {
         //$grupos = Grupo::paginate(15);
         try {
-            $grupos = Grupo::all();
+            $grupos = Grupo::orderBy('id', 'desc')->get();
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', $grupos);
             return response()->json($response, 200);
         } catch (Exception  $ex) {

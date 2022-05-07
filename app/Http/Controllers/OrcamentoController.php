@@ -16,7 +16,7 @@ class OrcamentoController extends Controller
     {
         //$orcamentos = Orcamento::paginate(15);
         try {
-            $orcamentos = Orcamento::with(['produtos', 'servicos', 'transportadora', 'cliente'])->get();
+            $orcamentos = Orcamento::with(['produtos', 'servicos', 'transportadora', 'cliente'])->orderBy('id', 'desc')->get();
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', $orcamentos);
             return response()->json($response, 200);
         } catch (Exception  $ex) {

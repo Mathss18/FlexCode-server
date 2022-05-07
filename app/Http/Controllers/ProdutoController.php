@@ -20,7 +20,7 @@ class ProdutoController extends Controller
     {
         //$produtos = Produto::paginate(15);
         try {
-            $produtos = Produto::with(['foto_produto','fornecedores','cliente','unidade_produto'])->get();
+            $produtos = Produto::with(['foto_produto','fornecedores','cliente','unidade_produto','grupo_produto'])->orderBy('id', 'desc')->get();
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', $produtos);
             return response()->json($response, 200);
         } catch (Exception  $ex) {
@@ -32,7 +32,7 @@ class ProdutoController extends Controller
     public function show($id)
     {
         try {
-            $produto = Produto::with(['foto_produto','fornecedores','cliente','unidade_produto'])->findOrFail($id);
+            $produto = Produto::with(['foto_produto','fornecedores','cliente','unidade_produto','grupo_produto'])->findOrFail($id);
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', $produto);
             return response()->json($response, 200);
         } catch (Exception  $ex) {
@@ -117,7 +117,7 @@ class ProdutoController extends Controller
                     $fotoProduto->nome = $value['nome'];
                     $fotoProduto->tamanho = $value['tamanho'];
                     $fotoProduto->produto_id = $produto->id;
-                    $fotoProduto->foto = $return;
+                    $fotoProduto->url = $return;
                     try {
                         $fotoProduto->save();
                     } catch (Exception  $ex) {
@@ -155,13 +155,15 @@ class ProdutoController extends Controller
             try {
                 DB::table('entradas_produtos')->insert(
                     [
-                        'produto_id'    => $produto->id,
-                        'quantidade'    => $produto->quantidadeAtual ?? 0,
-                        'preco'         => $produto->custoFinal,
-                        'nome_usuario'  => $user->nome,
-                        'observacao'    => 'Produto cadastrado',
-                        'created_at'    => Carbon::now(),
-                        'updated_at'    => Carbon::now()
+                        'produto_id'        => $produto->id,
+                        'quantidade'        => $produto->quantidadeAtual ?? 0,
+                        'quantidadeMomento' => $produto->quantidadeAtual ?? 0,
+                        'preco'             => $produto->custoFinal,
+                        'usuario_id'        => $user->id,
+                        'nome_usuario'      => $user->nome,
+                        'observacao'        => 'Produto cadastrado',
+                        'created_at'        => Carbon::now(),
+                        'updated_at'        => Carbon::now()
                     ]
                 );
 
@@ -182,7 +184,8 @@ class ProdutoController extends Controller
     {
 
         $produto = Produto::findOrFail($request->id);
-        $oldProduto = $produto;
+        $oldProduto = clone $produto;
+
         $produto->nome = $request->input('nome');
         $produto->codigoInterno = $request->input('codigoInterno');
         $produto->fotoPrincipal = '';
@@ -203,7 +206,9 @@ class ProdutoController extends Controller
         $produto->custoFinal = $request->input('custoFinal');
         $produto->estoqueMinimo = $request->input('estoqueMinimo');
         $produto->estoqueMaximo = $request->input('estoqueMaximo');
-        $produto->quantidadeAtual = $request->input('quantidadeAtual');
+        if($oldProduto->movimentaEstoque === false && $produto->movimentaEstoque === true){
+            $produto->quantidadeAtual = $request->input('quantidadeAtual');
+        }
         $produto->ncm = $request->input('ncm');
         $produto->cest = $request->input('cest');
         $produto->origem = $request->input('origem');
@@ -249,7 +254,7 @@ class ProdutoController extends Controller
                     $fotoProduto->nome = $value['nome'];
                     $fotoProduto->tamanho = $value['tamanho'];
                     $fotoProduto->produto_id = $produto->id;
-                    $fotoProduto->foto = $return;
+                    $fotoProduto->url = $return;
                     try {
                         $fotoProduto->save();
                     } catch (Exception  $ex) {
@@ -264,7 +269,7 @@ class ProdutoController extends Controller
                 $fotoProduto->nome = $value['nome'];
                 $fotoProduto->tamanho = $value['tamanho'];
                 $fotoProduto->produto_id = $produto->id;
-                $fotoProduto->foto = $value['url'];
+                $fotoProduto->url = $value['url'];
                 try {
                     $fotoProduto->save();
                 } catch (Exception  $ex) {
@@ -300,13 +305,15 @@ class ProdutoController extends Controller
             try {
                 DB::table('entradas_produtos')->insert(
                     [
-                        'produto_id'    => $produto->id,
-                        'quantidade'    => $produto->quantidadeAtual ?? 0,
-                        'preco'         => $produto->custoFinal,
-                        'nome_usuario'  => $user->nome,
-                        'observacao'    => 'Produto não movimentava estoque, agora movimenta',
-                        'created_at'    => Carbon::now(),
-                        'updated_at'    => Carbon::now()
+                        'produto_id'        => $produto->id,
+                        'quantidade'        => $produto->quantidadeAtual ?? 0,
+                        'quantidadeMomento' => $produto->quantidadeAtual ?? 0,
+                        'preco'             => $produto->custoFinal,
+                        'nome_usuario'      => $user->nome,
+                        'usuario_id'        => $user->id,
+                        'observacao'        => 'Produto não movimentava estoque, agora movimenta',
+                        'created_at'        => Carbon::now(),
+                        'updated_at'        => Carbon::now()
                     ]
                 );
             } catch (Exception  $ex) {

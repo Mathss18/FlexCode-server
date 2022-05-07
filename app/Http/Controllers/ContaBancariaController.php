@@ -15,7 +15,7 @@ class ContaBancariaController extends Controller
     {
         //$contasBancarias = ContaBancaria::paginate(15);
         try {
-            $contasBancarias = ContaBancaria::all();
+            $contasBancarias = ContaBancaria::orderBy('id', 'desc')->get();
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', $contasBancarias);
             return response()->json($response, 200);
         } catch (Exception  $ex) {
@@ -38,8 +38,6 @@ class ContaBancariaController extends Controller
 
     public function store(Request $request)
     {
-        return response($request->all(),500);
-
         $contasBancarias = new ContaBancaria;
 
         $contasBancarias->nome = $request->input('nome');
@@ -58,8 +56,6 @@ class ContaBancariaController extends Controller
 
     public function update(Request $request)
     {
-        return response($request->all(),500);
-
         $contasBancarias = ContaBancaria::findOrFail($request->id);
 
         $contasBancarias->nome = $request->input('nome');

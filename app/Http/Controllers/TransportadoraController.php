@@ -12,9 +12,8 @@ class TransportadoraController extends Controller
     public function index()
     {
         //$transportadoras = Transportadora::paginate(15);
-        $transportadoras = Transportadora::all();
         try {
-            $transportadoras = Transportadora::all();
+            $transportadoras = Transportadora::orderBy('id', 'desc')->get();
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', $transportadoras);
             return response()->json($response, 200);
         } catch (Exception  $ex) {

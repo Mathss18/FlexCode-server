@@ -16,7 +16,7 @@ class FormaPagamentoController extends Controller
     {
         //$formasPagamentos = FormaPagamento::paginate(15);
         try {
-            $formasPagamentos = FormaPagamento::with(['conta_bancaria'])->get();
+            $formasPagamentos = FormaPagamento::with(['conta_bancaria'])->orderBy('id', 'desc')->get();
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', $formasPagamentos);
             return response()->json($response, 200);
         } catch (Exception  $ex) {
@@ -39,8 +39,6 @@ class FormaPagamentoController extends Controller
 
     public function store(Request $request)
     {
-        return response($request->all(),500);
-
         $formasPagamentos = new FormaPagamento;
 
         $formasPagamentos->nome = $request->input('nome');
@@ -60,8 +58,6 @@ class FormaPagamentoController extends Controller
 
     public function update(Request $request)
     {
-        return response($request->all(),500);
-
         $formasPagamentos = FormaPagamento::with(['conta_bancaria'])->findOrFail($request->id);
 
         $formasPagamentos->nome = $request->input('nome');

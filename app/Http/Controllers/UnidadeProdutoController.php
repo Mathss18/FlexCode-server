@@ -11,7 +11,7 @@ class UnidadeProdutoController extends Controller
     public function index()
     {
         //$unidadesProdutos = unidadeProduto::paginate(15);
-        $unidadesProdutos = UnidadeProduto::all();
+        $unidadesProdutos = UnidadeProduto::orderBy('id', 'desc')->get();
         return Json::collection($unidadesProdutos);
     }
 

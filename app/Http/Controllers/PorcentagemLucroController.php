@@ -13,7 +13,7 @@ class PorcentagemLucroController extends Controller
     {
         //$porcentagensLucros = PorcentagemLucro::paginate(15);
         try {
-            $porcentagensLucros = PorcentagemLucro::all();
+            $porcentagensLucros = PorcentagemLucro::orderBy('id', 'desc')->get();
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', $porcentagensLucros);
             return response()->json($response, 200);
         } catch (Exception  $ex) {
