@@ -73,8 +73,8 @@ class OrdemServicoController extends Controller
                             'preco' => $produto['preco'],
                             'total' => $produto['total'],
                             'observacao' => $produto['observacao'],
-                            'created_at' => Carbon::now(),
-                            'updated_at' => Carbon::now(),
+                            'created_at' => Carbon::now('GMT-3'),
+                            'updated_at' => Carbon::now('GMT-3'),
                         ]
                     );
                 }
@@ -90,8 +90,8 @@ class OrdemServicoController extends Controller
                             'preco' => $servico['preco'],
                             'total' => $servico['total'],
                             'observacao' => $servico['observacao'],
-                            'created_at' => Carbon::now(),
-                            'updated_at' => Carbon::now(),
+                            'created_at' => Carbon::now('GMT-3'),
+                            'updated_at' => Carbon::now('GMT-3'),
                         ]
                     );
                 }
@@ -117,8 +117,8 @@ class OrdemServicoController extends Controller
                             'status' => $stausOrdemServicoFuncionario,
                             'dataFinalizado' => null,
                             'observacao' => null,
-                            'created_at' => Carbon::now(),
-                            'updated_at' => Carbon::now(),
+                            'created_at' => Carbon::now('GMT-3'),
+                            'updated_at' => Carbon::now('GMT-3'),
                         ]
                     );
                 }
@@ -171,8 +171,8 @@ class OrdemServicoController extends Controller
                             'preco' => $produto['preco'],
                             'total' => $produto['total'],
                             'observacao' => $produto['observacao'],
-                            'created_at' => Carbon::now(),
-                            'updated_at' => Carbon::now(),
+                            'created_at' => Carbon::now('GMT-3'),
+                            'updated_at' => Carbon::now('GMT-3'),
                         ]
                     );
                 }
@@ -193,8 +193,8 @@ class OrdemServicoController extends Controller
                             'preco' => $servico['preco'],
                             'total' => $servico['total'],
                             'observacao' => $servico['observacao'],
-                            'created_at' => Carbon::now(),
-                            'updated_at' => Carbon::now(),
+                            'created_at' => Carbon::now('GMT-3'),
+                            'updated_at' => Carbon::now('GMT-3'),
                         ]
                     );
                 }
@@ -225,8 +225,8 @@ class OrdemServicoController extends Controller
                             'status' => $stausOrdemServicoFuncionario,
                             'dataFinalizado' => null,
                             'observacao' => null,
-                            'created_at' => Carbon::now(),
-                            'updated_at' => Carbon::now(),
+                            'created_at' => Carbon::now('GMT-3'),
+                            'updated_at' => Carbon::now('GMT-3'),
                         ]
                     );
                 }

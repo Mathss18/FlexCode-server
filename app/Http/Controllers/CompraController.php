@@ -84,8 +84,8 @@ class CompraController extends Controller
                             'preco' => $produto['preco'],
                             'total' => $produto['total'],
                             'observacao' => $produto['observacao'],
-                            'created_at' => Carbon::now(),
-                            'updated_at' => Carbon::now(),
+                            'created_at' => Carbon::now('GMT-3'),
+                            'updated_at' => Carbon::now('GMT-3'),
                         ]
                     );
                 }
@@ -153,8 +153,8 @@ class CompraController extends Controller
                                 'nome_usuario'      => $user->nome,
                                 'fornecedor_id'     => $compras->fornecedor_id,
                                 'observacao'        => '[Compra Recebida] Entrada de produto da compra nº ' . $compras->numero,
-                                'created_at'        => Carbon::now(),
-                                'updated_at'        => Carbon::now()
+                                'created_at'        => Carbon::now('GMT-3'),
+                                'updated_at'        => Carbon::now('GMT-3')
                             ]
                         );
                     }
@@ -222,8 +222,8 @@ class CompraController extends Controller
                             'preco' => $produto['preco'],
                             'total' => $produto['total'],
                             'observacao' => $produto['observacao'],
-                            'created_at' => Carbon::now(),
-                            'updated_at' => Carbon::now(),
+                            'created_at' => Carbon::now('GMT-3'),
+                            'updated_at' => Carbon::now('GMT-3'),
                         ]
                     );
                 }
@@ -243,8 +243,8 @@ class CompraController extends Controller
                                     'valorParcela' => $parcela['valorParcela'],
                                     'forma_pagamento_id' => $parcela['forma_pagamento_id'],
                                     'observacao' => $parcela['observacao'],
-                                    'created_at' => Carbon::now(),
-                                    'updated_at' => Carbon::now(),
+                                    'created_at' => Carbon::now('GMT-3'),
+                                    'updated_at' => Carbon::now('GMT-3'),
                                 ]
                             )
                         ]
@@ -299,8 +299,8 @@ class CompraController extends Controller
                                 'nome_usuario'      => $user->nome,
                                 'fornecedor_id'     => $compras->fornecedor_id,
                                 'observacao'        => '[Compra Recebida] Entrada de produto da compra nº ' . $compras->numero,
-                                'created_at'        => Carbon::now(),
-                                'updated_at'        => Carbon::now()
+                                'created_at'        => Carbon::now('GMT-3'),
+                                'updated_at'        => Carbon::now('GMT-3')
                             ]
                         );
                     }
@@ -322,8 +322,8 @@ class CompraController extends Controller
                                 'nome_usuario'      => $user->nome,
                                 'fornecedor_id'     => $compras->fornecedor_id,
                                 'observacao'        => '[Compra Devolvida] Estorno de produto da compra nº ' . $compras->numero,
-                                'created_at'        => Carbon::now(),
-                                'updated_at'        => Carbon::now()
+                                'created_at'        => Carbon::now('GMT-3'),
+                                'updated_at'        => Carbon::now('GMT-3')
                             ]
                         );
                     }
@@ -345,8 +345,8 @@ class CompraController extends Controller
                                 'nome_usuario'      => $user->nome,
                                 'fornecedor_id'     => $compras->fornecedor_id,
                                 'observacao'        => '[Compra Cancelada] Estorno de produto da compra nº ' . $compras->numero,
-                                'created_at'        => Carbon::now(),
-                                'updated_at'        => Carbon::now()
+                                'created_at'        => Carbon::now('GMT-3'),
+                                'updated_at'        => Carbon::now('GMT-3')
                             ]
                         );
                     }

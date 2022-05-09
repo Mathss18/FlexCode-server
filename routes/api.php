@@ -24,6 +24,8 @@ use App\Http\Controllers\FormaPagamentoController;
 use App\Http\Controllers\ContaBancariaController;
 use App\Http\Controllers\CompraController;
 use App\Http\Controllers\EstoqueController;
+use App\Http\Controllers\OutrosFavorecidosController;
+use App\Http\Controllers\TransacaoController;
 use App\Http\Controllers\VendaController;
 
 /*
@@ -291,9 +293,33 @@ Route::middleware(['jwt'])->group(function () {
 
     Route::get('estoques/movimentacoes/{id}', [EstoqueController::class, 'movimentacoes']);
 
+    Route::post('estoques/ajustar', [EstoqueController::class, 'ajustar']);
+
     Route::post('estoques', [EstoqueController::class, 'store']);
 
     Route::put('estoques/{id}', [EstoqueController::class, 'update']);
 
     Route::delete('estoques/{id}', [EstoqueController::class, 'destroy']);
+
+    //============================ OUTROS FAVORECIDOS ==============================
+    Route::get('outros-favorecidos', [OutrosFavorecidosController::class, 'index']);
+
+    Route::get('outros-favorecidos/{id}', [OutrosFavorecidosController::class, 'show']);
+
+    Route::post('outros-favorecidos', [OutrosFavorecidosController::class, 'store']);
+
+    Route::put('outros-favorecidos/{id}', [OutrosFavorecidosController::class, 'update']);
+
+    Route::delete('outros-favorecidos/{id}', [OutrosFavorecidosController::class, 'destroy']);
+
+    //============================ TRANSAÇOES ==============================
+    Route::get('transacoes', [TransacaoController::class, 'index']);
+
+    Route::get('transacoes/{id}', [TransacaoController::class, 'show']);
+
+    Route::post('transacoes', [TransacaoController::class, 'store']);
+
+    Route::put('transacoes/{id}', [TransacaoController::class, 'update']);
+
+    Route::delete('transacoes/{id}', [TransacaoController::class, 'destroy']);
 });

@@ -84,8 +84,8 @@ class VendaController extends Controller
                             'preco' => $produto['preco'],
                             'total' => $produto['total'],
                             'observacao' => $produto['observacao'],
-                            'created_at' => Carbon::now(),
-                            'updated_at' => Carbon::now(),
+                            'created_at' => Carbon::now('GMT-3'),
+                            'updated_at' => Carbon::now('GMT-3'),
                         ]
                     );
                 }
@@ -101,8 +101,8 @@ class VendaController extends Controller
                             'preco' => $servico['preco'],
                             'total' => $servico['total'],
                             'observacao' => $servico['observacao'],
-                            'created_at' => Carbon::now(),
-                            'updated_at' => Carbon::now(),
+                            'created_at' => Carbon::now('GMT-3'),
+                            'updated_at' => Carbon::now('GMT-3'),
                         ]
                     );
                 }
@@ -170,8 +170,8 @@ class VendaController extends Controller
                                 'nome_usuario'      => $user->nome,
                                 'cliente_id'        => $vendas->cliente_id,
                                 'observacao'        => '[Venda Realizada] Saída de produto da venda nº ' . $vendas->numero,
-                                'created_at'        => Carbon::now(),
-                                'updated_at'        => Carbon::now()
+                                'created_at'        => Carbon::now('GMT-3'),
+                                'updated_at'        => Carbon::now('GMT-3')
                             ]
                         );
                     }
@@ -237,8 +237,8 @@ class VendaController extends Controller
                             'preco' => $produto['preco'],
                             'total' => $produto['total'],
                             'observacao' => $produto['observacao'],
-                            'created_at' => Carbon::now(),
-                            'updated_at' => Carbon::now(),
+                            'created_at' => Carbon::now('GMT-3'),
+                            'updated_at' => Carbon::now('GMT-3'),
                         ]
                     );
                 }
@@ -257,8 +257,8 @@ class VendaController extends Controller
                             'preco' => $servico['preco'],
                             'total' => $servico['total'],
                             'observacao' => $servico['observacao'],
-                            'created_at' => Carbon::now(),
-                            'updated_at' => Carbon::now(),
+                            'created_at' => Carbon::now('GMT-3'),
+                            'updated_at' => Carbon::now('GMT-3'),
                         ]
                     );
                 }
@@ -278,8 +278,8 @@ class VendaController extends Controller
                                     'valorParcela' => $parcela['valorParcela'],
                                     'forma_pagamento_id' => $parcela['forma_pagamento_id'],
                                     'observacao' => $parcela['observacao'],
-                                    'created_at' => Carbon::now(),
-                                    'updated_at' => Carbon::now(),
+                                    'created_at' => Carbon::now('GMT-3'),
+                                    'updated_at' => Carbon::now('GMT-3'),
                                 ]
                             )
                         ]
@@ -334,8 +334,8 @@ class VendaController extends Controller
                                 'nome_usuario'      => $user->nome,
                                 'cliente_id'        => $vendas->cliente_id,
                                 'observacao'        => '[Venda Realizada] Saída de produto da venda nº ' . $vendas->numero,
-                                'created_at'        => Carbon::now(),
-                                'updated_at'        => Carbon::now()
+                                'created_at'        => Carbon::now('GMT-3'),
+                                'updated_at'        => Carbon::now('GMT-3')
                             ]
                         );
                     }
@@ -357,8 +357,8 @@ class VendaController extends Controller
                                 'nome_usuario'      => $user->nome,
                                 'cliente_id'        => $vendas->cliente_id,
                                 'observacao'        => '[Venda Devolvida] Devolução de produto da venda nº ' . $vendas->numero,
-                                'created_at'        => Carbon::now(),
-                                'updated_at'        => Carbon::now()
+                                'created_at'        => Carbon::now('GMT-3'),
+                                'updated_at'        => Carbon::now('GMT-3')
                             ]
                         );
                     }
@@ -380,8 +380,8 @@ class VendaController extends Controller
                                 'nome_usuario'  => $user->nome,
                                 'cliente_id'    => $vendas->cliente_id,
                                 'observacao'    => '[Venda Cancelada] Devolução de produto da venda nº ' . $vendas->numero,
-                                'created_at'    => Carbon::now(),
-                                'updated_at'    => Carbon::now()
+                                'created_at'    => Carbon::now('GMT-3'),
+                                'updated_at'    => Carbon::now('GMT-3')
                             ]
                         );
                     }

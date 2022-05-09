@@ -72,8 +72,8 @@ class OrcamentoController extends Controller
                             'preco' => $produto['preco'],
                             'total' => $produto['total'],
                             'observacao' => $produto['observacao'],
-                            'created_at' => Carbon::now(),
-                            'updated_at' => Carbon::now(),
+                            'created_at' => Carbon::now('GMT-3'),
+                            'updated_at' => Carbon::now('GMT-3'),
                         ]
                     );
                 }
@@ -89,8 +89,8 @@ class OrcamentoController extends Controller
                             'preco' => $servico['preco'],
                             'total' => $servico['total'],
                             'observacao' => $servico['observacao'],
-                            'created_at' => Carbon::now(),
-                            'updated_at' => Carbon::now(),
+                            'created_at' => Carbon::now('GMT-3'),
+                            'updated_at' => Carbon::now('GMT-3'),
                         ]
                     );
                 }
@@ -142,8 +142,8 @@ class OrcamentoController extends Controller
                             'preco' => $produto['preco'],
                             'total' => $produto['total'],
                             'observacao' => $produto['observacao'],
-                            'created_at' => Carbon::now(),
-                            'updated_at' => Carbon::now(),
+                            'created_at' => Carbon::now('GMT-3'),
+                            'updated_at' => Carbon::now('GMT-3'),
                         ]
                     );
                 }
@@ -164,8 +164,8 @@ class OrcamentoController extends Controller
                             'preco' => $servico['preco'],
                             'total' => $servico['total'],
                             'observacao' => $servico['observacao'],
-                            'created_at' => Carbon::now(),
-                            'updated_at' => Carbon::now(),
+                            'created_at' => Carbon::now('GMT-3'),
+                            'updated_at' => Carbon::now('GMT-3'),
                         ]
                     );
                 }

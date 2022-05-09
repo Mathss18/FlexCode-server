@@ -60,8 +60,8 @@ class GrupoProdutoController extends Controller
                 [
                     'porcentagem_lucro_id' => $value['id'],
                     'grupo_produto_id' => $grupoProduto->id,
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now()
+                    'created_at' => Carbon::now('GMT-3'),
+                    'updated_at' => Carbon::now('GMT-3')
                 ]
             );
         }
@@ -86,8 +86,8 @@ class GrupoProdutoController extends Controller
                 [
                     'porcentagem_lucro_id' => $value['id'],
                     'grupo_produto_id' => $grupoProduto->id,
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now()
+                    'created_at' => Carbon::now('GMT-3'),
+                    'updated_at' => Carbon::now('GMT-3')
                 ]
             );
         }

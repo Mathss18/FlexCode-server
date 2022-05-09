@@ -137,8 +137,8 @@ class ProdutoController extends Controller
                         [
                             'fornecedor_id' => $value['value'],
                             'produto_id' => $produto->id,
-                            'created_at' => Carbon::now(),
-                            'updated_at' => Carbon::now()
+                            'created_at' => Carbon::now('GMT-3'),
+                            'updated_at' => Carbon::now('GMT-3')
                         ]
                     );
                 } catch (Exception  $ex) {
@@ -161,9 +161,9 @@ class ProdutoController extends Controller
                         'preco'             => $produto->custoFinal,
                         'usuario_id'        => $user->id,
                         'nome_usuario'      => $user->nome,
-                        'observacao'        => 'Produto cadastrado',
-                        'created_at'        => Carbon::now(),
-                        'updated_at'        => Carbon::now()
+                        'observacao'        => '[Produtos] Produto cadastrado',
+                        'created_at'        => Carbon::now('GMT-3'),
+                        'updated_at'        => Carbon::now('GMT-3')
                     ]
                 );
 
@@ -206,9 +206,14 @@ class ProdutoController extends Controller
         $produto->custoFinal = $request->input('custoFinal');
         $produto->estoqueMinimo = $request->input('estoqueMinimo');
         $produto->estoqueMaximo = $request->input('estoqueMaximo');
-        if($oldProduto->movimentaEstoque === false && $produto->movimentaEstoque === true){
+
+        //Só altera a quantidadeAtual se o produto não está na tabela estoque
+        $existeNaTabelaEstoque = DB::table('estoques')->where('produto_id', $produto->id)->first();
+        if(!$existeNaTabelaEstoque){
+            return response()->json($existeNaTabelaEstoque, 500);
             $produto->quantidadeAtual = $request->input('quantidadeAtual');
         }
+
         $produto->ncm = $request->input('ncm');
         $produto->cest = $request->input('cest');
         $produto->origem = $request->input('origem');
@@ -288,8 +293,8 @@ class ProdutoController extends Controller
                     [
                         'fornecedor_id' => $value['value'],
                         'produto_id' => $produto->id,
-                        'created_at' => Carbon::now(),
-                        'updated_at' => Carbon::now()
+                        'created_at' => Carbon::now('GMT-3'),
+                        'updated_at' => Carbon::now('GMT-3')
                     ]
                 );
             } catch (Exception  $ex) {
@@ -300,7 +305,7 @@ class ProdutoController extends Controller
         }
 
         // Se o produto não movimentava estoque mas agora movimenta, lança uma entrada
-        if($oldProduto->movimentaEstoque == false && $produto->movimentaEstoque == true){
+        if($oldProduto->movimentaEstoque == false && $produto->movimentaEstoque == true && !$existeNaTabelaEstoque){
             $user = JWTAuth::user();
             try {
                 DB::table('entradas_produtos')->insert(
@@ -311,9 +316,9 @@ class ProdutoController extends Controller
                         'preco'             => $produto->custoFinal,
                         'nome_usuario'      => $user->nome,
                         'usuario_id'        => $user->id,
-                        'observacao'        => 'Produto não movimentava estoque, agora movimenta',
-                        'created_at'        => Carbon::now(),
-                        'updated_at'        => Carbon::now()
+                        'observacao'        => '[Produtos] Produto não movimentava estoque, agora movimenta',
+                        'created_at'        => Carbon::now('GMT-3'),
+                        'updated_at'        => Carbon::now('GMT-3')
                     ]
                 );
             } catch (Exception  $ex) {
