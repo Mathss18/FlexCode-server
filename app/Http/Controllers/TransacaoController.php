@@ -66,7 +66,7 @@ class TransacaoController extends Controller
     public function update(Request $request)
     {
         $user = JWTAuth::user();
-        $transacoes = Transacao::findOrFail($request->id);
+        $transacoes = Transacao::with(['conta_bancaria'])->findOrFail($request->id);
         $transacoes->data = $request->input('data');
         $transacoes->title = $request->input('title');
         $transacoes->observacao = $request->input('observacao');
