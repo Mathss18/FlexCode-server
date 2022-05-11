@@ -21,6 +21,7 @@ class CreateTransacoesTable extends Migration
             $table->double('valor', 8 ,2);
             $table->string('tipo');
             $table->string('situacao');
+            $table->timestamp('dataTransacaoRegistrada')->nullable();
             $table->integer('favorecido_id');
             $table->string('favorecido_nome');
             $table->string('tipoFavorecido');
