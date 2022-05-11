@@ -16,7 +16,7 @@ class TransacaoController extends Controller
             $from = date($request->query('dataInicio'));
             $to = date($request->query('dataFim'));
 
-            $transacoes = Transacao::with(['conta_bancaria'])->whereBetween('data', [$from, $to])->orderBy('id', 'desc')->get();
+            $transacoes = Transacao::with(['conta_bancaria','compra','venda'])->whereBetween('data', [$from, $to])->orderBy('id', 'desc')->get();
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', $transacoes);
             return response()->json($response, 200);
         } catch (Exception  $ex) {
@@ -28,7 +28,7 @@ class TransacaoController extends Controller
     public function show($id)
     {
         try {
-            $transacoes = Transacao::with(['conta_bancaria'])->findOrFail($id);
+            $transacoes = Transacao::with(['conta_bancaria','compra','venda'])->findOrFail($id);
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', $transacoes);
             return response()->json($response, 200);
         } catch (Exception  $ex) {
@@ -47,6 +47,8 @@ class TransacaoController extends Controller
         $transacoes->valor = $request->input('valor');
         $transacoes->tipo = $request->input('tipo');
         $transacoes->situacao = $request->input('situacao');
+        $transacoes->compra_id = $request->input('compra_id') ?? null;
+        $transacoes->venda_id = $request->input('venda_id') ?? null;
         $transacoes->favorecido_id = $request->input('favorecido_id')['value'];
         $transacoes->favorecido_nome = $request->input('favorecido_id')['label'];
         $transacoes->tipoFavorecido = $request->input('tipoFavorecido');
@@ -69,7 +71,7 @@ class TransacaoController extends Controller
     public function update(Request $request)
     {
         $user = JWTAuth::user();
-        $transacoes = Transacao::with(['conta_bancaria'])->findOrFail($request->id);
+        $transacoes = Transacao::with(['conta_bancaria','compra','venda'])->findOrFail($request->id);
         $oldTransacoes = clone $transacoes;
         $transacoes->data = $request->input('data');
         $transacoes->title = $request->input('title');
@@ -116,7 +118,7 @@ class TransacaoController extends Controller
     public function transacoes($contaBancariaId)
     {
         try {
-            $transacoes = Transacao::with(['conta_bancaria'])->where('conta_bancaria_id', $contaBancariaId)->where('situacao', 'registrada')->orderBy('dataTransacaoRegistrada', 'desc')->get();
+            $transacoes = Transacao::with(['conta_bancaria','compra','venda'])->where('conta_bancaria_id', $contaBancariaId)->where('situacao', 'registrada')->orderBy('dataTransacaoRegistrada', 'desc')->get();
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', $transacoes);
             return response()->json($response, 200);
         } catch (Exception  $ex) {

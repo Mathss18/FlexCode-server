@@ -210,7 +210,6 @@ class ProdutoController extends Controller
         //Só altera a quantidadeAtual se o produto não está na tabela estoque
         $existeNaTabelaEstoque = DB::table('estoques')->where('produto_id', $produto->id)->first();
         if(!$existeNaTabelaEstoque){
-            return response()->json($existeNaTabelaEstoque, 500);
             $produto->quantidadeAtual = $request->input('quantidadeAtual');
         }
 

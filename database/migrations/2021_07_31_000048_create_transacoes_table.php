@@ -26,6 +26,8 @@ class CreateTransacoesTable extends Migration
             $table->string('favorecido_nome');
             $table->string('tipoFavorecido');
             $table->foreignId('conta_bancaria_id')->constrained('contas_bancarias');
+            $table->foreignId('compra_id')->nullable()->constrained('compras');
+            $table->foreignId('venda_id')->nullable()->constrained('vendas');
             $table->string('nome_usuario')->nullable();
 
 

@@ -4,13 +4,16 @@ namespace App\Http\Controllers;
 
 use App\Helpers\APIHelper;
 use App\Http\Resources\Json;
+use App\Models\FormaPagamento;
 use App\Models\Venda;
 use App\Models\VendaAnexo;
 use App\Models\VendaParcela;
 use App\Models\Produto;
+use App\Models\Transacao;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
+use DateTime;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -46,6 +49,7 @@ class VendaController extends Controller
     public function store(Request $request)
     {
         $vendas = new Venda;
+        $user = JWTAuth::user();
 
         $vendas->numero = $request->input('numero');
         $vendas->cliente_id = $request->input('cliente_id')['value'];
@@ -119,13 +123,33 @@ class VendaController extends Controller
                     $parcela->forma_pagamento_id = $value['forma_pagamento_id'];
                     $parcela->observacao = $value['observacao'];
                     $parcela->venda_id = $vendas->id;
-                    try {
-                        $parcela->save();
-                    } catch (Exception  $ex) {
-                        DB::rollBack();
-                        $response = APIHelper::APIResponse(false, 500, null, null, $ex);
-                        return response()->json($response, 500);
+
+                    $parcela->save();
+
+                    if ($vendas->situacao == 1) {
+                        //Cadastra as parcelas no money
+                        $formaPagamento = FormaPagamento::with(['conta_bancaria'])->findOrFail($value['forma_pagamento_id']);
+
+                        $transacao = new Transacao;
+                        $transacao->title = $request->input('cliente_id')['label'];
+                        $transacao->data  = DateTime::createFromFormat('d/m/Y', $value['dataVencimento'])->format("Y-m-d");
+                        $transacao->observacao = 'Venda nº ' . $vendas->numero . ' - Parcela ' . ($key + 1);
+                        $transacao->valor = $value['valorParcela'];
+                        $transacao->tipo = 'rendimento';
+                        $transacao->situacao = 'aberta';
+                        $transacao->dataTransacaoRegistrada = null;
+                        $transacao->favorecido_id = $request->input('cliente_id')['value'];
+                        $transacao->favorecido_nome = $request->input('cliente_id')['label'];
+                        $transacao->tipoFavorecido = 'clientes';
+                        $transacao->conta_bancaria_id = $formaPagamento->conta_bancaria->id;
+                        $transacao->venda_id = $vendas->id;
+                        $transacao->nome_usuario = $user->nome;
+                        $transacao->created_at = Carbon::now('GMT-3');
+                        $transacao->updated_at = Carbon::now('GMT-3');
+
+                        $transacao->save();
                     }
+
                 }
             }
 
@@ -193,6 +217,7 @@ class VendaController extends Controller
     {
         $vendas = Venda::with(['produtos', 'servicos', 'cliente', 'transportadora', 'forma_pagamento', 'parcelas', 'parcelas.forma_pagamento', 'anexos'])->findOrFail($request->id);
         $oldVendas = clone $vendas;
+        $user = JWTAuth::user();
 
 
         $vendas->numero = $request->input('numero');
@@ -269,6 +294,16 @@ class VendaController extends Controller
             //Cadastra as parcelas do pedido de venda
             if ($parcelas) {
                 $vendas->parcelas()->delete();
+                $index = 0;
+                if ($oldVendas->situacao == 0 && $vendas->situacao == 1) {
+                    DB::table('transacoes')->where('venda_id', $vendas->id)->delete();
+                }
+                if ($oldVendas->situacao == 1 && $vendas->situacao == 0) {
+                    DB::table('transacoes')->where('venda_id', $vendas->id)->delete();
+                }
+                if ($vendas->situacao == 2) {
+                    DB::table('transacoes')->where('venda_id', $vendas->id)->delete();
+                }
                 foreach ($parcelas as $parcela) {
                     $vendas->parcelas()->saveMany(
                         [
@@ -285,6 +320,32 @@ class VendaController extends Controller
                         ]
 
                     );
+
+                    if ($oldVendas->situacao == 0 && $vendas->situacao == 1) {
+                        //Cadastra as parcelas no money
+                        $formaPagamento = FormaPagamento::with(['conta_bancaria'])->findOrFail($parcela['forma_pagamento_id']);
+
+                        $transacao = new Transacao;
+                        $transacao->title = $request->input('cliente_id')['label'];
+                        $transacao->data  = DateTime::createFromFormat('d/m/Y', $parcela['dataVencimento'])->format("Y-m-d");
+                        $transacao->observacao = 'Venda nº ' . $vendas->numero . ' - Parcela ' . ($index+1);
+                        $transacao->valor = $parcela['valorParcela'];
+                        $transacao->tipo = 'rendimento';
+                        $transacao->situacao = 'aberta';
+                        $transacao->dataTransacaoRegistrada = null;
+                        $transacao->favorecido_id = $request->input('cliente_id')['value'];
+                        $transacao->favorecido_nome = $request->input('cliente_id')['label'];
+                        $transacao->tipoFavorecido = 'clientes';
+                        $transacao->conta_bancaria_id = $formaPagamento->conta_bancaria->id;
+                        $transacao->venda_id = $vendas->id;
+                        $transacao->nome_usuario = $user->nome;
+                        $transacao->created_at = Carbon::now('GMT-3');
+                        $transacao->updated_at = Carbon::now('GMT-3');
+
+                        $transacao->save();
+                    }
+
+                    $index++;
                 }
             } else {
                 $vendas->parcelas()->delete();
@@ -297,7 +358,7 @@ class VendaController extends Controller
                 if ($this->is_base64($value['url'])) {
                     $image = $value['url'];
                     $imageName = $value['nome'];
-                    $folderName = "vendas/" . $vendas->id; // ID da comrpa que foi editado
+                    $folderName = "vendas/" . $vendas->id; // ID da venda que foi editado
 
                     if ($return = $this->upload($image, $imageName, $folderName)) {
                         $vendaAnexo = new VendaAnexo;

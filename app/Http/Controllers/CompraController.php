@@ -7,10 +7,13 @@ use App\Http\Resources\Json;
 use App\Models\Compra;
 use App\Models\CompraAnexo;
 use App\Models\CompraParcela;
+use App\Models\FormaPagamento;
 use App\Models\Produto;
+use App\Models\Transacao;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
+use DateTime;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -46,6 +49,7 @@ class CompraController extends Controller
     public function store(Request $request)
     {
         $compras = new Compra;
+        $user = JWTAuth::user();
 
         $compras->numero = $request->input('numero');
         $compras->fornecedor_id = $request->input('fornecedor_id')['value'];
@@ -91,7 +95,7 @@ class CompraController extends Controller
                 }
             }
 
-            //Cadastra as parcelas do pedido de compra
+            //Cadastra as parcelas do pedido de compra e joga-as no money
             if ($parcelas) {
                 foreach ($request->input('parcelas') as $key => $value) {
 
@@ -102,12 +106,31 @@ class CompraController extends Controller
                     $parcela->forma_pagamento_id = $value['forma_pagamento_id'];
                     $parcela->observacao = $value['observacao'];
                     $parcela->compra_id = $compras->id;
-                    try {
-                        $parcela->save();
-                    } catch (Exception  $ex) {
-                        DB::rollBack();
-                        $response = APIHelper::APIResponse(false, 500, null, null, $ex);
-                        return response()->json($response, 500);
+                    $parcela->save();
+
+
+                    if ($compras->situacao == 1) {
+                        //Cadastra as parcelas no money
+                        $formaPagamento = FormaPagamento::with(['conta_bancaria'])->findOrFail($value['forma_pagamento_id']);
+
+                        $transacao = new Transacao;
+                        $transacao->title = $request->input('fornecedor_id')['label'];
+                        $transacao->data  = DateTime::createFromFormat('d/m/Y', $value['dataVencimento'])->format("Y-m-d");
+                        $transacao->observacao = 'Compra nº ' . $compras->numero . ' - Parcela ' . ($key + 1);
+                        $transacao->valor = $value['valorParcela'];
+                        $transacao->tipo = 'despesa';
+                        $transacao->situacao = 'aberta';
+                        $transacao->dataTransacaoRegistrada = null;
+                        $transacao->favorecido_id = $request->input('fornecedor_id')['value'];
+                        $transacao->favorecido_nome = $request->input('fornecedor_id')['label'];
+                        $transacao->tipoFavorecido = 'fornecedores';
+                        $transacao->conta_bancaria_id = $formaPagamento->conta_bancaria->id;
+                        $transacao->compra_id = $compras->id;
+                        $transacao->nome_usuario = $user->nome;
+                        $transacao->created_at = Carbon::now('GMT-3');
+                        $transacao->updated_at = Carbon::now('GMT-3');
+
+                        $transacao->save();
                     }
                 }
             }
@@ -176,6 +199,7 @@ class CompraController extends Controller
     {
         $compras = Compra::with(['produtos', 'fornecedor', 'transportadora', 'forma_pagamento', 'parcelas', 'parcelas.forma_pagamento', 'anexos'])->findOrFail($request->id);
         $oldCompras = clone $compras;
+        $user = JWTAuth::user();
 
 
         $compras->numero = $request->input('numero');
@@ -234,6 +258,13 @@ class CompraController extends Controller
             //Cadastra as parcelas do pedido de compra
             if ($parcelas) {
                 $compras->parcelas()->delete();
+                $index = 0;
+                if ($oldCompras->situacao == 0 && $compras->situacao == 1) {
+                    DB::table('transacoes')->where('compra_id', $compras->id)->delete();
+                }
+                if ($compras->situacao == 2) {
+                    DB::table('transacoes')->where('compra_id', $compras->id)->delete();
+                }
                 foreach ($parcelas as $parcela) {
                     $compras->parcelas()->saveMany(
                         [
@@ -250,6 +281,32 @@ class CompraController extends Controller
                         ]
 
                     );
+
+                    if ($oldCompras->situacao == 0 && $compras->situacao == 1) {
+                        //Cadastra as parcelas no money
+                        $formaPagamento = FormaPagamento::with(['conta_bancaria'])->findOrFail($parcela['forma_pagamento_id']);
+
+                        $transacao = new Transacao;
+                        $transacao->title = $request->input('fornecedor_id')['label'];
+                        $transacao->data  = DateTime::createFromFormat('d/m/Y', $parcela['dataVencimento'])->format("Y-m-d");
+                        $transacao->observacao = 'Compra nº ' . $compras->numero . ' - Parcela ' . ($index+1);
+                        $transacao->valor = $parcela['valorParcela'];
+                        $transacao->tipo = 'despesa';
+                        $transacao->situacao = 'aberta';
+                        $transacao->dataTransacaoRegistrada = null;
+                        $transacao->favorecido_id = $request->input('fornecedor_id')['value'];
+                        $transacao->favorecido_nome = $request->input('fornecedor_id')['label'];
+                        $transacao->tipoFavorecido = 'fornecedores';
+                        $transacao->conta_bancaria_id = $formaPagamento->conta_bancaria->id;
+                        $transacao->compra_id = $compras->id;
+                        $transacao->nome_usuario = $user->nome;
+                        $transacao->created_at = Carbon::now('GMT-3');
+                        $transacao->updated_at = Carbon::now('GMT-3');
+
+                        $transacao->save();
+                    }
+
+                    $index++;
                 }
             } else {
                 $compras->parcelas()->delete();
