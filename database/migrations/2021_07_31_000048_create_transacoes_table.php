@@ -28,6 +28,8 @@ class CreateTransacoesTable extends Migration
             $table->foreignId('conta_bancaria_id')->constrained('contas_bancarias');
             $table->foreignId('compra_id')->nullable()->constrained('compras');
             $table->foreignId('venda_id')->nullable()->constrained('vendas');
+            $table->integer('transacao_id')->nullable();
+            $table->boolean('isTransferencia')->nullable()->default(false);
             $table->string('nome_usuario')->nullable();
 
 

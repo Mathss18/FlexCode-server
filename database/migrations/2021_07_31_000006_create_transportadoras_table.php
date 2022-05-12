@@ -17,11 +17,11 @@ class CreateTransportadorasTable extends Migration
             $table->bigIncrements('id');
             $table->string('tipoTransportadora');
             $table->integer('situacao');
-            $table->string('tipoContribuinte');
+            $table->string('tipoContribuinte')->nullable();
             $table->string('inscricaoEstadual')->nullable();
-            $table->string('nome');
-            $table->string('cpfCnpj')->unique();
-            $table->string('email');
+            $table->string('nome')->unique();
+            $table->string('cpfCnpj')->unique()->nullable();
+            $table->string('email')->nullable();
             $table->string('contato')->nullable();
             $table->string('rua')->nullable();
             $table->string('cidade')->nullable();

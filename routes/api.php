@@ -324,4 +324,6 @@ Route::middleware(['jwt'])->group(function () {
     Route::delete('transacoes/{id}', [TransacaoController::class, 'destroy']);
 
     Route::get('transacoes/contas-bancarias/{idContaBancaria}', [TransacaoController::class, 'transacoes']);
+
+    Route::post('transacoes/contas-bancarias/transferencias', [TransacaoController::class, 'transferencia']);
 });
