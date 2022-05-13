@@ -18,7 +18,7 @@ class TenantMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        return response()->json($request->getHost(),500);
+        // return response()->json($request->getHost(),500);
         $manager = app(ManagerTenant::class);
 
         if($manager->isMainDomain()){
@@ -28,7 +28,7 @@ class TenantMiddleware
         $tenant = $this->getTenant($request->getHost());
 
         if(!$tenant) {
-            return response()->json(['error' => 'Tenant not found'], 404);
+            return response()->json(['error' => '[Middleware] Tenant not found'], 404);
         }
         else{
             $manager->setConnection($tenant);
