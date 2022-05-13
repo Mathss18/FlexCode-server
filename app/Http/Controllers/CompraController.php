@@ -428,6 +428,19 @@ class CompraController extends Controller
         }
     }
 
+    public function getNextId()
+    {
+        try {
+            $statement = DB::select("SHOW TABLE STATUS LIKE 'compras'");
+            $nextId = $statement[0]->Auto_increment;
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso', $nextId);
+            return response()->json($response, 200);
+        } catch (Exception  $ex) {
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+            return response()->json($response, 500);
+        }
+    }
+
     protected function upload($file, $fileName, $folderName)
     {
         $extension = explode('/', explode(':', substr($file, 0, strpos($file, ';')))[1])[1];

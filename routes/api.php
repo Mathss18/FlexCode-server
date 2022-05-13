@@ -210,6 +210,8 @@ Route::middleware(['jwt'])->group(function () {
 
     Route::get('ordens-servicos/{id}', [OrdemServicoController::class, 'show']);
 
+    Route::get('ordens-servicos-proximo', [OrdemServicoController::class, 'getNextId']);
+
     Route::post('ordens-servicos', [OrdemServicoController::class, 'store']);
 
     Route::put('ordens-servicos/{id}', [OrdemServicoController::class, 'update']);
@@ -235,6 +237,8 @@ Route::middleware(['jwt'])->group(function () {
     Route::get('orcamentos', [OrcamentoController::class, 'index']);
 
     Route::get('orcamentos/{id}', [OrcamentoController::class, 'show']);
+
+    Route::get('orcamentos-proximo', [OrcamentoController::class, 'getNextId']);
 
     Route::post('orcamentos', [OrcamentoController::class, 'store']);
 
@@ -269,6 +273,8 @@ Route::middleware(['jwt'])->group(function () {
 
     Route::get('compras/{id}', [CompraController::class, 'show']);
 
+    Route::get('compras-proximo', [CompraController::class, 'getNextId']);
+
     Route::post('compras', [CompraController::class, 'store']);
 
     Route::put('compras/{id}', [CompraController::class, 'update']);
@@ -279,6 +285,8 @@ Route::middleware(['jwt'])->group(function () {
     Route::get('vendas', [VendaController::class, 'index']);
 
     Route::get('vendas/{id}', [VendaController::class, 'show']);
+
+    Route::get('vendas-proximo', [VendaController::class, 'getNextId']);
 
     Route::post('vendas', [VendaController::class, 'store']);
 

@@ -190,4 +190,17 @@ class OrcamentoController extends Controller
             return new Json($orcamentos);
         }
     }
+
+    public function getNextId()
+    {
+        try {
+            $statement = DB::select("SHOW TABLE STATUS LIKE 'orcamentos'");
+            $nextId = $statement[0]->Auto_increment;
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso', $nextId);
+            return response()->json($response, 200);
+        } catch (Exception  $ex) {
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+            return response()->json($response, 500);
+        }
+    }
 }

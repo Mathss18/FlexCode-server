@@ -251,4 +251,17 @@ class OrdemServicoController extends Controller
             return new Json($ordensServicos);
         }
     }
+
+    public function getNextId()
+    {
+        try {
+            $statement = DB::select("SHOW TABLE STATUS LIKE 'ordens_servicos'");
+            $nextId = $statement[0]->Auto_increment;
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso', $nextId);
+            return response()->json($response, 200);
+        } catch (Exception  $ex) {
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+            return response()->json($response, 500);
+        }
+    }
 }
