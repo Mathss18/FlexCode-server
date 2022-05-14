@@ -6,6 +6,7 @@ use App\Helpers\APIHelper;
 use Illuminate\Http\Request;
 use App\Models\Cliente;
 use Exception;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class ClienteController extends Controller
 {

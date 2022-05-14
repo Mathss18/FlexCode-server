@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\APIHelper;
+use App\Models\Usuario;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Tymon\JWTAuth\Facades\JWTAuth;
+use Tymon\JWTAuth\Facades\JWTFactory;
 
 class AuthController extends Controller
 {
@@ -12,13 +15,19 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $credentials = $request->only(['email', 'senha']);
-        $resp = auth('api')->attempt($credentials);
-        //dd($resp);
 
-        if (!$token = auth('api')->attempt($credentials)) {
+        if (!auth('api')->attempt($credentials)) {
             $response = APIHelper::APIResponse(false, 403, 'Unauthorized');
             return response()->json($response, 403);
         }
+
+        $user = Usuario::where('email', $request->input('email'))->where('senha', $request->input('senha'))->first();
+
+        $payload = JWTFactory::sub($user->id)
+            ->tenant(config('database.connections.tenant.database'))
+            ->make();
+
+        $token = JWTAuth::encode($payload)->get();
 
         return $this->respondWithToken($token);
     }
@@ -66,9 +75,8 @@ class AuthController extends Controller
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => auth('api')->factory()->getTTL() * 600,
+            'expires_in' => auth('api')->factory()->getTTL() * 60,
             'user' => $userLoggedInfo
         ]);
     }
-
 }

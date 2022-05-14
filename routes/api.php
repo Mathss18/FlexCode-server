@@ -44,7 +44,7 @@ Route::post('login', [AuthController::class, 'login']);
 
 Route::get('ordens-servicos-acompanhar/{idOrdemServico}', [OrdemServicoFuncionarioController::class, 'getAcompanhemntoOrdemServico']);
 
-Route::middleware(['jwt'])->group(function () {
+Route::middleware(['jwt','check.jwt.tenant'])->group(function () {
 
     //============================ CLIENTES ==============================
     Route::get('clientes', [ClienteController::class, 'index']);
