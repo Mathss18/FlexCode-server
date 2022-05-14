@@ -34,10 +34,10 @@ class Controller extends BaseController
         $file = str_replace(' ', '+', $file);
 
         $imageName = Str::kebab($fileName) . '.' . $extension;
-        $fileUploaded = Storage::put('public/' . $folderName . '/' . $imageName, base64_decode($file));
+        $fileUploaded = Storage::put('public/' . config('database.connections.tenant.database') . '/' . $folderName . '/' . $imageName, base64_decode($file));
 
         if ($fileUploaded) {
-            $url = config('app.url') . config('app.port') . '/' . "storage/" .config('database.connections.tenant.database').'/'. $folderName . '/' . $imageName;
+            $url = config('app.url') . config('app.port') . '/' . "storage/" . config('database.connections.tenant.database') . '/' . $folderName . '/' . $imageName;
             return $url;
         }
         return $fileUploaded;
