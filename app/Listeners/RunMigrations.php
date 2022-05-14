@@ -36,6 +36,13 @@ class RunMigrations
         if ($resp !== 0) {
             throw new Exception('Error running migrations');
         }
-        return $resp === 0; // se retornar 0 é porque deu certo
+
+        $resp2 = Artisan::call('db:seed');
+
+        if ($resp2 !== 0) {
+            throw new Exception('Error running seeders');
+        }
+
+        return true; // retorna true se tudo deu certo
     }
 }
