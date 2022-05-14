@@ -16,7 +16,8 @@ class CheckMainDomain
      */
     public function handle(Request $request, Closure $next)
     {
-        if ($request->getHost() == config('tenant.main_domain')) {
+        if ($request->getHost() == config('tenant.main_domain') && $request->header('Authorization') == config('tenant.main_domain_token')) {
+
             return $next($request);
         }
         else{
