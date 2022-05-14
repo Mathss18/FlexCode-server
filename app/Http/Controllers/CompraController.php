@@ -10,8 +10,7 @@ use App\Models\CompraParcela;
 use App\Models\FormaPagamento;
 use App\Models\Produto;
 use App\Models\Transacao;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
+
 use Carbon\Carbon;
 use DateTime;
 use Exception;
@@ -441,33 +440,4 @@ class CompraController extends Controller
         }
     }
 
-    protected function upload($file, $fileName, $folderName)
-    {
-        $extension = explode('/', explode(':', substr($file, 0, strpos($file, ';')))[1])[1];
-        $replace = substr($file, 0, strpos($file, ',') + 1);
-        $file = str_replace($replace, '', $file);
-        $file = str_replace(' ', '+', $file);
-
-        $imageName = Str::kebab($fileName) . '.' . $extension;
-        $fileUploaded = Storage::put('public/' . $folderName . '/' . $imageName, base64_decode($file));
-
-        if ($fileUploaded) {
-            $url = config('app.url') . config('app.port') . '/' . "storage/" . $folderName . '/' . $imageName;
-            return $url;
-        }
-        return $fileUploaded;
-    }
-
-    protected function is_base64($file)
-    {
-        $replace = substr($file, 0, strpos($file, ',') + 1);
-        $file = str_replace($replace, '', $file);
-        $file = str_replace(' ', '+', $file);
-
-        if (base64_encode(base64_decode($file, true)) === $file) {
-            return true;
-        } else {
-            return false;
-        }
-    }
 }
