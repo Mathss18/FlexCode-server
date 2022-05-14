@@ -13,7 +13,7 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
-    private function is_base64($file)
+    public function is_base64($file)
     {
         $replace = substr($file, 0, strpos($file, ',') + 1);
         $file = str_replace($replace, '', $file);
@@ -26,7 +26,7 @@ class Controller extends BaseController
         }
     }
 
-    private function upload($file, $fileName, $folderName)
+    public function upload($file, $fileName, $folderName)
     {
         $extension = explode('/', explode(':', substr($file, 0, strpos($file, ';')))[1])[1];
         $replace = substr($file, 0, strpos($file, ',') + 1);
