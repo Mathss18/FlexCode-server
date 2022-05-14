@@ -37,7 +37,7 @@ class Controller extends BaseController
         $fileUploaded = Storage::put('public/' . $folderName . '/' . $imageName, base64_decode($file));
 
         if ($fileUploaded) {
-            $url = config('app.url') . config('app.port') . '/' . "storage/" .config('database.connections.tenant.host').'/'. $folderName . '/' . $imageName;
+            $url = config('app.url') . config('app.port') . '/' . "storage/" .config('database.connections.tenant.database').'/'. $folderName . '/' . $imageName;
             return $url;
         }
         return $fileUploaded;
