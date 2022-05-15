@@ -50,7 +50,7 @@ class TenantSeed extends Command
                 $this->managerTenant->setConnection($tenant);
                 $this->runMigration($tenant);
             }catch (\Exception $e){
-                $this->error("Tenant not found");
+                $this->error($e->getMessage());
             }
         }
         else{

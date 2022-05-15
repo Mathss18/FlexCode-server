@@ -30,7 +30,7 @@ class RunMigrations
     public function handle(TenantMigrate $event)
     {
         $tenant = $event->getTenant();
-        $resp = Artisan::call('tenants:migrations', [
+        $resp = Artisan::call('tenants:migrate', [
             'id' => $tenant->id,
         ]);
         if ($resp !== 0) {

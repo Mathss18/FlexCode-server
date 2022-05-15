@@ -32,6 +32,7 @@ class TenantMiddleware
         }
         else{
             $manager->setConnection($tenant);
+            $this->setSession($tenant);
         }
 
         return $next($request);
@@ -40,5 +41,9 @@ class TenantMiddleware
     public function getTenant($host)
     {
         return Tenant::where('sub_dominio', $host)->first();
+    }
+
+    public function setSession($tenant){
+        session()->put('tenant', $tenant);
     }
 }

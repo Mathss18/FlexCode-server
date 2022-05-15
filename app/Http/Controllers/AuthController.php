@@ -24,7 +24,7 @@ class AuthController extends Controller
         $user = Usuario::where('email', $request->input('email'))->where('senha', $request->input('senha'))->first();
 
         $payload = JWTFactory::sub($user->id)
-            ->tenant(config('database.connections.tenant.database'))
+            ->tenant(session('tenant')->nome)
             ->make();
 
         $token = JWTAuth::encode($payload)->get();

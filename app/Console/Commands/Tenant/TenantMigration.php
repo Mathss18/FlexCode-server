@@ -15,7 +15,7 @@ class TenantMigration extends Command
      *
      * @var string
      */
-    protected $signature = 'tenants:migrations {id?} {--refresh}';
+    protected $signature = 'tenants:migrate {id?} {--refresh}';
 
     /**
      * The console command description.
@@ -50,7 +50,7 @@ class TenantMigration extends Command
                 $this->managerTenant->setConnection($tenant);
                 $this->runMigration($tenant);
             }catch (\Exception $e){
-                $this->error("Tenant not found");
+                $this->error($e->getMessage());
             }
         }
         else{
