@@ -24,6 +24,7 @@ use App\Http\Controllers\FormaPagamentoController;
 use App\Http\Controllers\ContaBancariaController;
 use App\Http\Controllers\CompraController;
 use App\Http\Controllers\EstoqueController;
+use App\Http\Controllers\NotaFiscalController;
 use App\Http\Controllers\OutrosFavorecidosController;
 use App\Http\Controllers\TransacaoController;
 use App\Http\Controllers\VendaController;
@@ -44,7 +45,7 @@ Route::post('login', [AuthController::class, 'login']);
 
 Route::get('ordens-servicos-acompanhar/{idOrdemServico}', [OrdemServicoFuncionarioController::class, 'getAcompanhemntoOrdemServico']);
 
-Route::middleware(['jwt','check.jwt.tenant'])->group(function () {
+Route::middleware(['jwt', 'check.jwt.tenant'])->group(function () {
 
     //============================ CLIENTES ==============================
     Route::get('clientes', [ClienteController::class, 'index']);
@@ -334,4 +335,15 @@ Route::middleware(['jwt','check.jwt.tenant'])->group(function () {
     Route::get('transacoes/contas-bancarias/{idContaBancaria}', [TransacaoController::class, 'transacoes']);
 
     Route::post('transacoes/contas-bancarias/transferencias', [TransacaoController::class, 'transferencia']);
+
+    //============================ NOTA FISCAL ==============================
+    Route::get('notas-fiscais', [NotaFiscalController::class, 'index']);
+
+    Route::get('notas-fiscais/{id}', [NotaFiscalController::class, 'show']);
+
+    Route::post('notas-fiscais', [NotaFiscalController::class, 'store']);
+
+    Route::put('notas-fiscais/{id}', [NotaFiscalController::class, 'update']);
+
+    Route::delete('notas-fiscais/{id}', [NotaFiscalController::class, 'destroy']);
 });
