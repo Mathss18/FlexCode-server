@@ -45,6 +45,7 @@ class OrdemServicoController extends Controller
         $ordensServicos->numero = $request->input('numero');
         $ordensServicos->situacao = $request->input('situacao');
         $ordensServicos->cliente_id = $request->input('cliente_id')['value'] ?? null;
+        $ordensServicos->venda_id = $request->input('venda_id') ?? null;
         $ordensServicos->dataEntrada = $request->input('dataEntrada');
         $ordensServicos->horaEntrada = $request->input('horaEntrada');
         $ordensServicos->dataSaida = $request->input('dataSaida');

@@ -17,6 +17,7 @@ class CreateOrdensServicosTable extends Migration
             $table->bigIncrements('id');
             $table->integer('numero')->unique();
             $table->foreignId('cliente_id')->nullable()->constrained('clientes');
+            $table->foreignId('venda_id')->nullable()->constrained('vendas');
             $table->integer('situacao');
             $table->string('dataEntrada');
             $table->string('horaEntrada');
