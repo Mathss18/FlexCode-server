@@ -50,7 +50,7 @@ class FuncionarioController extends Controller
         $funcionario->dataNascimento = $request->input('dataNascimento');
         $funcionario->sexo = $request->input('sexo');
         $funcionario->email = $request->input('emailPessoal');
-        $funcionario->comissao = $request->input('comissao');
+        $funcionario->comissao = number_format((float)$request->input('comissao'), session('config')->quantidadeCasasDecimaisValor, '.', '');
         $funcionario->rua = $request->input('rua');
         $funcionario->cidade = $request->input('cidade');
         $funcionario->numero = $request->input('numero');
@@ -116,7 +116,7 @@ class FuncionarioController extends Controller
         $funcionario->dataNascimento = $request->input('dataNascimento');
         $funcionario->sexo = $request->input('sexo');
         $funcionario->email = $request->input('emailPessoal');
-        $funcionario->comissao = $request->input('comissao');
+        $funcionario->comissao = number_format((float)$request->input('comissao'), session('config')->quantidadeCasasDecimaisValor, '.', '');
         $funcionario->rua = $request->input('rua');
         $funcionario->cidade = $request->input('cidade');
         $funcionario->numero = $request->input('numero');

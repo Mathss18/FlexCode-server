@@ -18,7 +18,7 @@ class CreateServicosTable extends Migration
             $table->string('nome')->unique();
             $table->string('codigoInterno')->unique();
             $table->double('valor', 8, 4);
-            $table->double('comissao', 8, 2);
+            $table->double('comissao', 8, 4);
             $table->string('descricao');
 
             $table->timestamps();

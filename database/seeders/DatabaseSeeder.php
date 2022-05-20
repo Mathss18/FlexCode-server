@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Cliente;
+use App\Models\Configuracao;
 use App\Models\Fornecedor;
 use App\Models\Funcionario;
 use App\Models\Transportadora;
@@ -21,6 +22,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
+        Configuracao::factory(1)->create();
         Usuario::factory(1)->create();
         Cliente::factory(20)->create();
         Fornecedor::factory(20)->create();

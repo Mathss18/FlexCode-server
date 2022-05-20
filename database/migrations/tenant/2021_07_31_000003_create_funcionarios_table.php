@@ -21,7 +21,7 @@ class CreateFuncionariosTable extends Migration
             $table->string('rg')->nullable()->unique();
             $table->string('dataNascimento')->nullable();
             $table->string('sexo');
-            $table->double('comissao', 8, 2);
+            $table->double('comissao', 8, 4);
             $table->string('email')->nullable()->unique();
             $table->string('foto')->nullable();
             $table->string('rua')->nullable();

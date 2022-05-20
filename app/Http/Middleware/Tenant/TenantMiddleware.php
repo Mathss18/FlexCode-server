@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware\Tenant;
 
+use App\Models\Configuracao;
 use Closure;
 use Illuminate\Http\Request;
 use App\Models\Tenant;
@@ -21,18 +22,23 @@ class TenantMiddleware
         // return response()->json($request->getHost(),500);
         $manager = app(ManagerTenant::class);
 
-        if($manager->isMainDomain()){
+        if ($manager->isMainDomain()) {
             return $next($request);
         }
 
         $tenant = $this->getTenant($request->getHost());
 
-        if(!$tenant) {
+        if (!$tenant) {
             return response()->json(['error' => '[Middleware] Tenant not found'], 404);
-        }
-        else{
+        } else {
             $manager->setConnection($tenant);
-            $this->setSession($tenant);
+            $this->setSession('tenant', $tenant);
+
+            $config = Configuracao::where('situacao', true)->first();
+            unset($config->id);
+            unset($config->senhaCertificadoDigital);
+            unset($config->senhaSmtp);
+            $this->setSession('config', $config);
         }
 
         return $next($request);
@@ -43,7 +49,8 @@ class TenantMiddleware
         return Tenant::where('sub_dominio', $host)->first();
     }
 
-    public function setSession($tenant){
-        session()->put('tenant', $tenant);
+    public function setSession($key, $value)
+    {
+        session()->put($key, $value);
     }
 }

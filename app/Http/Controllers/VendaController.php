@@ -59,12 +59,13 @@ class VendaController extends Controller
         $vendas->forma_pagamento_id = $request->input('forma_pagamento_id')['value'];
         $vendas->quantidadeParcelas = $request->input('quantidadeParcelas');
         $vendas->intervaloParcelas = $request->input('intervaloParcelas');
+        $vendas->somarFreteAoTotal = $request->input('somarFreteAoTotal');
         $vendas->dataPrimeiraParcela = $request->input('dataPrimeiraParcela');
         $vendas->tipoFormaPagamento = $request->input('tipoFormaPagamento');
-        $vendas->frete = $request->input('frete');
-        $vendas->impostos = $request->input('impostos');
-        $vendas->desconto = $request->input('desconto');
-        $vendas->total = $request->input('total');
+        $vendas->frete = number_format((float)$request->input('frete'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $vendas->impostos = number_format((float)$request->input('impostos'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $vendas->desconto = number_format((float)$request->input('desconto'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $vendas->total = number_format((float)$request->input('total'), session('config')->quantidadeCasasDecimaisValor, '.', '');
         $vendas->observacao = $request->input('observacao');
         $vendas->observacaoInterna = $request->input('observacaoInterna');
 
@@ -84,9 +85,9 @@ class VendaController extends Controller
                     $vendas->produtos()->attach(
                         $produto['produto_id'],
                         [
-                            'quantidade' => $produto['quantidade'],
-                            'preco' => $produto['preco'],
-                            'total' => $produto['total'],
+                            'quantidade' => number_format((float)$produto['quantidade'], session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
+                            'preco' => number_format((float)$produto['preco'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
+                            'total' => number_format((float)$produto['total'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
                             'observacao' => $produto['observacao'],
                             'created_at' => Carbon::now('GMT-3'),
                             'updated_at' => Carbon::now('GMT-3'),
@@ -95,15 +96,16 @@ class VendaController extends Controller
                 }
             }
 
+
             // Cadastra os servicos do pedido de venda
             if ($servicos) {
                 foreach ($servicos as $servico) {
                     $vendas->servicos()->attach(
                         $servico['servico_id'],
                         [
-                            'quantidade' => $servico['quantidade'],
-                            'preco' => $servico['preco'],
-                            'total' => $servico['total'],
+                            'quantidade' => number_format((float)$servico['quantidade'], session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
+                            'preco' => number_format((float)$servico['preco'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
+                            'total' => number_format((float)$servico['total'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
                             'observacao' => $servico['observacao'],
                             'created_at' => Carbon::now('GMT-3'),
                             'updated_at' => Carbon::now('GMT-3'),
@@ -112,6 +114,8 @@ class VendaController extends Controller
                 }
             }
 
+
+
             //Cadastra as parcelas do pedido de venda
             if ($parcelas) {
                 foreach ($request->input('parcelas') as $key => $value) {
@@ -119,7 +123,7 @@ class VendaController extends Controller
 
                     $parcela = new VendaParcela;
                     $parcela->dataVencimento = $value['dataVencimento'];
-                    $parcela->valorParcela = $value['valorParcela'];
+                    $parcela->valorParcela = number_format((float)$value['valorParcela'], 2, '.', '');
                     $parcela->forma_pagamento_id = $value['forma_pagamento_id'];
                     $parcela->observacao = $value['observacao'];
                     $parcela->venda_id = $vendas->id;
@@ -134,7 +138,7 @@ class VendaController extends Controller
                         $transacao->title = $request->input('cliente_id')['label'];
                         $transacao->data  = DateTime::createFromFormat('d/m/Y', $value['dataVencimento'])->format("Y-m-d");
                         $transacao->observacao = 'Venda nº ' . $vendas->numero . ' - Parcela ' . ($key + 1);
-                        $transacao->valor = $value['valorParcela'];
+                        $transacao->valor = number_format((float)$value['valorParcela'], 2, '.', '');
                         $transacao->tipo = 'rendimento';
                         $transacao->situacao = 'aberta';
                         $transacao->dataTransacaoRegistrada = null;
@@ -149,9 +153,9 @@ class VendaController extends Controller
 
                         $transacao->save();
                     }
-
                 }
             }
+
 
             // Cadastra os anexos da venda
             if ($anexos) {
@@ -187,10 +191,10 @@ class VendaController extends Controller
                     if ($prodBanco->movimentaEstoque) {
                         DB::table('saidas_produtos')->insert(
                             [
-                                'produto_id'        => $produto->id,
-                                'quantidade'        => $produto['quantidade'],
-                                'quantidadeMomento' => $prodBanco->quantidadeAtual - $produto['quantidade'],
-                                'preco'             => $produto->preco,
+                                'produto_id'        => $produto['produto_id'],
+                                'quantidade'        => number_format((float)$produto['quantidade'], session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
+                                'quantidadeMomento' => number_format((float)$prodBanco->quantidadeAtual, session('config')->quantidadeCasasDecimaisQuantidade, '.', '') - number_format((float)$produto['quantidade'], session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
+                                'preco'             => number_format((float)$produto['preco'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
                                 'nome_usuario'      => $user->nome,
                                 'cliente_id'        => $vendas->cliente_id,
                                 'observacao'        => '[Venda Realizada] Saída de produto da venda nº ' . $vendas->numero,
@@ -201,7 +205,6 @@ class VendaController extends Controller
                     }
                 }
             }
-
 
             $response = APIHelper::APIResponse(true, 200, 'Sucesso ao criar o pedido de venda', $vendas);
             DB::commit();
@@ -228,12 +231,13 @@ class VendaController extends Controller
         $vendas->forma_pagamento_id = $request->input('forma_pagamento_id')['value'];
         $vendas->quantidadeParcelas = $request->input('quantidadeParcelas');
         $vendas->intervaloParcelas = $request->input('intervaloParcelas');
+        $vendas->somarFreteAoTotal = $request->input('somarFreteAoTotal');
         $vendas->dataPrimeiraParcela = $request->input('dataPrimeiraParcela');
         $vendas->tipoFormaPagamento = $request->input('tipoFormaPagamento');
-        $vendas->frete = $request->input('frete');
-        $vendas->impostos = $request->input('impostos');
-        $vendas->desconto = $request->input('desconto');
-        $vendas->total = $request->input('total');
+        $vendas->frete = number_format((float)$request->input('frete'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $vendas->impostos = number_format((float)$request->input('impostos'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $vendas->desconto = number_format((float)$request->input('desconto'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $vendas->total = number_format((float)$request->input('total'), session('config')->quantidadeCasasDecimaisValor, '.', '');
         $vendas->observacao = $request->input('observacao');
         $vendas->observacaoInterna = $request->input('observacaoInterna');
 
@@ -258,9 +262,9 @@ class VendaController extends Controller
                     $vendas->produtos()->attach(
                         $produto['produto_id'],
                         [
-                            'quantidade' => $produto['quantidade'],
-                            'preco' => $produto['preco'],
-                            'total' => $produto['total'],
+                            'quantidade' => number_format((float)$produto['quantidade'], session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
+                            'preco' => number_format((float)$produto['preco'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
+                            'total' => number_format((float)$produto['total'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
                             'observacao' => $produto['observacao'],
                             'created_at' => Carbon::now('GMT-3'),
                             'updated_at' => Carbon::now('GMT-3'),
@@ -278,9 +282,9 @@ class VendaController extends Controller
                     $vendas->servicos()->attach(
                         $servico['servico_id'],
                         [
-                            'quantidade' => $servico['quantidade'],
-                            'preco' => $servico['preco'],
-                            'total' => $servico['total'],
+                            'quantidade' => number_format((float)$servico['quantidade'], session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
+                            'preco' => number_format((float)$servico['preco'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
+                            'total' => number_format((float)$servico['total'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
                             'observacao' => $servico['observacao'],
                             'created_at' => Carbon::now('GMT-3'),
                             'updated_at' => Carbon::now('GMT-3'),
@@ -310,7 +314,7 @@ class VendaController extends Controller
                             new VendaParcela(
                                 [
                                     'dataVencimento' => $parcela['dataVencimento'],
-                                    'valorParcela' => $parcela['valorParcela'],
+                                    'valorParcela' => number_format((float)$parcela['valorParcela'], 2, '.', ''),
                                     'forma_pagamento_id' => $parcela['forma_pagamento_id'],
                                     'observacao' => $parcela['observacao'],
                                     'created_at' => Carbon::now('GMT-3'),
@@ -328,8 +332,8 @@ class VendaController extends Controller
                         $transacao = new Transacao;
                         $transacao->title = $request->input('cliente_id')['label'];
                         $transacao->data  = DateTime::createFromFormat('d/m/Y', $parcela['dataVencimento'])->format("Y-m-d");
-                        $transacao->observacao = 'Venda nº ' . $vendas->numero . ' - Parcela ' . ($index+1);
-                        $transacao->valor = $parcela['valorParcela'];
+                        $transacao->observacao = 'Venda nº ' . $vendas->numero . ' - Parcela ' . ($index + 1);
+                        $transacao->valor = number_format((float)$parcela['valorParcela'], 2, '.', '');
                         $transacao->tipo = 'rendimento';
                         $transacao->situacao = 'aberta';
                         $transacao->dataTransacaoRegistrada = null;
@@ -388,10 +392,10 @@ class VendaController extends Controller
                     if ($prodBanco->movimentaEstoque) {
                         DB::table('saidas_produtos')->insert(
                             [
-                                'produto_id'        => $produto['id'],
-                                'quantidade'        => $produto['quantidade'],
-                                'quantidadeMomento' => $prodBanco->quantidadeAtual - $produto['quantidade'],
-                                'preco'             => $produto['preco'],
+                                'produto_id'        => $produto['produto_id'],
+                                'quantidade'        => number_format((float)$produto['quantidade'], session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
+                                'quantidadeMomento' => number_format((float)$prodBanco->quantidadeAtual, session('config')->quantidadeCasasDecimaisQuantidade, '.', '') - number_format((float)$produto['quantidade'], session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
+                                'preco'             => number_format((float)$produto['preco'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
                                 'nome_usuario'      => $user->nome,
                                 'cliente_id'        => $vendas->cliente_id,
                                 'observacao'        => '[Venda Realizada] Saída de produto da venda nº ' . $vendas->numero,
@@ -411,10 +415,10 @@ class VendaController extends Controller
                     if ($prodBanco->movimentaEstoque) {
                         DB::table('entradas_produtos')->insert(
                             [
-                                'produto_id'        => $produto['id'],
-                                'quantidade'        => $produto['quantidade'],
-                                'quantidadeMomento' => $prodBanco->quantidadeAtual + $produto['quantidade'],
-                                'preco'             => $produto['preco'],
+                                'produto_id'        => $produto['produto_id'],
+                                'quantidade'        => number_format((float)$produto['quantidade'], session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
+                                'quantidadeMomento' => number_format((float)$prodBanco->quantidadeAtual, session('config')->quantidadeCasasDecimaisQuantidade, '.', '') + number_format((float)$produto['quantidade'], session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
+                                'preco'             => number_format((float)$produto['preco'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
                                 'nome_usuario'      => $user->nome,
                                 'cliente_id'        => $vendas->cliente_id,
                                 'observacao'        => '[Venda Devolvida] Devolução de produto da venda nº ' . $vendas->numero,
@@ -434,10 +438,10 @@ class VendaController extends Controller
                     if ($prodBanco->movimentaEstoque) {
                         DB::table('entradas_produtos')->insert(
                             [
-                                'produto_id'    => $produto['id'],
-                                'quantidade'    => $produto['quantidade'],
-                                'quantidadeMomento' => $prodBanco->quantidadeAtual + $produto['quantidade'],
-                                'preco'         => $produto['preco'],
+                                'produto_id'    => $produto['produto_id'],
+                                'quantidade'        => number_format((float)$produto['quantidade'], session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
+                                'quantidadeMomento' => number_format((float)$prodBanco->quantidadeAtual, session('config')->quantidadeCasasDecimaisQuantidade, '.', '') + number_format((float)$produto['quantidade'], session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
+                                'preco'             => number_format((float)$produto['preco'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
                                 'nome_usuario'  => $user->nome,
                                 'cliente_id'    => $vendas->cliente_id,
                                 'observacao'    => '[Venda Cancelada] Devolução de produto da venda nº ' . $vendas->numero,

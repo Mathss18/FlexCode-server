@@ -58,13 +58,14 @@ class CompraController extends Controller
         $compras->numeroNF = $request->input('numeroNF');
         $compras->forma_pagamento_id = $request->input('forma_pagamento_id')['value'];
         $compras->quantidadeParcelas = $request->input('quantidadeParcelas');
+        $compras->somarFreteAoTotal = $request->input('somarFreteAoTotal');
         $compras->intervaloParcelas = $request->input('intervaloParcelas');
         $compras->dataPrimeiraParcela = $request->input('dataPrimeiraParcela');
         $compras->tipoFormaPagamento = $request->input('tipoFormaPagamento');
-        $compras->frete = $request->input('frete');
-        $compras->impostos = $request->input('impostos');
-        $compras->desconto = $request->input('desconto');
-        $compras->total = $request->input('total');
+        $compras->frete = number_format((float)$request->input('frete'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $compras->impostos = number_format((float)$request->input('impostos'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $compras->desconto = number_format((float)$request->input('desconto'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $compras->total = number_format((float)$request->input('total'), session('config')->quantidadeCasasDecimaisValor, '.', '');
         $compras->observacao = $request->input('observacao');
         $compras->observacaoInterna = $request->input('observacaoInterna');
 
@@ -83,9 +84,9 @@ class CompraController extends Controller
                     $compras->produtos()->attach(
                         $produto['produto_id'],
                         [
-                            'quantidade' => $produto['quantidade'],
-                            'preco' => $produto['preco'],
-                            'total' => $produto['total'],
+                            'quantidade' => number_format((float)$produto['quantidade'], session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
+                            'preco' => number_format((float)$produto['preco'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
+                            'total' => number_format((float)$produto['total'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
                             'observacao' => $produto['observacao'],
                             'created_at' => Carbon::now('GMT-3'),
                             'updated_at' => Carbon::now('GMT-3'),
@@ -101,7 +102,7 @@ class CompraController extends Controller
 
                     $parcela = new CompraParcela;
                     $parcela->dataVencimento = $value['dataVencimento'];
-                    $parcela->valorParcela = $value['valorParcela'];
+                    $parcela->valorParcela = number_format((float)$value['valorParcela'], 2, '.', '');
                     $parcela->forma_pagamento_id = $value['forma_pagamento_id'];
                     $parcela->observacao = $value['observacao'];
                     $parcela->compra_id = $compras->id;
@@ -116,7 +117,7 @@ class CompraController extends Controller
                         $transacao->title = $request->input('fornecedor_id')['label'];
                         $transacao->data  = DateTime::createFromFormat('d/m/Y', $value['dataVencimento'])->format("Y-m-d");
                         $transacao->observacao = 'Compra nº ' . $compras->numero . ' - Parcela ' . ($key + 1);
-                        $transacao->valor = $value['valorParcela'];
+                        $transacao->valor = number_format((float)$value['valorParcela'], 2, '.', '');
                         $transacao->tipo = 'despesa';
                         $transacao->situacao = 'aberta';
                         $transacao->dataTransacaoRegistrada = null;
@@ -168,10 +169,10 @@ class CompraController extends Controller
                     if ($prodBanco->movimentaEstoque) {
                         DB::table('entradas_produtos')->insert(
                             [
-                                'produto_id'        => $produto->id,
-                                'quantidade'        => $produto['quantidade'],
-                                'quantidadeMomento' => $prodBanco->quantidadeAtual + $produto['quantidade'],
-                                'preco'             => $produto->preco,
+                                'produto_id'        => $produto['produto_id'],
+                                'quantidade'        => number_format((float)$produto['quantidade'], session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
+                                'quantidadeMomento' => number_format((float)$prodBanco->quantidadeAtual, session('config')->quantidadeCasasDecimaisQuantidade, '.', '') + number_format((float)$produto['quantidade'], session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
+                                'preco'             => number_format((float)$produto['preco'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
                                 'nome_usuario'      => $user->nome,
                                 'fornecedor_id'     => $compras->fornecedor_id,
                                 'observacao'        => '[Compra Recebida] Entrada de produto da compra nº ' . $compras->numero,
@@ -209,13 +210,14 @@ class CompraController extends Controller
         $compras->numeroNF = $request->input('numeroNF');
         $compras->forma_pagamento_id = $request->input('forma_pagamento_id')['value'];
         $compras->quantidadeParcelas = $request->input('quantidadeParcelas');
+        $compras->somarFreteAoTotal = $request->input('somarFreteAoTotal');
         $compras->intervaloParcelas = $request->input('intervaloParcelas');
         $compras->dataPrimeiraParcela = $request->input('dataPrimeiraParcela');
         $compras->tipoFormaPagamento = $request->input('tipoFormaPagamento');
-        $compras->frete = $request->input('frete');
-        $compras->impostos = $request->input('impostos');
-        $compras->desconto = $request->input('desconto');
-        $compras->total = $request->input('total');
+        $compras->frete = number_format((float)$request->input('frete'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $compras->impostos = number_format((float)$request->input('impostos'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $compras->desconto = number_format((float)$request->input('desconto'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $compras->total = number_format((float)$request->input('total'), session('config')->quantidadeCasasDecimaisValor, '.', '');
         $compras->observacao = $request->input('observacao');
         $compras->observacaoInterna = $request->input('observacaoInterna');
 
@@ -241,9 +243,9 @@ class CompraController extends Controller
                     $compras->produtos()->attach(
                         $produto['produto_id'],
                         [
-                            'quantidade' => $produto['quantidade'],
-                            'preco' => $produto['preco'],
-                            'total' => $produto['total'],
+                            'quantidade' => number_format((float)$produto['quantidade'], session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
+                            'preco' => number_format((float)$produto['preco'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
+                            'total' => number_format((float)$produto['total'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
                             'observacao' => $produto['observacao'],
                             'created_at' => Carbon::now('GMT-3'),
                             'updated_at' => Carbon::now('GMT-3'),
@@ -270,7 +272,7 @@ class CompraController extends Controller
                             new CompraParcela(
                                 [
                                     'dataVencimento' => $parcela['dataVencimento'],
-                                    'valorParcela' => $parcela['valorParcela'],
+                                    'valorParcela' => number_format((float)$parcela['valorParcela'], 2, '.', ''),
                                     'forma_pagamento_id' => $parcela['forma_pagamento_id'],
                                     'observacao' => $parcela['observacao'],
                                     'created_at' => Carbon::now('GMT-3'),
@@ -289,7 +291,7 @@ class CompraController extends Controller
                         $transacao->title = $request->input('fornecedor_id')['label'];
                         $transacao->data  = DateTime::createFromFormat('d/m/Y', $parcela['dataVencimento'])->format("Y-m-d");
                         $transacao->observacao = 'Compra nº ' . $compras->numero . ' - Parcela ' . ($index+1);
-                        $transacao->valor = $parcela['valorParcela'];
+                        $transacao->valor = number_format((float)$parcela['valorParcela'], 2, '.', '');
                         $transacao->tipo = 'despesa';
                         $transacao->situacao = 'aberta';
                         $transacao->dataTransacaoRegistrada = null;
@@ -349,9 +351,9 @@ class CompraController extends Controller
                         DB::table('entradas_produtos')->insert(
                             [
                                 'produto_id'        => $produto['id'],
-                                'quantidade'        => $produto['quantidade'],
-                                'quantidadeMomento' => $prodBanco->quantidadeAtual + $produto['quantidade'],
-                                'preco'             => $produto['preco'],
+                                'quantidade'        => number_format((float)$produto['quantidade'], session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
+                                'quantidadeMomento' => number_format((float)$prodBanco->quantidadeAtual, session('config')->quantidadeCasasDecimaisQuantidade, '.', '') + number_format((float)$produto['quantidade'], session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
+                                'preco'             => number_format((float)$produto['preco'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
                                 'nome_usuario'      => $user->nome,
                                 'fornecedor_id'     => $compras->fornecedor_id,
                                 'observacao'        => '[Compra Recebida] Entrada de produto da compra nº ' . $compras->numero,
@@ -372,9 +374,9 @@ class CompraController extends Controller
                         DB::table('saidas_produtos')->insert(
                             [
                                 'produto_id'        => $produto['id'],
-                                'quantidade'        => $produto['quantidade'],
-                                'quantidadeMomento' => $prodBanco->quantidadeAtual - $produto['quantidade'],
-                                'preco'             => $produto['preco'],
+                                'quantidade'        => number_format((float)$produto['quantidade'], session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
+                                'quantidadeMomento' => number_format((float)$prodBanco->quantidadeAtual, session('config')->quantidadeCasasDecimaisQuantidade, '.', '') - number_format((float)$produto['quantidade'], session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
+                                'preco'             => number_format((float)$produto['preco'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
                                 'nome_usuario'      => $user->nome,
                                 'fornecedor_id'     => $compras->fornecedor_id,
                                 'observacao'        => '[Compra Devolvida] Estorno de produto da compra nº ' . $compras->numero,
@@ -394,10 +396,10 @@ class CompraController extends Controller
                     if ($prodBanco->movimentaEstoque) {
                         DB::table('saidas_produtos')->insert(
                             [
-                                'produto_id'        => $produto['id'],
-                                'quantidade'        => $produto['quantidade'],
-                                'quantidadeMomento' => $prodBanco->quantidadeAtual - $produto['quantidade'],
-                                'preco'             => $produto['preco'],
+                                'produto_id'        => $produto['produto_id'],
+                                'quantidade'        => number_format((float)$produto['quantidade'], session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
+                                'quantidadeMomento' => number_format((float)$prodBanco->quantidadeAtual, session('config')->quantidadeCasasDecimaisQuantidade, '.', '') - number_format((float)$produto['quantidade'], session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
+                                'preco'             => number_format((float)$produto['preco'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
                                 'nome_usuario'      => $user->nome,
                                 'fornecedor_id'     => $compras->fornecedor_id,
                                 'observacao'        => '[Compra Cancelada] Estorno de produto da compra nº ' . $compras->numero,

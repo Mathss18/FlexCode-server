@@ -17,9 +17,9 @@ class CreateVendasServicosTable extends Migration
             $table->bigIncrements('id');
             $table->foreignId('servico_id')->constrained('servicos');
             $table->foreignId('venda_id')->constrained('vendas');
-            $table->double('quantidade', 8, 2);
-            $table->double('preco', 8, 2);
-            $table->double('total', 8, 2);
+            $table->double('quantidade', 8, 4);
+            $table->double('preco', 8, 4);
+            $table->double('total', 8, 4);
             $table->string('observacao')->nullable();
             $table->timestamps();
         });

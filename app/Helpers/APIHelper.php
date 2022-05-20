@@ -14,7 +14,7 @@ class APIHelper
         if (!$success) {
 
             if ($exeption instanceof ModelNotFoundException) {
-                $errorMessage = 'Não foi possivel encontrar';
+                $errorMessage = $exeption->getMessage();
             }
             else if($exeption instanceof QueryException){
                 // dd($exeption);

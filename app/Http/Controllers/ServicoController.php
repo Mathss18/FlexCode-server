@@ -42,8 +42,8 @@ class ServicoController extends Controller
 
         $servicos->nome = $request->input('nome');
         $servicos->codigoInterno = $request->input('codigoInterno');
-        $servicos->valor = $request->input('valor');
-        $servicos->comissao = $request->input('comissao');
+        $servicos->valor = number_format((float)$request->input('valor'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $servicos->comissao = number_format((float)$request->input('comissao'), session('config')->quantidadeCasasDecimaisValor, '.', '');
         $servicos->descricao = $request->input('descricao');
 
         try {
@@ -61,8 +61,8 @@ class ServicoController extends Controller
 
         $servicos->nome = $request->input('nome');
         $servicos->codigoInterno = $request->input('codigoInterno');
-        $servicos->valor = $request->input('valor');
-        $servicos->comissao = $request->input('comissao');
+        $servicos->valor = number_format((float)$request->input('valor'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $servicos->comissao = number_format((float)$request->input('comissao'), session('config')->quantidadeCasasDecimaisValor, '.', '');
         $servicos->descricao = $request->input('descricao');
 
         try {

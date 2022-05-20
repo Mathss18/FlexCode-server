@@ -23,6 +23,7 @@ use App\Http\Controllers\OrdemServicoFuncionarioController;
 use App\Http\Controllers\FormaPagamentoController;
 use App\Http\Controllers\ContaBancariaController;
 use App\Http\Controllers\CompraController;
+use App\Http\Controllers\ConfiguracaoController;
 use App\Http\Controllers\EstoqueController;
 use App\Http\Controllers\NotaFiscalController;
 use App\Http\Controllers\OutrosFavorecidosController;
@@ -346,4 +347,15 @@ Route::middleware(['jwt', 'check.jwt.tenant'])->group(function () {
     Route::put('notas-fiscais/{id}', [NotaFiscalController::class, 'update']);
 
     Route::delete('notas-fiscais/{id}', [NotaFiscalController::class, 'destroy']);
+
+    //============================ CONFIGURACOES ==============================
+    Route::get('configuracoes', [ConfiguracaoController::class, 'index']);
+
+    Route::get('configuracoes/{id}', [ConfiguracaoController::class, 'show']);
+
+    Route::post('configuracoes', [ConfiguracaoController::class, 'store']);
+
+    Route::put('configuracoes/{id}', [ConfiguracaoController::class, 'update']);
+
+    Route::delete('configuracoes/{id}', [ConfiguracaoController::class, 'destroy']);
 });

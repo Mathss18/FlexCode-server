@@ -50,10 +50,10 @@ class OrdemServicoController extends Controller
         $ordensServicos->horaEntrada = $request->input('horaEntrada');
         $ordensServicos->dataSaida = $request->input('dataSaida');
         $ordensServicos->horaSaida = $request->input('horaSaida');
-        $ordensServicos->frete = $request->input('frete');
-        $ordensServicos->outros = $request->input('outros');
-        $ordensServicos->desconto = $request->input('desconto');
-        $ordensServicos->total = $request->input('total');
+        $ordensServicos->frete = number_format((float)$request->input('frete'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $ordensServicos->outros = number_format((float)$request->input('outros'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $ordensServicos->desconto = number_format((float)$request->input('desconto'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $ordensServicos->total = number_format((float)$request->input('total'), session('config')->quantidadeCasasDecimaisValor, '.', '');
         $ordensServicos->observacao = $request->input('observacao');
         $ordensServicos->observacaoInterna = $request->input('observacaoInterna');
 
@@ -70,9 +70,9 @@ class OrdemServicoController extends Controller
                     $ordensServicos->produtos()->attach(
                         $produto['produto_id'],
                         [
-                            'quantidade' => $produto['quantidade'],
-                            'preco' => $produto['preco'],
-                            'total' => $produto['total'],
+                            'quantidade' => number_format((float)$produto['quantidade'], session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
+                            'preco' => number_format((float)$produto['preco'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
+                            'total' => number_format((float)$produto['total'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
                             'observacao' => $produto['observacao'],
                             'created_at' => Carbon::now('GMT-3'),
                             'updated_at' => Carbon::now('GMT-3'),
@@ -87,9 +87,9 @@ class OrdemServicoController extends Controller
                     $ordensServicos->servicos()->attach(
                         $servico['servico_id'],
                         [
-                            'quantidade' => $servico['quantidade'],
-                            'preco' => $servico['preco'],
-                            'total' => $servico['total'],
+                            'quantidade' => number_format((float)$servico['quantidade'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
+                            'preco' => number_format((float)$servico['preco'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
+                            'total' => number_format((float)$servico['total'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
                             'observacao' => $servico['observacao'],
                             'created_at' => Carbon::now('GMT-3'),
                             'updated_at' => Carbon::now('GMT-3'),
@@ -145,10 +145,10 @@ class OrdemServicoController extends Controller
         $ordensServicos->horaEntrada = $request->input('horaEntrada');
         $ordensServicos->dataSaida = $request->input('dataSaida');
         $ordensServicos->horaSaida = $request->input('horaSaida');
-        $ordensServicos->frete = $request->input('frete');
-        $ordensServicos->outros = $request->input('outros');
-        $ordensServicos->desconto = $request->input('desconto');
-        $ordensServicos->total = $request->input('total');
+        $ordensServicos->frete = number_format((float)$request->input('frete'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $ordensServicos->outros = number_format((float)$request->input('outros'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $ordensServicos->desconto = number_format((float)$request->input('desconto'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $ordensServicos->total = number_format((float)$request->input('total'), session('config')->quantidadeCasasDecimaisValor, '.', '');
         $ordensServicos->observacao = $request->input('observacao');
         $ordensServicos->observacaoInterna = $request->input('observacaoInterna');
 
@@ -168,9 +168,9 @@ class OrdemServicoController extends Controller
                     $ordensServicos->produtos()->attach(
                         $produto['produto_id'],
                         [
-                            'quantidade' => $produto['quantidade'],
-                            'preco' => $produto['preco'],
-                            'total' => $produto['total'],
+                            'quantidade' => number_format((float)$produto['quantidade'], session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
+                            'preco' => number_format((float)$produto['preco'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
+                            'total' => number_format((float)$produto['total'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
                             'observacao' => $produto['observacao'],
                             'created_at' => Carbon::now('GMT-3'),
                             'updated_at' => Carbon::now('GMT-3'),
@@ -190,9 +190,9 @@ class OrdemServicoController extends Controller
                     $ordensServicos->servicos()->attach(
                         $servico['servico_id'],
                         [
-                            'quantidade' => $servico['quantidade'],
-                            'preco' => $servico['preco'],
-                            'total' => $servico['total'],
+                            'quantidade' => number_format((float)$servico['quantidade'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
+                            'preco' => number_format((float)$servico['preco'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
+                            'total' => number_format((float)$servico['total'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
                             'observacao' => $servico['observacao'],
                             'created_at' => Carbon::now('GMT-3'),
                             'updated_at' => Carbon::now('GMT-3'),

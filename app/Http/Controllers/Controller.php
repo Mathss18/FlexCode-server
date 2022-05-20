@@ -34,12 +34,17 @@ class Controller extends BaseController
         $file = str_replace(' ', '+', $file);
 
         $imageName = Str::kebab($fileName) . '.' . $extension;
-        $fileUploaded = Storage::put('public/' . config('database.connections.tenant.database') . '/' . $folderName . '/' . $imageName, base64_decode($file));
+        $fileUploaded = Storage::put('public/' . session('tenant')->nome . '/' . $folderName . '/' . $imageName, base64_decode($file));
 
         if ($fileUploaded) {
-            $url = config('app.url') . config('app.port') . '/' . "storage/" . config('database.connections.tenant.database') . '/' . $folderName . '/' . $imageName;
+            $url = config('app.url') . config('app.port') . '/' . "storage/" . session('tenant')->nome . '/' . $folderName . '/' . $imageName;
             return $url;
         }
         return $fileUploaded;
+    }
+
+    public function tirarAcentos($string)
+    {
+        return preg_replace(array("/(á|à|ã|â|ä)/", "/(Á|À|Ã|Â|Ä)/", "/(é|è|ê|ë)/", "/(É|È|Ê|Ë)/", "/(í|ì|î|ï)/", "/(Í|Ì|Î|Ï)/", "/(ó|ò|õ|ô|ö)/", "/(Ó|Ò|Õ|Ô|Ö)/", "/(ú|ù|û|ü)/", "/(Ú|Ù|Û|Ü)/", "/(ñ)/", "/(Ñ)/", "/(Ç)/", "/(ç)/"), explode(" ", "a A e E i I o O u U n N C c"), $string);
     }
 }

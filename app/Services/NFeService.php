@@ -1,0 +1,634 @@
+<?php
+
+namespace App\Services;
+
+use stdClass;
+use Auth;
+use DateTime;
+use Illuminate\Support\Facades\Storage;
+use NFePHP\NFe\Make;
+use NFePHP\NFe\Tools;
+use NFePHP\Common\Keys;
+use NFePHP\Common\Certificate;
+use NFePHP\NFe\Common\Standardize;
+use NFePHP\NFe\Complements;
+
+class NfeService
+{
+
+    private $xmlFinal;
+    private $recibo;
+    private $protocolo;
+    private $chave;
+    private $success = false;
+    private $error;
+
+    private $tools;
+
+    public function __construct($config)
+    {
+
+        // $certificadoDigital = file_get_contents('..\app\Services\certFM.pfx');
+
+        if (Storage::disk('local')->exists('public/teste/configuracoes/certificadoDigital/certificado-digital.x-pkcs12')) {
+            $path = Storage::disk('local')->path('public/teste/configuracoes/certificadoDigital/certificado-digital.x-pkcs12');
+            $certificadoDigital = file_get_contents($path);
+        } else {
+            return 'Certificado Dígital não encontrado!';
+        }
+
+        $this->config = $config;
+        $this->tools = new Tools(json_encode($config), Certificate::readPfx($certificadoDigital, '123456'));
+    }
+
+    public function gerarNfe($dados, $lastnNF, $favorecido, $produtos, $transportadora, $aliquota)
+    {
+        // return $dados;
+
+        //Criar Nota Fiscal Vazia
+        $nfe = new Make();
+
+        //====================TAG INFO===================
+        $infNfe = new stdClass();
+        $infNfe->versao = '4.00'; //versão do layout (string)
+        $infNfe->Id = null; //se o Id de 44 digitos não for passado será gerado automaticamente
+        $infNfe->pk_nItem = null; //deixe essa variavel sempre como NULL
+
+        $nfe->taginfNFe($infNfe);
+
+        //====================TAG IDE===================
+        $ide = new stdClass();
+        $ide->cUF = $this->getCodigoMinicipio(); //codigo do estado
+        $ide->nNF = session('config')->nNF + 1; //numero da nota fiscal
+        $ide->cNF = STR_PAD($ide->nNF + 1, '0', 8, STR_PAD_LEFT); //rand(11111111,99999999);
+        $ide->natOp = $this->tirarAcentos($dados['natOp']['label']);
+        $ide->mod = 55;
+        $ide->serie = session('config')->serie;
+        $ide->dhEmi = date('Y-m-d\TH:i:sP');
+        $ide->dhSaiEnt = date('Y-m-d\TH:i:sP');
+        $ide->tpNF = $dados['tpNF'];
+        $ide->idDest = $favorecido['estado'] == session('config')->estado ? 1 : 2;
+        $ide->cMunFG = session('config')->codigoMunicipio;
+        $ide->tpImp = 1; //Formato de Impressão da DANFE 1-Retrato / 2-Paisagem
+        $ide->tpEmis = 1;
+        // $ide->cDV = 2; // Dígito Verificador da Chave de Acesso da NF-e
+        $ide->tpAmb = session('config')->ambienteNfe;
+        $ide->finNFe = $dados['finNFe']; //1-NF-e normal, 2-NF-e complementar, 3-NF-e de ajuste, 4-Devolução/Retorno
+        $ide->indFinal = $dados['indFinal']; // 0-Normal; 1-Consumidor final;
+        $ide->indPres = $dados['indPres'];
+        $ide->indIntermed = null;
+        $ide->procEmi = 0;
+        $ide->verProc = '4.00';
+        $ide->dhCont = null;
+        $ide->xJust = null;
+
+        $nfe->tagide($ide);
+
+        //====================TAG REF NFE===================
+        if (array_key_exists("refNFe", $dados)) {
+            $nfeRef = new stdClass();
+            $nfeRef->refNFe = $dados['refNFe'];
+            $nfe->tagrefNFe($nfeRef);
+        }
+
+
+        //====================TAG EMITENTE===================
+        $emit = new stdClass();
+        $emit->xNome = $this->tirarAcentos(session('config')->nome);
+        $emit->xFant = $this->tirarAcentos(session('config')->nomeFantasia);
+        $emit->IE = session('config')->inscricaoEstadual;
+        //$emit->IEST;
+        //$emit->IM ;
+        //$emit->CNAE;
+        $emit->CRT =  session('config')->crt;
+        $emit->CNPJ =  session('config')->tipoEmpresa == 'pj' ? session('config')->cpfCnpj : null;
+        $emit->CPF = session('config')->tipoEmpresa == 'pf' ? session('config')->cpfCnpj : null;
+
+        $nfe->tagemit($emit);
+
+        //====================TAG ENDERECO EMITENTE===================
+        $enderEmit = new stdClass();
+        $enderEmit->xLgr = $this->tirarAcentos(session('config')->rua);
+        $enderEmit->nro = $this->tirarAcentos(session('config')->numero);
+        //$enderEmit->xCpl;
+        $enderEmit->xBairro = $this->tirarAcentos(session('config')->bairro);
+        $enderEmit->cMun = session('config')->codigoMunicipio;
+        $enderEmit->xMun = $this->tirarAcentos(session('config')->cidade);
+        $enderEmit->UF = session('config')->estado;
+        $enderEmit->CEP = session('config')->cep;
+        $enderEmit->cPais = '1058';
+        $enderEmit->xPais = 'Brasil';
+        $enderEmit->fone = session('config')->telefone;
+
+        $nfe->tagenderEmit($enderEmit);
+
+        //====================TAG DESTINATARIO===================
+        $dest = new stdClass();
+        $dest->xNome = $this->tirarAcentos($favorecido['nome']);
+        $dest->indIEDest = $favorecido['tipoContribuinte'];
+        $dest->IE = $favorecido['tipoContribuinte'] == 1 ? $favorecido['inscricaoEstadual'] : null;
+        // $dest->ISUF;
+        // $dest->IM;
+        $dest->email = $favorecido['email'];
+        if (strlen($favorecido['cpfCnpj']) == 14) {
+            $dest->CNPJ = $favorecido['cpfCnpj'];
+        } else {
+            $dest->CPF = $favorecido['cpfCnpj'];
+        }
+        // $dest->idEstrangeiro;
+
+        $nfe->tagdest($dest);
+
+        //====================TAG ENDERECO DESTINATARIO===================
+        $enderDest = new stdClass();
+        $enderDest->xLgr = $this->tirarAcentos($favorecido->rua);
+        $enderDest->nro = $favorecido->numero;
+        //$enderDest->xCpl;
+        $enderDest->xBairro = $this->tirarAcentos($favorecido->bairro);
+        $enderDest->cMun = $favorecido->codigoMunicipio;
+        $enderDest->xMun = $this->tirarAcentos($favorecido->cidade);
+        $enderDest->UF = $favorecido->estado;
+        $enderDest->CEP = str_replace("-", "", $favorecido->cep);
+        $enderDest->cPais = '1058';
+        $enderDest->xPais = 'Brasil';
+        $enderDest->fone = $favorecido->telefone;
+
+        $nfe->tagenderDest($enderDest);
+
+        //====================TAG PRODUTO===================
+        for ($i = 0; $i < count($dados['produtos']); $i++) {
+            $prod = new stdClass();
+            $prod->item = $i + 1; //item da NFe
+            $prod->cProd = $produtos[$i]['codigoInterno'];
+            $prod->cEAN =  $produtos[$i]['codigoBarras'] ?? 'SEM GTIN';
+            $prod->xProd = $dados['produtos'][$i]['nome'];
+            $prod->NCM =   $produtos[$i]['ncm'];
+
+            //$prod->cBenef = null; //incluido no layout 4.00
+
+            //$prod->EXTIPI;
+            $prod->CFOP = $dados['produtos'][$i]['cfop'];
+            $prod->uCom = $produtos[$i]['unidade_produto']['sigla'] ?? 'PC'; //Unidade do produto
+            $prod->qCom = $dados['produtos'][$i]['quantidade']; //Quantidade do produto
+            $prod->vUnCom = $dados['produtos'][$i]['preco']; // Valor total - %desconto
+            $prod->cEANTrib = $produtos[$i]['codigoBarras'] ?? 'SEM GTIN';
+            $prod->uTrib = $produtos[$i]['unidade_produto']['sigla'] ?? 'PC'; //Unidade do produto
+            $prod->qTrib = $dados['produtos'][$i]['quantidade'];
+            $prod->vUnTrib = $dados['produtos'][$i]['preco'];
+            $prod->vProd = $dados['produtos'][$i]['total'];
+            if ($dados['frete'] > 0.00) {
+                if ($i == count($dados['produtos']) - 1) {
+                    $prod->vFrete = number_format($dados['frete'], 2, '.', '');
+                }
+            }
+            //$prod->vSeg = 0.00;
+            //$prod->vDesc =  (($nfe2['precoProd'][$i] * $nfe3['porcento'])/100);
+            //$prod->vOutro = 0.00;// change 0.00
+            $prod->indTot = 1;
+            //$prod->xPed;         //Numero de pedido do cliente
+            //$prod->nItemPed;
+            //$prod->nFCI;
+
+            $nfe->tagprod($prod);
+
+            //====================TAG INFORMACAO ADICIONAL PRODUTO===================
+            // $adciProd = new stdClass();
+            // $adciProd->item = $i+1; //item da NFe
+
+            // $adciProd->infAdProd = 'informacao adicional do item';
+
+            // $nfe->taginfAdProd($adciProd);
+
+            //====================TAG IMPOSTO===================
+            $imposto = new stdClass();
+            $imposto->item = $i + 1; //item da NFe
+            //$imposto->vTotTrib = 1000.00;
+
+            $nfe->tagimposto($imposto);
+
+            //====================TAG ICMS SIMPLES NACIONAL ===================
+            $icms = new stdClass();
+            $icms->item = $i + 1; //item da NFe
+            $icms->orig = 0;
+            //VERIFICA SE TEM IE OU NÃO
+            if (
+                $dados['produtos'][$i]['cfop'] == '5101' ||
+                $dados['produtos'][$i]['cfop'] == '5102' ||
+                $dados['produtos'][$i]['cfop'] == '6101' ||
+                $dados['produtos'][$i]['cfop'] == '6102'
+            ) {
+                $icms->CSOSN = '101';
+                $icms->pCredSN = $aliquota;
+                $icms->vCredICMSSN = $dados['produtos'][$i]['total'] * ($aliquota / 100);
+            } else if (
+                $dados['produtos'][$i]['cfop'] == '5902' ||
+                $dados['produtos'][$i]['cfop'] == '6912' ||
+                $dados['produtos'][$i]['cfop'] == '6910'
+            ) {
+                $icms->CSOSN = '400';
+                $icms->pCredSN = $aliquota;
+                $icms->vCredICMSSN = 0.00;
+            } else {
+                $icms->CSOSN = '900';
+                $icms->pCredSN = $aliquota;
+                $icms->vCredICMSSN = 0.00;
+            }
+            //$icms->modBCST = null;
+            //$icms->pMVAST = null;
+            //$icms->pRedBCST = null;
+            //$icms->vBCST = null;
+            //$icms->pICMSST = null;
+            //$icms->vICMSST = null;
+            //$icms->vBCFCPST = null; //incluso no layout 4.00
+            //$icms->pFCPST = null; //incluso no layout 4.00
+            //$icms->vFCPST = null; //incluso no layout 4.00
+            //$icms->vBCSTRet = null;
+            //$icms->pST = null;
+            //$icms->vICMSSTRet = null;
+            //$icms->vBCFCPSTRet = null; //incluso no layout 4.00
+            //$icms->pFCPSTRet = null; //incluso no layout 4.00
+            //$icms->vFCPSTRet = null; //incluso no layout 4.00
+            //$icms->modBC = null;
+            //$icms->vBC = null;
+            //$icms->pRedBC = null;
+            //$icms->pICMS = null;
+            //$icms->vICMS = 480.21; // change COMENTAR A LINHA OU NULL
+            //$icms->pRedBCEfet = null;
+            //$icms->vBCEfet = null;
+            //$icms->pICMSEfet = null;
+            //$icms->vICMSEfet = null;
+            //$icms->vICMSSubstituto = null;
+
+            $nfe->tagICMSSN($icms);
+
+            //====================TAG PIS===================
+            $pis = new stdClass();
+            $pis->item = $i + 1; //item da NFe
+            $pis->CST = 99;
+            $pis->vBC = 0.00;
+            $pis->pPIS = 0.00;
+            $pis->vPIS = 0.00;
+            //$pis->qBCProd = null;
+            //$pis->vAliqProd = null;
+
+            $nfe->tagPIS($pis);
+
+            //====================TAG COFINS===================
+            $cofis = new stdClass();
+            $cofis->item = $i + 1; //item da NFe
+            $cofis->CST = 99;
+            $cofis->vBC = 0.00;
+            $cofis->pCOFINS = 0.00;
+            $cofis->vCOFINS = 0.00;
+            //$cofis->qBCProd = null;
+            //$cofis->vAliqProd = null;
+
+            $nfe->tagCOFINS($cofis);
+
+            //====================TAG IPI===================
+            // $ipi = new stdClass();
+            // $ipi->item =  $i + 1; //item da NFe
+            // $ipi->clEnq = null;
+            // $ipi->CNPJProd = null;
+            // $ipi->cSelo = null;
+            // $ipi->qSelo = null;
+            // $ipi->cEnq = '999';
+            // $ipi->CST = 99;
+            // $ipi->vIPI = 0.00;
+            // $ipi->vBC = 1000.00;
+            // $ipi->pIPI = 0.00;
+            // $ipi->qUnid = null;
+            // $ipi->vUnid = null;
+
+            // $nfe->tagIPI($ipi);
+
+        }
+
+        //====================TAG ICMSTOTAL===================
+        $icmsTotal = new stdClass();
+        $icmsTotal->vBC = 0.00;
+        $icmsTotal->vICMS = 0.00; //change 480.21
+        $icmsTotal->vICMSDeson = 0.00;
+        $icmsTotal->vFCP = 0.00; //incluso no layout 4.00
+        $icmsTotal->vBCST = 0.00;
+        $icmsTotal->vST = 0.00;
+        $icmsTotal->vFCPST = 0.00; //incluso no layout 4.00
+        $icmsTotal->vFCPSTRet = 0.00; //incluso no layout 4.00
+        $icmsTotal->vProd = $dados['totalProdutos'];
+        $icmsTotal->vFrete = $dados['frete'];
+        $icmsTotal->vSeg = 0.00;
+        $icmsTotal->vDesc = 0.00;
+        $icmsTotal->vII = 0.00;
+        $icmsTotal->vIPI = 0.00; //change 133.39
+        $icmsTotal->vIPIDevol = 0.00; //incluso no layout 4.00
+        $icmsTotal->vPIS = 0.00;
+        $icmsTotal->vCOFINS = 0.00;
+        $icmsTotal->vOutro = 0.00; // change to 0.00
+        $icmsTotal->vNF = $dados['totalFinal']; // total produtos + frete
+        //$icmsTotal->vTotTrib = 0.00;
+
+        $nfe->tagICMSTot($icmsTotal);
+
+        //====================TAG TRANSP===================
+        $transp = new stdClass();
+        $transp->modFrete = $dados['modFrete']; //0-Por conta do emitente; 1-Por conta do destinatário/remetente; 2-Por conta de terceiros; 9-Sem frete. (V2.0)
+
+        $nfe->tagtransp($transp);
+
+        //====================TAG TRANSPORTADORA===================
+        $transpo = new stdClass();
+        $transpo->xNome = $transportadora->nome;
+        $transpo->IE = $transportadora->inscricaoEstadual;
+        $transpo->xEnder = $this->tirarAcentos($transportadora->rua);
+        $transpo->xMun = $transportadora->cidade;
+        $transpo->UF = $transportadora->estado;
+        if (strlen($transportadora->cpfCnpj) == 14) {
+            $transpo->CNPJ = $transportadora->cpfCnpj;
+        } else {
+            $transpo->CPF = $transportadora->cpfCnpj;
+        }
+
+        $nfe->tagtransporta($transpo);
+
+        //====================TAG VOLUME===================
+        $vol = new stdClass();
+        //$vol->item = 1; //indicativo do numero do volume
+        $vol->qVol = $dados['qVol'];
+        $vol->esp = $dados['esp'];
+        //$vol->marca = 'MARCA';
+        //$vol->nVol = '11111';
+        $vol->pesoL = $dados['pesoL'];
+        $vol->pesoB = $dados['pesoB'];
+
+        $nfe->tagvol($vol);
+
+
+        if (count($dados['parcelas']) >= 1) {
+
+            //====================TAG FATURA===================
+            $fat = new stdClass();
+            $fat->nFat = $ide->nNF;
+            $fat->vOrig = array_reduce($dados['parcelas'], array($this, "sum"));
+            $fat->vDesc = $dados['desconto'];
+            $fat->vLiq =  $fat->vOrig - $fat->vDesc;
+            $nfe->tagfat($fat);
+            //====================TAG DUPLICATA===================
+
+            for ($i = 0; $i < count($dados['parcelas']); $i++) {
+
+                $dup = new stdClass();
+
+                $dup->nDup = str_pad($i + 1, 3, "0", STR_PAD_LEFT);
+                $date = DateTime::createFromFormat('d/m/Y', $dados['parcelas'][$i]['dataVencimento']);
+                $dup->dVenc = $date->format('Y-m-d');
+                $dup->vDup = $dados['parcelas'][$i]['valorParcela'];
+                $nfe->tagdup($dup);
+            }
+        }
+
+        //====================TAG PAGAMENTO===================
+        $pag = new stdClass();
+        //$std->vTroco = null; //incluso no layout 4.00, obrigatório informar para NFCe (65)
+
+        $nfe->tagpag($pag);
+
+        //====================TAG DETALHE PAGAMENTO===================
+        $detPag = new stdClass();
+        $detPag->tPag = '01'; //01-Dinheiro; 02-Cheque; 03-Cartão de Crédito; 04-Cartão de Débito; 05-Crédito Loja; 10-Vale Alimentação; 11-Vale Refeição; 12-Vale Presente; 13-Vale Combustível; 99-Outros
+        $detPag->vPag = $dados['totalFinal']; //Obs: deve ser informado o valor pago pelo cliente change 0.00
+        //$detPag->CNPJ = '12345678901234';
+        //$detPag->tBand = '01';
+        //$detPag->cAut = '3333333';
+        //$detPag->tpIntegra = 1; //incluso na NT 2015/002
+        //$detPag->indPag = '0'; //0= Pagamento à Vista 1= Pagamento à Prazo
+
+        $nfe->tagdetPag($detPag);
+
+        //====================INFO ADICIONAL===================
+        $stdInfo = new stdClass();
+        $stdInfo->infAdFisco = $dados['infAdFisco'] ?? '' . " --- DOCUMENTO EMITIDO POR ME OU EPP OPTANTE PELO SIMPLES NACIONAL, CONFORME LEI COMPLEMENTAR 123/2006 II - NAO GERA DIREITO A CREDITO FISCAL DE IPI. III - PERMITE O APROVEITAMENTO DO CREDITO DE ICMS NO VALOR DE R$ " . $icms->vCredICMSSN . " CORRESPONDENTE A ALIQUOTA DE " . $aliquota . ", NOS TERMOS DO ART. 23 DA LC 123/2006";
+        $stdInfo->infCpl = $dados['infCpl'] ?? '';
+
+        $nfe->taginfAdic($stdInfo);
+
+        //====================MONTA A NOTA FISCAL ====================
+
+        // dd($nfe->getErrors());
+        // dd($nfe->dom->errors);
+        $chave = $this->getChave($ide, $emit);
+        $xml = $this->montar($nfe);
+        $xmlAssinado = $this->assinar($xml);
+        $xmlFinal = $this->transmitir($xmlAssinado, $chave);
+        $xmlObject = [
+            "chave" => $this->chave,
+            "protocolo" => $this->protocolo,
+            "recibo" => $this->recibo,
+            "xml" => $this->xmlFinal,
+            "success" => $this->success,
+            "error" => $this->error,
+        ];
+        return $xmlObject;
+    }
+
+    public function montar($nfe)
+    {
+        try {
+            $xml = $nfe->monta();
+            return $xml;
+        } catch (\Exception $ex) {
+            $this->error = 'Erro ao montar: ' . $ex->getMessage();
+        }
+    }
+
+    public function assinar($xml)
+    {
+        try {
+            $xmlAssinado = $this->tools->signNFe($xml); // O conteúdo do XML assinado fica armazenado na variável $xmlAssinado
+
+            return $xmlAssinado;
+        } catch (\Exception $ex) {
+            //aqui você trata possíveis exceptions da assinatura
+            $this->error = 'Problema ao assinar a NFe' . $ex->getMessage();
+        }
+    }
+
+    public function transmitir($xmlAssinado, $chave)
+    {
+        try {
+            $st = new Standardize();
+
+            //Envia o lote
+            $xmlTranmitido = $this->tools->sefazEnviaLote([$xmlAssinado], 1);
+            $std = $st->toStd($xmlTranmitido);
+            if ($std->cStat != 103) {
+                //erro registrar e voltar
+                $this->error = ("[$std->cStat] $std->xMotivo");
+            }
+            $recibo = $std->infRec->nRec; // Vamos usar a variável $recibo para consultar o status da nota
+
+            sleep(5); // Dorme por 5 segundos para evitar sobrecarga do servidor
+
+            $xmlFinal = $this->consultaRecibo($recibo, $xmlAssinado, $chave);
+            return $xmlFinal;
+        } catch (\Exception $ex) {
+            $this->error = "Erro ao transmitir a NFe: " . $ex->getMessage();
+        }
+    }
+
+    public function consultaRecibo($recibo, $xmlAssinado, $chave)
+    {
+        try {
+            $protocolo = $this->tools->sefazConsultaRecibo($recibo);
+
+            $this->protocolo = $protocolo;
+            $this->recibo = $recibo;
+            $this->chave = $chave;
+
+            //transforma o xml de retorno em um stdClass
+            $st = new Standardize();
+            $std = $st->toStd($protocolo);
+
+            if ($std->cStat == '103') { //lote enviado
+                //Lote ainda não foi precessado pela SEFAZ;
+            }
+            if ($std->cStat == '105') { //lote em processamento
+                //tente novamente mais tarde
+                sleep(5);
+                $this->consultaRecibo($recibo, $xmlAssinado, $chave);
+            }
+
+            if ($std->cStat == '104') { //lote processado (tudo ok)
+
+                if ($std->protNFe->infProt->cStat == '100') { //Autorizado o uso da NF-e
+                    //Protocola o recibo no XML
+                    $request = $xmlAssinado;
+                    $response = $protocolo;
+
+                    $xmlFinal = Complements::toAuthorize($request, $response);
+                    $this->success = true;
+                    $this->xmlFinal = $xmlFinal;
+                    return $xmlFinal;
+                } elseif (in_array($std->protNFe->infProt->cStat, ["110", "301", "302"])) { //DENEGADAS
+                    $this->error = 'Problema ao consultar recibo. Situação:' . ' denegada ' . $std->protNFe->infProt->xMotivo . ' cstat: ' . $std->protNFe->infProt->cStat;
+                } else { //não autorizada (rejeição)
+                    $this->error = 'Problema ao consultar recibo. Situação:' . ' rejeitada ' . $std->protNFe->infProt->xMotivo . ' cstat: ' . $std->protNFe->infProt->cStat;
+                }
+            } else { //outros erros possíveis
+                $this->error = 'Problema ao consultar recibo. Situação:' . ' rejeitada ' . $std->protNFe->infProt->xMotivo . ' cstat: ' . $std->protNFe->infProt->cStat;
+            }
+        } catch (\Exception $ex) {
+            $this->error = 'Problema ao consultar recibo. ' . $ex->getMessage();
+        }
+    }
+
+    public function getChave($ide, $emit)
+    {
+        $mes = date('m');
+        $ano = date('y');
+        //$chave = $ide->cUF.$ano.$mes.$emit->CNPJ.$ide->mod.'00'.$ide->serie.$cNFcomZero.$ide->tpEmis.$ide->cNF.'0';
+        $chave = Keys::build($ide->cUF, $ano, $mes, $emit->CNPJ, $ide->mod, $ide->serie, $ide->nNF, $ide->tpEmis, $ide->cNF);
+        return $chave;
+    }
+
+    function tirarAcentos($string)
+    {
+        return preg_replace(array("/(á|à|ã|â|ä)/", "/(Á|À|Ã|Â|Ä)/", "/(é|è|ê|ë)/", "/(É|È|Ê|Ë)/", "/(í|ì|î|ï)/", "/(Í|Ì|Î|Ï)/", "/(ó|ò|õ|ô|ö)/", "/(Ó|Ò|Õ|Ô|Ö)/", "/(ú|ù|û|ü)/", "/(Ú|Ù|Û|Ü)/", "/(ñ)/", "/(Ñ)/", "/(Ç)/", "/(ç)/"), explode(" ", "a A e E i I o O u U n N C c"), $string);
+    }
+
+    function sum($carry, $item)
+    {
+        $carry += $item['valorParcela'];
+        return $carry;
+    }
+
+    function getCodigoMinicipio()
+    {
+        $uf = session('config')->estado;
+        switch ($uf) {
+            case 'AC':
+                return 12;
+                break;
+            case 'AL':
+                return 27;
+                break;
+            case 'AM':
+                return 13;
+                break;
+            case 'AP':
+                return 16;
+                break;
+            case 'BA':
+                return 29;
+                break;
+            case 'CE':
+                return 23;
+                break;
+            case 'DF':
+                return 53;
+                break;
+            case 'ES':
+                return 32;
+                break;
+            case 'GO':
+                return 52;
+                break;
+            case 'MA':
+                return 21;
+                break;
+            case 'MG':
+                return 31;
+                break;
+            case 'MS':
+                return 50;
+                break;
+            case 'MT':
+                return 51;
+                break;
+            case 'PA':
+                return 15;
+                break;
+            case 'PB':
+                return 25;
+                break;
+            case 'PE':
+                return 26;
+                break;
+            case 'PI':
+                return 22;
+                break;
+            case 'PR':
+                return 41;
+                break;
+            case 'RJ':
+                return 33;
+                break;
+            case 'RN':
+                return 24;
+                break;
+            case 'RO':
+                return 11;
+                break;
+            case 'RR':
+                return 14;
+                break;
+            case 'RS':
+                return 43;
+                break;
+            case 'SC':
+                return 42;
+                break;
+            case 'SE':
+                return 28;
+                break;
+            case 'SP':
+                return 35;
+                break;
+            case 'TO':
+                return 17;
+                break;
+            default:
+                return 35;
+                break;
+        }
+    }
+}

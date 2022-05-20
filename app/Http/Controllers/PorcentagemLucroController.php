@@ -38,7 +38,7 @@ class PorcentagemLucroController extends Controller
     {
         $porcentagemLucro = new PorcentagemLucro;
         $porcentagemLucro->descricao = $request->input('descricao');
-        $porcentagemLucro->porcentagem = $request->input('porcentagem');
+        $porcentagemLucro->porcentagem = number_format((float)$request->input('porcentagem'), session('config')->quantidadeCasasDecimaisValor, '.', '');
         $porcentagemLucro->favorito = $request->input('favorito');
 
         try {
@@ -56,7 +56,7 @@ class PorcentagemLucroController extends Controller
         $porcentagemLucro = PorcentagemLucro::findOrFail($request->id);
 
         $porcentagemLucro->descricao = $request->input('descricao');
-        $porcentagemLucro->porcentagem = $request->input('porcentagem');
+        $porcentagemLucro->porcentagem = number_format((float)$request->input('porcentagem'), session('config')->quantidadeCasasDecimaisValor, '.', '');
         $porcentagemLucro->favorito = $request->input('favorito');
 
         try {

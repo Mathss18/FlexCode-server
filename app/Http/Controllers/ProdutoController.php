@@ -54,24 +54,24 @@ class ProdutoController extends Controller
         $produto->movimentaEstoque = $request->input('movimentaEstoque');
         $produto->habilitaNotaFiscal = $request->input('habilitaNotaFiscal');
         $produto->codigoBarras = $request->input('codigoBarras');
-        $produto->peso = $request->input('peso');
-        $produto->largura = $request->input('largura');
-        $produto->altura = $request->input('altura');
-        $produto->comprimento = $request->input('comprimento');
-        $produto->comissao = $request->input('comissao');
+        $produto->peso = number_format((float)$request->input('peso'), session('config')->quantidadeCasasDecimaisQuantidade, '.', '');
+        $produto->largura = number_format((float)$request->input('largura'), session('config')->quantidadeCasasDecimaisQuantidade, '.', '');
+        $produto->altura = number_format((float)$request->input('altura'), session('config')->quantidadeCasasDecimaisQuantidade, '.', '');
+        $produto->comprimento = number_format((float)$request->input('comprimento'), session('config')->quantidadeCasasDecimaisQuantidade, '.', '');
+        $produto->comissao = number_format((float)$request->input('comissao'), session('config')->quantidadeCasasDecimaisValor, '.', '');
         $produto->descricao = $request->input('descricao');
-        $produto->valorCusto = $request->input('valorCusto');
-        $produto->despesasAdicionais = $request->input('despesasAdicionais');
-        $produto->outrasDespesas = $request->input('outrasDespesas');
-        $produto->custoFinal = $request->input('custoFinal');
-        $produto->estoqueMinimo = $request->input('estoqueMinimo');
-        $produto->estoqueMaximo = $request->input('estoqueMaximo');
-        $produto->quantidadeAtual = $request->input('quantidadeAtual');
+        $produto->valorCusto = number_format((float)$request->input('valorCusto'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $produto->despesasAdicionais = number_format((float)$request->input('despesasAdicionais'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $produto->outrasDespesas = number_format((float)$request->input('outrasDespesas'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $produto->custoFinal = number_format((float)$request->input('custoFinal'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $produto->estoqueMinimo = number_format((float)$request->input('estoqueMinimo'), session('config')->quantidadeCasasDecimaisQuantidade, '.', '');
+        $produto->estoqueMaximo = number_format((float)$request->input('estoqueMaximo'), session('config')->quantidadeCasasDecimaisQuantidade, '.', '');
+        $produto->quantidadeAtual = number_format((float)$request->input('quantidadeAtual'), session('config')->quantidadeCasasDecimaisQuantidade, '.', '');
         $produto->ncm = $request->input('ncm');
         $produto->cest = $request->input('cest');
-        $produto->origem = $request->input('origem');
-        $produto->pesoLiquido = $request->input('pesoLiquido');
-        $produto->pesoBruto = $request->input('pesoBruto');
+        $produto->cfop = $request->input('cfop')['value'];
+        $produto->pesoLiquido = number_format((float)$request->input('pesoLiquido'), session('config')->quantidadeCasasDecimaisQuantidade, '.', '');
+        $produto->pesoBruto = number_format((float)$request->input('pesoBruto'), session('config')->quantidadeCasasDecimaisQuantidade, '.', '');
         $produto->numeroFci = $request->input('numeroFci');
         $produto->valorAproxTribut = $request->input('valorAproxTribut');
         $produto->valorPixoPis = $request->input('valorPixoPis');
@@ -156,9 +156,9 @@ class ProdutoController extends Controller
                 DB::table('entradas_produtos')->insert(
                     [
                         'produto_id'        => $produto->id,
-                        'quantidade'        => $produto->quantidadeAtual ?? 0,
-                        'quantidadeMomento' => $produto->quantidadeAtual ?? 0,
-                        'preco'             => $produto->custoFinal,
+                        'quantidade'        => number_format((float)$produto->quantidadeAtual, session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
+                        'quantidadeMomento' => number_format((float)$produto->quantidadeAtual, session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
+                        'preco'             => number_format((float)$produto->custoFinal, session('config')->quantidadeCasasDecimaisValor, '.', ''),
                         'usuario_id'        => $user->id,
                         'nome_usuario'      => $user->nome,
                         'observacao'        => '[Produtos] Produto cadastrado',
@@ -194,30 +194,30 @@ class ProdutoController extends Controller
         $produto->movimentaEstoque = $request->input('movimentaEstoque');
         $produto->habilitaNotaFiscal = $request->input('habilitaNotaFiscal');
         $produto->codigoBarras = $request->input('codigoBarras');
-        $produto->peso = $request->input('peso');
-        $produto->largura = $request->input('largura');
-        $produto->altura = $request->input('altura');
-        $produto->comprimento = $request->input('comprimento');
-        $produto->comissao = $request->input('comissao');
+        $produto->peso = number_format((float)$request->input('peso'), session('config')->quantidadeCasasDecimaisQuantidade, '.', '');
+        $produto->largura = number_format((float)$request->input('largura'), session('config')->quantidadeCasasDecimaisQuantidade, '.', '');
+        $produto->altura = number_format((float)$request->input('altura'), session('config')->quantidadeCasasDecimaisQuantidade, '.', '');
+        $produto->comprimento = number_format((float)$request->input('comprimento'), session('config')->quantidadeCasasDecimaisQuantidade, '.', '');
+        $produto->comissao = number_format((float)$request->input('comissao'), session('config')->quantidadeCasasDecimaisValor, '.', '');
         $produto->descricao = $request->input('descricao');
-        $produto->valorCusto = $request->input('valorCusto');
-        $produto->despesasAdicionais = $request->input('despesasAdicionais');
-        $produto->outrasDespesas = $request->input('outrasDespesas');
-        $produto->custoFinal = $request->input('custoFinal');
-        $produto->estoqueMinimo = $request->input('estoqueMinimo');
-        $produto->estoqueMaximo = $request->input('estoqueMaximo');
+        $produto->valorCusto = number_format((float)$request->input('valorCusto'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $produto->despesasAdicionais = number_format((float)$request->input('despesasAdicionais'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $produto->outrasDespesas = number_format((float)$request->input('outrasDespesas'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $produto->custoFinal = number_format((float)$request->input('custoFinal'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $produto->estoqueMinimo = number_format((float)$request->input('estoqueMinimo'), session('config')->quantidadeCasasDecimaisQuantidade, '.', '');
+        $produto->estoqueMaximo = number_format((float)$request->input('estoqueMaximo'), session('config')->quantidadeCasasDecimaisQuantidade, '.', '');
 
         //Só altera a quantidadeAtual se o produto não está na tabela estoque
         $existeNaTabelaEstoque = DB::table('estoques')->where('produto_id', $produto->id)->first();
         if(!$existeNaTabelaEstoque){
-            $produto->quantidadeAtual = $request->input('quantidadeAtual');
+            $produto->quantidadeAtual = number_format((float)$request->input('quantidadeAtual'), session('config')->quantidadeCasasDecimaisQuantidade, '.', '');
         }
 
         $produto->ncm = $request->input('ncm');
         $produto->cest = $request->input('cest');
-        $produto->origem = $request->input('origem');
-        $produto->pesoLiquido = $request->input('pesoLiquido');
-        $produto->pesoBruto = $request->input('pesoBruto');
+        $produto->cfop = $request->input('cfop')['value'];
+        $produto->pesoLiquido = number_format((float)$request->input('pesoLiquido'), session('config')->quantidadeCasasDecimaisQuantidade, '.', '');
+        $produto->pesoBruto = number_format((float)$request->input('pesoBruto'), session('config')->quantidadeCasasDecimaisQuantidade, '.', '');
         $produto->numeroFci = $request->input('numeroFci');
         $produto->valorAproxTribut = $request->input('valorAproxTribut');
         $produto->valorPixoPis = $request->input('valorPixoPis');
@@ -310,9 +310,9 @@ class ProdutoController extends Controller
                 DB::table('entradas_produtos')->insert(
                     [
                         'produto_id'        => $produto->id,
-                        'quantidade'        => $produto->quantidadeAtual ?? 0,
-                        'quantidadeMomento' => $produto->quantidadeAtual ?? 0,
-                        'preco'             => $produto->custoFinal,
+                        'quantidade'        => number_format((float)$produto->quantidadeAtual, session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
+                        'quantidadeMomento' => number_format((float)$produto->quantidadeAtual, session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
+                        'preco'             => number_format((float)$produto->custoFinal, session('config')->quantidadeCasasDecimaisValor, '.', ''),
                         'nome_usuario'      => $user->nome,
                         'usuario_id'        => $user->id,
                         'observacao'        => '[Produtos] Produto não movimentava estoque, agora movimenta',

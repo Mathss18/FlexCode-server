@@ -17,9 +17,9 @@ class CreateOrcamentosProdutosTable extends Migration
             $table->bigIncrements('id');
             $table->foreignId('produto_id')->nullable()->constrained('produtos');
             $table->foreignId('orcamento_id')->nullable()->constrained('orcamentos');
-            $table->double('quantidade', 8, 2);
-            $table->double('preco', 8, 2);
-            $table->double('total', 8, 2);
+            $table->double('quantidade', 8, 4);
+            $table->double('preco', 8, 4);
+            $table->double('total', 8, 4);
             $table->string('observacao')->nullable();
             $table->timestamps();
         });

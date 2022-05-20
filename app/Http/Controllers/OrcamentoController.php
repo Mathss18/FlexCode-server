@@ -47,10 +47,10 @@ class OrcamentoController extends Controller
         $orcamentos->cliente_id = $request->input('cliente_id')['value'] ?? null;
         $orcamentos->transportadora_id = $request->input('transportadora_id')['value'] ?? null;
         $orcamentos->dataEntrada = $request->input('dataEntrada');
-        $orcamentos->frete = $request->input('frete');
-        $orcamentos->outros = $request->input('outros');
-        $orcamentos->desconto = $request->input('desconto');
-        $orcamentos->total = $request->input('total');
+        $orcamentos->frete = number_format((float)$request->input('frete'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $orcamentos->outros = number_format((float)$request->input('outros'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $orcamentos->desconto = number_format((float)$request->input('desconto'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $orcamentos->total = number_format((float)$request->input('total'), session('config')->quantidadeCasasDecimaisValor, '.', '');
         $orcamentos->observacao = $request->input('observacao');
         $orcamentos->observacaoInterna = $request->input('observacaoInterna');
 
@@ -68,9 +68,9 @@ class OrcamentoController extends Controller
                     $orcamentos->produtos()->attach(
                         $produto['produto_id'],
                         [
-                            'quantidade' => $produto['quantidade'],
-                            'preco' => $produto['preco'],
-                            'total' => $produto['total'],
+                            'quantidade' => number_format((float)$produto['quantidade'], session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
+                            'preco' => number_format((float)$produto['preco'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
+                            'total' => number_format((float)$produto['total'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
                             'observacao' => $produto['observacao'],
                             'created_at' => Carbon::now('GMT-3'),
                             'updated_at' => Carbon::now('GMT-3'),
@@ -85,9 +85,9 @@ class OrcamentoController extends Controller
                     $orcamentos->servicos()->attach(
                         $servico['servico_id'],
                         [
-                            'quantidade' => $servico['quantidade'],
-                            'preco' => $servico['preco'],
-                            'total' => $servico['total'],
+                            'quantidade' => number_format((float)$servico['quantidade'], session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
+                            'preco' => number_format((float)$servico['preco'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
+                            'total' => number_format((float)$servico['total'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
                             'observacao' => $servico['observacao'],
                             'created_at' => Carbon::now('GMT-3'),
                             'updated_at' => Carbon::now('GMT-3'),
@@ -116,10 +116,10 @@ class OrcamentoController extends Controller
         $orcamentos->cliente_id = $request->input('cliente_id')['value'] ?? null;
         $orcamentos->transportadora_id = $request->input('transportadora_id')['value'] ?? null;
         $orcamentos->dataEntrada = $request->input('dataEntrada');
-        $orcamentos->frete = $request->input('frete');
-        $orcamentos->outros = $request->input('outros');
-        $orcamentos->desconto = $request->input('desconto');
-        $orcamentos->total = $request->input('total');
+        $orcamentos->frete = number_format((float)$request->input('frete'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $orcamentos->outros = number_format((float)$request->input('outros'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $orcamentos->desconto = number_format((float)$request->input('desconto'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $orcamentos->total = number_format((float)$request->input('total'), session('config')->quantidadeCasasDecimaisValor, '.', '');
         $orcamentos->observacao = $request->input('observacao');
         $orcamentos->observacaoInterna = $request->input('observacaoInterna');
 
@@ -138,9 +138,9 @@ class OrcamentoController extends Controller
                     $orcamentos->produtos()->attach(
                         $produto['produto_id'],
                         [
-                            'quantidade' => $produto['quantidade'],
-                            'preco' => $produto['preco'],
-                            'total' => $produto['total'],
+                            'quantidade' => number_format((float)$produto['quantidade'], session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
+                            'preco' => number_format((float)$produto['preco'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
+                            'total' => number_format((float)$produto['total'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
                             'observacao' => $produto['observacao'],
                             'created_at' => Carbon::now('GMT-3'),
                             'updated_at' => Carbon::now('GMT-3'),
@@ -160,9 +160,9 @@ class OrcamentoController extends Controller
                     $orcamentos->servicos()->attach(
                         $servico['servico_id'],
                         [
-                            'quantidade' => $servico['quantidade'],
-                            'preco' => $servico['preco'],
-                            'total' => $servico['total'],
+                            'quantidade' => number_format((float)$servico['quantidade'], session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
+                            'preco' => number_format((float)$servico['preco'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
+                            'total' => number_format((float)$servico['total'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
                             'observacao' => $servico['observacao'],
                             'created_at' => Carbon::now('GMT-3'),
                             'updated_at' => Carbon::now('GMT-3'),

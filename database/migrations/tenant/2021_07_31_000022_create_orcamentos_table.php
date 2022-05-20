@@ -20,10 +20,10 @@ class CreateOrcamentosTable extends Migration
             $table->foreignId('transportadora_id')->nullable()->constrained('transportadoras');
             $table->integer('situacao');
             $table->string('dataEntrada');
-            $table->double('frete', 8, 2);
-            $table->double('outros', 8, 2);
-            $table->double('desconto', 8, 2);
-            $table->double('total', 8, 2);
+            $table->double('frete', 8, 4);
+            $table->double('outros', 8, 4);
+            $table->double('desconto', 8, 4);
+            $table->double('total', 8, 4);
             $table->string('observacao')->nullable();
             $table->string('observacaoInterna')->nullable();
             $table->timestamps();

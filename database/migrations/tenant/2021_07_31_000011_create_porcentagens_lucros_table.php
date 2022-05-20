@@ -16,7 +16,7 @@ class CreatePorcentagensLucrosTable extends Migration
         Schema::create('porcentagens_lucros', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('descricao')->unique();
-            $table->double('porcentagem', 8, 2);
+            $table->double('porcentagem', 8, 4);
             $table->boolean('favorito')->nullable();
             $table->timestamps();
         });
