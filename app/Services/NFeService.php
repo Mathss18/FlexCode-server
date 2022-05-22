@@ -12,6 +12,8 @@ use NFePHP\Common\Keys;
 use NFePHP\Common\Certificate;
 use NFePHP\NFe\Common\Standardize;
 use NFePHP\NFe\Complements;
+use NFePHP\DA\NFe\Danfe;
+use NFePHP\DA\NFe\Daevento;
 
 class NfeService
 {
@@ -30,18 +32,22 @@ class NfeService
 
         // $certificadoDigital = file_get_contents('..\app\Services\certFM.pfx');
 
-        if (Storage::disk('local')->exists('public/teste/configuracoes/certificadoDigital/certificado-digital.x-pkcs12')) {
-            $path = Storage::disk('local')->path('public/teste/configuracoes/certificadoDigital/certificado-digital.x-pkcs12');
+        if (Storage::disk('local')->exists('public/' . session('tenant')->nome . '/configuracoes/certificadoDigital/certificado-digital.x-pkcs12')) {
+            $path = Storage::disk('local')->path('public/' . session('tenant')->nome . '/configuracoes/certificadoDigital/certificado-digital.x-pkcs12');
             $certificadoDigital = file_get_contents($path);
         } else {
-            return 'Certificado Dígital não encontrado!';
+            throw new \Exception('Certificado digital não encontrado');
         }
 
         $this->config = $config;
-        $this->tools = new Tools(json_encode($config), Certificate::readPfx($certificadoDigital, '123456'));
+        try {
+            $this->tools = new Tools(json_encode($config), Certificate::readPfx($certificadoDigital, session('config')->senhaCertificadoDigital));
+        } catch (\Exception $ex) {
+            throw new \Exception($ex->getMessage());
+        }
     }
 
-    public function gerarNfe($dados, $lastnNF, $favorecido, $produtos, $transportadora, $aliquota)
+    public function gerarNfe($dados, $favorecido, $produtos, $transportadora, $aliquota)
     {
         // return $dados;
 
@@ -60,7 +66,7 @@ class NfeService
         $ide = new stdClass();
         $ide->cUF = $this->getCodigoMinicipio(); //codigo do estado
         $ide->nNF = session('config')->nNF + 1; //numero da nota fiscal
-        $ide->cNF = STR_PAD($ide->nNF + 1, '0', 8, STR_PAD_LEFT); //rand(11111111,99999999);
+        $ide->cNF = rand(11111111, 99999999); //STR_PAD($ide->nNF + 1, '0', 8, STR_PAD_LEFT);
         $ide->natOp = $this->tirarAcentos($dados['natOp']['label']);
         $ide->mod = 55;
         $ide->serie = session('config')->serie;
@@ -406,7 +412,13 @@ class NfeService
 
         //====================INFO ADICIONAL===================
         $stdInfo = new stdClass();
-        $stdInfo->infAdFisco = $dados['infAdFisco'] ?? '' . " --- DOCUMENTO EMITIDO POR ME OU EPP OPTANTE PELO SIMPLES NACIONAL, CONFORME LEI COMPLEMENTAR 123/2006 II - NAO GERA DIREITO A CREDITO FISCAL DE IPI. III - PERMITE O APROVEITAMENTO DO CREDITO DE ICMS NO VALOR DE R$ " . $icms->vCredICMSSN . " CORRESPONDENTE A ALIQUOTA DE " . $aliquota . ", NOS TERMOS DO ART. 23 DA LC 123/2006";
+        if (array_key_exists("infAdFisco", $dados)) {
+            $stdInfo->infAdFisco = $dados['infAdFisco'] . " --- DOCUMENTO EMITIDO POR ME OU EPP OPTANTE PELO SIMPLES NACIONAL, CONFORME LEI COMPLEMENTAR 123/2006 II - NAO GERA DIREITO A CREDITO FISCAL DE IPI. III - PERMITE O APROVEITAMENTO DO CREDITO DE ICMS NO VALOR DE R$ " . $icms->vCredICMSSN . " CORRESPONDENTE A ALIQUOTA DE " . $aliquota . ", NOS TERMOS DO ART. 23 DA LC 123/2006";
+        }
+        else{
+            $stdInfo->infAdFisco = " --- DOCUMENTO EMITIDO POR ME OU EPP OPTANTE PELO SIMPLES NACIONAL, CONFORME LEI COMPLEMENTAR 123/2006 II - NAO GERA DIREITO A CREDITO FISCAL DE IPI. III - PERMITE O APROVEITAMENTO DO CREDITO DE ICMS NO VALOR DE R$ " . $icms->vCredICMSSN . " CORRESPONDENTE A ALIQUOTA DE " . $aliquota . ", NOS TERMOS DO ART. 23 DA LC 123/2006";
+        }
+
         $stdInfo->infCpl = $dados['infCpl'] ?? '';
 
         $nfe->taginfAdic($stdInfo);
@@ -415,19 +427,35 @@ class NfeService
 
         // dd($nfe->getErrors());
         // dd($nfe->dom->errors);
-        $chave = $this->getChave($ide, $emit);
-        $xml = $this->montar($nfe);
-        $xmlAssinado = $this->assinar($xml);
-        $xmlFinal = $this->transmitir($xmlAssinado, $chave);
-        $xmlObject = [
-            "chave" => $this->chave,
-            "protocolo" => $this->protocolo,
-            "recibo" => $this->recibo,
-            "xml" => $this->xmlFinal,
-            "success" => $this->success,
-            "error" => $this->error,
-        ];
-        return $xmlObject;
+
+        try {
+            $chave = $this->getChave($ide, $emit);
+            $xml = $this->montar($nfe);
+            $xmlAssinado = $this->assinar($xml);
+            $this->transmitir($xmlAssinado, $chave);
+            return [
+                "chave" => $this->chave,
+                "protocolo" => $this->protocolo,
+                "recibo" => $this->recibo,
+                "xml" => $this->xmlFinal,
+                "success" => $this->success,
+                "error" => $this->error,
+                "tagErrors" => null,
+                "tagDOM" => null
+            ];
+        } catch (\Throwable $th) {
+            $this->error = $th;
+            return [
+                "chave" => $this->chave,
+                "protocolo" => $this->protocolo,
+                "recibo" => $this->recibo,
+                "xml" => $this->xmlFinal,
+                "success" => $this->success,
+                "error" => $this->error,
+                "tagErrors" => $nfe->getErrors(),
+                "tagDOM" => $nfe->dom->errors
+            ];
+        }
     }
 
     public function montar($nfe)
@@ -437,6 +465,7 @@ class NfeService
             return $xml;
         } catch (\Exception $ex) {
             $this->error = 'Erro ao montar: ' . $ex->getMessage();
+            throw $ex;
         }
     }
 
@@ -449,6 +478,7 @@ class NfeService
         } catch (\Exception $ex) {
             //aqui você trata possíveis exceptions da assinatura
             $this->error = 'Problema ao assinar a NFe' . $ex->getMessage();
+            throw $ex;
         }
     }
 
@@ -466,12 +496,13 @@ class NfeService
             }
             $recibo = $std->infRec->nRec; // Vamos usar a variável $recibo para consultar o status da nota
 
-            sleep(5); // Dorme por 5 segundos para evitar sobrecarga do servidor
+            // sleep(5); // Dorme por 5 segundos para evitar sobrecarga do servidor
 
             $xmlFinal = $this->consultaRecibo($recibo, $xmlAssinado, $chave);
             return $xmlFinal;
         } catch (\Exception $ex) {
             $this->error = "Erro ao transmitir a NFe: " . $ex->getMessage();
+            throw $ex;
         }
     }
 
@@ -480,13 +511,13 @@ class NfeService
         try {
             $protocolo = $this->tools->sefazConsultaRecibo($recibo);
 
-            $this->protocolo = $protocolo;
-            $this->recibo = $recibo;
-            $this->chave = $chave;
-
             //transforma o xml de retorno em um stdClass
             $st = new Standardize();
             $std = $st->toStd($protocolo);
+
+            $this->protocolo = $std->protNFe->infProt->nProt ?? '';
+            $this->recibo = $recibo ?? '';
+            $this->chave = $chave ?? '';
 
             if ($std->cStat == '103') { //lote enviado
                 //Lote ainda não foi precessado pela SEFAZ;
@@ -510,14 +541,18 @@ class NfeService
                     return $xmlFinal;
                 } elseif (in_array($std->protNFe->infProt->cStat, ["110", "301", "302"])) { //DENEGADAS
                     $this->error = 'Problema ao consultar recibo. Situação:' . ' denegada ' . $std->protNFe->infProt->xMotivo . ' cstat: ' . $std->protNFe->infProt->cStat;
+                    throw new \Exception($this->error);
                 } else { //não autorizada (rejeição)
                     $this->error = 'Problema ao consultar recibo. Situação:' . ' rejeitada ' . $std->protNFe->infProt->xMotivo . ' cstat: ' . $std->protNFe->infProt->cStat;
+                    throw new \Exception($this->error);
                 }
             } else { //outros erros possíveis
                 $this->error = 'Problema ao consultar recibo. Situação:' . ' rejeitada ' . $std->protNFe->infProt->xMotivo . ' cstat: ' . $std->protNFe->infProt->cStat;
+                throw new \Exception($this->error);
             }
         } catch (\Exception $ex) {
             $this->error = 'Problema ao consultar recibo. ' . $ex->getMessage();
+            throw $ex;
         }
     }
 
@@ -528,6 +563,223 @@ class NfeService
         //$chave = $ide->cUF.$ano.$mes.$emit->CNPJ.$ide->mod.'00'.$ide->serie.$cNFcomZero.$ide->tpEmis.$ide->cNF.'0';
         $chave = Keys::build($ide->cUF, $ano, $mes, $emit->CNPJ, $ide->mod, $ide->serie, $ide->nNF, $ide->tpEmis, $ide->cNF);
         return $chave;
+    }
+
+    public function gerarDanfe($chave)
+    {
+        $mes = date('m');
+        $ano = date('Y');
+
+        $xmlPath = Storage::disk('local')->path("public/" . session('tenant')->nome . "/nfe/{$mes}-${ano}/${chave}.xml");
+        $xml = file_get_contents($xmlPath);
+
+        if (Storage::disk('local')->exists("public/" . session('tenant')->nome . "/configuracoes/logo/logo.png")) {
+            $logoPath = Storage::disk('local')->path("public/" . session('tenant')->nome . "/configuracoes/logo/logo.png");
+            $logo = 'data://text/plain;base64,' . base64_encode(file_get_contents($logoPath)) ?? '';
+        } else if (Storage::disk('local')->exists("public/" . session('tenant')->nome . "/configuracoes/logo/logo.jpeg")) {
+
+            $logoPath = Storage::disk('local')->path("public/" . session('tenant')->nome . "/configuracoes/logo/logo.jpeg");
+            $logo = 'data://text/plain;base64,' . base64_encode(file_get_contents($logoPath)) ?? '';
+        } else if (Storage::disk('local')->exists("public/" . session('tenant')->nome . "/configuracoes/logo/logo.jpg")) {
+
+            $logoPath = Storage::disk('local')->path("public/" . session('tenant')->nome . "/configuracoes/logo/logo.jpg");
+            $logo = 'data://text/plain;base64,' . base64_encode(file_get_contents($logoPath)) ?? '';
+        } else {
+            $logo = '';
+        }
+
+
+        try {
+            $danfe = new Danfe($xml);
+            $danfe->debugMode(false);
+            $danfe->creditsIntegratorFooter('Sistema Allmacoding - www.allmacoding.com (19) 98313-6930');
+            //Gera o PDF
+            $pdf = $danfe->render($logo);
+            // header('Content-Type: application/pdf');
+            // echo ($pdf);
+            return $pdf;
+        } catch (\Exception $ex) {
+            return "Ocorreu um erro durante a geração da DANFE :" . $ex->getMessage();
+            throw $ex;
+        }
+    }
+
+    public function inutilizaNumerosNfe($dados)
+    {
+
+        try {
+            $nSerie = $dados['serie'];
+            $nIni = $dados['numeroInicial'];
+            $nFin = $dados['numeroFinal'];
+            $xJust = $dados['justificativa'];
+            $response = $this->tools->sefazInutiliza($nSerie, $nIni, $nFin, $xJust);
+
+            //você pode padronizar os dados de retorno atraves da classe abaixo
+            //de forma a facilitar a extração dos dados do XML
+            //NOTA: mas lembre-se que esse XML muitas vezes será necessário,
+            //      quando houver a necessidade de protocolos
+            $stdCl = new Standardize($response);
+            //nesse caso $std irá conter uma representação em stdClass do XML
+            $std = $stdCl->toStd();
+            //nesse caso o $arr irá conter uma representação em array do XML
+            $arr = $stdCl->toArray();
+            //nesse caso o $json irá conter uma representação em JSON do XML
+            $json = $stdCl->toJson();
+
+            $std1 = new Standardize($response);
+            $retorno = $std1->toStd();
+            $cStat = $retorno->infInut->cStat;
+            if ($cStat == '102' || $cStat == '563') { //validou
+                $fileRandomName = now();
+                $fileUploaded = Storage::put('public/' . session('tenant')->nome . '/' . 'nfeInutilizadas' . '/' . $fileRandomName . '.xml', $response);
+                if ($fileUploaded) {
+                    $url = config('app.url') . config('app.port') . '/' . "storage/" . session('tenant')->nome . '/' . 'nfeInutilizadas' . '/' . $fileRandomName . '.xml';
+                    return $url;
+                }
+            } else {
+                throw new \Exception('Problema ao inutilizar. Situação:' . $retorno->infInut->xMotivo . ' cstat: ' . $retorno->infInut->cStat);
+            }
+        } catch (\Exception $ex) {
+            throw $ex;
+        }
+    }
+
+    public function corrigirNfe($dados)
+    {
+        try {
+            $this->tools->model('55');
+
+            $chave = $dados['chave']; //Chave da Nfe
+            $xCorrecao = $dados['justificativa']; //Justificativa da correção
+            $nSeqEvento = $dados['nSeqEvento'] + 1; //Numero do evento, ou seja qual o n° de cartas já feito
+            $response = $this->tools->sefazCCe($chave, $xCorrecao, $nSeqEvento);
+            $mes = date('m');
+            $ano = date('Y');
+
+            //você pode padronizar os dados de retorno atraves da classe abaixo
+            //de forma a facilitar a extração dos dados do XML
+            //NOTA: mas lembre-se que esse XML muitas vezes será necessário,
+            //      quando houver a necessidade de protocolos
+            $stdCl = new Standardize($response);
+            //nesse caso $std irá conter uma representação em stdClass do XML
+            $std = $stdCl->toStd();
+            //nesse caso o $arr irá conter uma representação em array do XML
+            $arr = $stdCl->toArray();
+            //nesse caso o $json irá conter uma representação em JSON do XML
+            $json = $stdCl->toJson();
+
+            //verifique se o evento foi processado
+            if ($std->cStat != 128) {
+                throw new \Exception('Erro Ao Tirar Carta de Correção!  Erro numero:', $std->cStat);
+            } else {
+                $cStat = $std->retEvento->infEvento->cStat;
+                if ($cStat == '135' || $cStat == '136') {
+                    //SUCESSO PROTOCOLAR A SOLICITAÇÂO ANTES DE GUARDAR
+                    $xml = Complements::toAuthorize($this->tools->lastRequest, $response);
+                    $fileUploaded = Storage::put('public/' . session('tenant')->nome . '/' . 'nfeCorrecoes' . '/' . "${mes}-${ano}/" . $chave . '.xml', $xml);
+                    if ($fileUploaded) {
+                        $url = config('app.url') . config('app.port') . '/' . "storage/" . session('tenant')->nome . '/' . 'nfeCorrecoes' . '/' . "${mes}-${ano}/" . $chave . '.xml';
+                        return $url;
+                    }
+                } else {
+                    throw new \Exception('Erro Ao Tirar Carta de Correção!  Erro numero: ' . $std->cStat);
+                }
+            }
+        } catch (\Exception $ex) {
+            throw $ex;
+        }
+    }
+
+    public function gerarCartaCorrecaoPdf($chave)
+    {
+        $mes = date('m');
+        $ano = date('Y');
+        $path =  Storage::disk('local')->path("public/" . session('tenant')->nome . '/' . 'nfeCorrecoes' . '/' . "${mes}-${ano}/" . $chave . '.xml');
+        $xml = file_get_contents($path);
+        $logo = $this->getLogo();
+
+
+        try {
+            $daevento = new Daevento($xml, $this->config);
+            $daevento->debugMode(false);
+            $daevento->creditsIntegratorFooter('Sistema Allmacoding - www.allmacoding.com (19) 98313-6930');
+            $pdf = $daevento->render($logo);
+            $fileUploaded = Storage::put('public/' . session('tenant')->nome . '/' . 'nfeCorrecoes' . '/' . "${mes}-${ano}/" . $chave . '.pdf', $pdf);
+            if ($fileUploaded) {
+                $url = config('app.url') . config('app.port') . '/' . "storage/" . session('tenant')->nome . '/' . 'nfeCorrecoes' . '/' . "${mes}-${ano}/" . $chave . '.pdf';
+                return $url;
+            }
+        } catch (\Exception $ex) {
+            throw $ex;
+        }
+    }
+
+    public function cancelarNfe($dados)
+    {
+        try {
+            $this->tools->model('55');
+
+            $chave = $dados['chave']; //Chave da Nfe
+            $xJust = $dados['justificativa']; //Justificativa da correção
+            $nProt = $dados['protocolo']; //Numero do protocolo
+            $mes = date('m');
+            $ano = date('Y');
+
+            $response = $this->tools->sefazCancela($chave, $xJust, $nProt);
+
+            //você pode padronizar os dados de retorno atraves da classe abaixo
+            //de forma a facilitar a extração dos dados do XML
+            //NOTA: mas lembre-se que esse XML muitas vezes será necessário,
+            //      quando houver a necessidade de protocolos
+            $stdCl = new Standardize($response);
+            //nesse caso $std irá conter uma representação em stdClass do XML
+            $std = $stdCl->toStd();
+            //nesse caso o $arr irá conter uma representação em array do XML
+            $arr = $stdCl->toArray();
+            //nesse caso o $json irá conter uma representação em JSON do XML
+            $json = $stdCl->toJson();
+
+            //verifique se o evento foi processado
+            if ($std->cStat != 128) {
+                //houve alguma falha e o evento não foi processado
+                throw new \Exception('Erro Ao Cancelar Nota!  Erro numero:', $std->cStat);
+            } else {
+                $cStat = $std->retEvento->infEvento->cStat;
+                if ($cStat == '101' || $cStat == '135' || $cStat == '155') {
+                    //SUCESSO PROTOCOLAR A SOLICITAÇÂO ANTES DE GUARDAR
+                    $xml = Complements::toAuthorize($this->tools->lastRequest, $response);
+                    $fileUploaded = Storage::put('public/' . session('tenant')->nome . '/' . 'nfeCanceladas' . '/' . "${mes}-${ano}/" . $chave . '.xml', $xml);
+                    if ($fileUploaded) {
+                        $url = config('app.url') . config('app.port') . '/' . "storage/" . session('tenant')->nome . '/' . 'nfeCanceladas' . '/' . "${mes}-${ano}/" . $chave . '.xml';
+                        return $url;
+                    }
+                } else {
+                    //houve alguma falha no evento
+                    throw new \Exception('Erro Ao Cancelar Nota!  Erro numero:', $std->cStat);
+                }
+            }
+        } catch (\Exception $ex) {
+            throw $ex;
+        }
+    }
+
+    function getLogo(){
+        $logo = '';
+        if (Storage::disk('local')->exists("public/" . session('tenant')->nome . "/configuracoes/logo/logo.png")) {
+            $logoPath = Storage::disk('local')->path("public/" . session('tenant')->nome . "/configuracoes/logo/logo.png");
+            $logo = 'data://text/plain;base64,' . base64_encode(file_get_contents($logoPath)) ?? '';
+        } else if (Storage::disk('local')->exists("public/" . session('tenant')->nome . "/configuracoes/logo/logo.jpeg")) {
+
+            $logoPath = Storage::disk('local')->path("public/" . session('tenant')->nome . "/configuracoes/logo/logo.jpeg");
+            $logo = 'data://text/plain;base64,' . base64_encode(file_get_contents($logoPath)) ?? '';
+        } else if (Storage::disk('local')->exists("public/" . session('tenant')->nome . "/configuracoes/logo/logo.jpg")) {
+
+            $logoPath = Storage::disk('local')->path("public/" . session('tenant')->nome . "/configuracoes/logo/logo.jpg");
+            $logo = 'data://text/plain;base64,' . base64_encode(file_get_contents($logoPath)) ?? '';
+        } else {
+            $logo = '';
+        }
+        return $logo;
     }
 
     function tirarAcentos($string)

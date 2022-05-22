@@ -35,10 +35,8 @@ class TenantMiddleware
             $this->setSession('tenant', $tenant);
 
             $config = Configuracao::where('situacao', true)->first();
-            unset($config->id);
-            unset($config->senhaCertificadoDigital);
-            unset($config->senhaSmtp);
             $this->setSession('config', $config);
+            $manager->setSmtp();
         }
 
         return $next($request);

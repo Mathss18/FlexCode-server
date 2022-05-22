@@ -1,0 +1,5 @@
+- Composer Install
+- Composer Update (se necessario, geralemnte erro no JWT)
+- php artinsan key:generate
+- generate jwt key
+- php artisan vendor:publish --tag=laravel-mail (Para poder editar template do email)

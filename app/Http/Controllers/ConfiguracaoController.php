@@ -70,6 +70,7 @@ class ConfiguracaoController extends Controller
         $configuracoes->servidorSmtp = $request->input('servidorSmtp');
         $configuracoes->portaSmtp = $request->input('portaSmtp');
         // $configuracoes->emailSmtp = $request->input('emailSmtp');
+        $configuracoes->usuarioSmtp = $request->input('usuarioSmtp');
         $configuracoes->senhaSmtp = $request->input('senhaSmtp');
         $configuracoes->quantidadeCasasDecimaisValor = $request->input('quantidadeCasasDecimaisValor');
         $configuracoes->quantidadeCasasDecimaisQuantidade = $request->input('quantidadeCasasDecimaisQuantidade');
@@ -157,8 +158,8 @@ class ConfiguracaoController extends Controller
         $configuracoes->servidorSmtp = $request->input('servidorSmtp');
         $configuracoes->portaSmtp = $request->input('portaSmtp');
         // $configuracoes->emailSmtp = $request->input('emailSmtp');
+        $configuracoes->usuarioSmtp = $request->input('usuarioSmtp');
         $configuracoes->senhaSmtp = $request->input('senhaSmtp');
-        $configuracoes->conexaoSeguraSmtp = $request->input('conexaoSeguraSmtp');
         $configuracoes->quantidadeCasasDecimaisValor = $request->input('quantidadeCasasDecimaisValor');
         $configuracoes->quantidadeCasasDecimaisQuantidade = $request->input('quantidadeCasasDecimaisQuantidade');
         $configuracoes->registrosPorPagina = $request->input('registrosPorPagina');

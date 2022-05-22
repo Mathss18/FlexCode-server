@@ -33,11 +33,41 @@ class Controller extends BaseController
         $file = str_replace($replace, '', $file);
         $file = str_replace(' ', '+', $file);
 
-        $imageName = Str::kebab($fileName) . '.' . $extension;
-        $fileUploaded = Storage::put('public/' . session('tenant')->nome . '/' . $folderName . '/' . $imageName, base64_decode($file));
+        $fName = Str::kebab($fileName) . '.' . $extension;
+        $fileUploaded = Storage::put('public/' . session('tenant')->nome . '/' . $folderName . '/' . $fName, base64_decode($file));
 
         if ($fileUploaded) {
-            $url = config('app.url') . config('app.port') . '/' . "storage/" . session('tenant')->nome . '/' . $folderName . '/' . $imageName;
+            $url = config('app.url') . config('app.port') . '/' . "storage/" . session('tenant')->nome . '/' . $folderName . '/' . $fName;
+            return $url;
+        }
+        return $fileUploaded;
+    }
+
+    public function uploadXML($xml, $chave)
+    {
+        $mes = date('m');
+        $ano = date('Y');
+        // Storage::put('nfe' . '/' . $mes . '-' . $ano . '/' . $chave . '.xml', $resp['xml']);
+        $fName = $chave . '.xml';
+        $fileUploaded = Storage::put('public/' . session('tenant')->nome . '/' . 'nfe' . '/'.$mes.'-'.$ano.'/'. $fName, $xml);
+
+        if ($fileUploaded) {
+            $url = config('app.url') . config('app.port') . '/' . "storage/" . session('tenant')->nome . '/' . 'nfe' . '/'.$mes.'-'.$ano.'/'. $fName;
+            return $url;
+        }
+        return $fileUploaded;
+    }
+
+    public function uploadDANFE($pdf, $chave)
+    {
+        $mes = date('m');
+        $ano = date('Y');
+
+        $fName = $chave . '.pdf';
+        $fileUploaded = Storage::put('public/' . session('tenant')->nome . '/' . 'nfe' . '/'.$mes.'-'.$ano.'/'. $fName, $pdf);
+
+        if ($fileUploaded) {
+            $url = config('app.url') . config('app.port') . '/' . "storage/" . session('tenant')->nome . '/' . 'nfe' . '/'.$mes.'-'.$ano.'/'. $fName;
             return $url;
         }
         return $fileUploaded;

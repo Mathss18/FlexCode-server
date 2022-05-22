@@ -24,6 +24,7 @@ use App\Http\Controllers\FormaPagamentoController;
 use App\Http\Controllers\ContaBancariaController;
 use App\Http\Controllers\CompraController;
 use App\Http\Controllers\ConfiguracaoController;
+use App\Http\Controllers\DashBoardController;
 use App\Http\Controllers\EstoqueController;
 use App\Http\Controllers\NotaFiscalController;
 use App\Http\Controllers\OutrosFavorecidosController;
@@ -344,9 +345,17 @@ Route::middleware(['jwt', 'check.jwt.tenant'])->group(function () {
 
     Route::post('notas-fiscais', [NotaFiscalController::class, 'store']);
 
+    Route::post('notas-fiscais/inutilizar', [NotaFiscalController::class, 'inutilizar']);
+
+    Route::post('notas-fiscais/corrigir', [NotaFiscalController::class, 'corrigir']);
+
+    Route::post('notas-fiscais/cancelar', [NotaFiscalController::class, 'cancelar']);
+
     Route::put('notas-fiscais/{id}', [NotaFiscalController::class, 'update']);
 
     Route::delete('notas-fiscais/{id}', [NotaFiscalController::class, 'destroy']);
+
+    Route::post('notas-fiscais-email-nfe', [NotaFiscalController::class, 'sendEmailNfe']); // Email nfe
 
     //============================ CONFIGURACOES ==============================
     Route::get('configuracoes', [ConfiguracaoController::class, 'index']);
@@ -358,4 +367,8 @@ Route::middleware(['jwt', 'check.jwt.tenant'])->group(function () {
     Route::put('configuracoes/{id}', [ConfiguracaoController::class, 'update']);
 
     Route::delete('configuracoes/{id}', [ConfiguracaoController::class, 'destroy']);
+
+    //============================ CONFIGURACOES ==============================
+    Route::get('dashboards', [DashBoardController::class, 'index']);
+
 });
