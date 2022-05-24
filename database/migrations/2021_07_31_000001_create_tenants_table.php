@@ -23,6 +23,9 @@ class CreateTenantsTable extends Migration
             $table->string('db_database')->unique();
             $table->string('db_username');
             $table->string('db_password')->nullable();
+            $table->boolean('situacao')->default(false);
+            $table->string('vencimento')->nullable();
+            $table->string('pagamento')->nullable();
             $table->timestamps();
         });
     }

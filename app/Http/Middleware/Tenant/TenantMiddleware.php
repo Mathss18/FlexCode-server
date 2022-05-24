@@ -5,7 +5,7 @@ namespace App\Http\Middleware\Tenant;
 use App\Models\Configuracao;
 use Closure;
 use Illuminate\Http\Request;
-use App\Models\Tenant;
+use App\Models\Tenant\Tenant;
 use App\Tenant\ManagerTenant;
 
 class TenantMiddleware

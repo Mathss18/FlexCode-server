@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands\Tenant;
 
-use App\Models\Tenant;
+use App\Models\Tenant\Tenant;
 use App\Tenant\ManagerTenant;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;

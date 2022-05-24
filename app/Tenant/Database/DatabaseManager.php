@@ -2,7 +2,7 @@
 
 namespace App\Tenant\Database;
 
-use App\Models\Tenant;
+use App\Models\Tenant\Tenant;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
