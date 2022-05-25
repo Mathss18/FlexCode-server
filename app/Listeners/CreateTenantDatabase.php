@@ -32,13 +32,21 @@ class CreateTenantDatabase
     {
         $tenant = $event->getTenant();
 
-        if (!$this->databaseManager->createDatabase($tenant)) {
-            throw new Exception('Error creating database');
+        if(false){
+            $databaseCreated = $this->databaseManager->createRemoteDatabase($tenant);
+            if (!$databaseCreated) {
+                throw new Exception('Error creating remote database');
+            }
+        }
+        else{
+            $databaseCreated = $this->databaseManager->createDatabase($tenant);
+            if (!$databaseCreated) {
+                throw new Exception('Error creating database');
+            }
         }
 
         //run migrations
         event(new TenantMigrate($tenant));
-
 
     }
 }
