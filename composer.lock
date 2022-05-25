@@ -694,16 +694,16 @@
         },
         {
             "name": "guzzlehttp/guzzle",
-            "version": "7.4.2",
+            "version": "7.4.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/guzzle.git",
-                "reference": "ac1ec1cd9b5624694c3a40be801d94137afb12b4"
+                "reference": "74a8602c6faec9ef74b7a9391ac82c5e65b1cdab"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/ac1ec1cd9b5624694c3a40be801d94137afb12b4",
-                "reference": "ac1ec1cd9b5624694c3a40be801d94137afb12b4",
+                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/74a8602c6faec9ef74b7a9391ac82c5e65b1cdab",
+                "reference": "74a8602c6faec9ef74b7a9391ac82c5e65b1cdab",
                 "shasum": ""
             },
             "require": {
@@ -798,7 +798,7 @@
             ],
             "support": {
                 "issues": "https://github.com/guzzle/guzzle/issues",
-                "source": "https://github.com/guzzle/guzzle/tree/7.4.2"
+                "source": "https://github.com/guzzle/guzzle/tree/7.4.3"
             },
             "funding": [
                 {
@@ -814,7 +814,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-03-20T14:16:28+00:00"
+            "time": "2022-05-25T13:24:33+00:00"
         },
         {
             "name": "guzzlehttp/promises",
@@ -1087,16 +1087,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v8.83.12",
+            "version": "v8.83.14",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "2af2314989845db68dfbb65a54b8748ffaf26204"
+                "reference": "141cf126f1746c7264f59aa78c923a84eaab501e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/2af2314989845db68dfbb65a54b8748ffaf26204",
-                "reference": "2af2314989845db68dfbb65a54b8748ffaf26204",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/141cf126f1746c7264f59aa78c923a84eaab501e",
+                "reference": "141cf126f1746c7264f59aa78c923a84eaab501e",
                 "shasum": ""
             },
             "require": {
@@ -1256,20 +1256,20 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2022-05-10T13:57:07+00:00"
+            "time": "2022-05-24T14:04:02+00:00"
         },
         {
             "name": "laravel/serializable-closure",
-            "version": "v1.1.1",
+            "version": "v1.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/serializable-closure.git",
-                "reference": "9e4b005daa20b0c161f3845040046dc9ddc1d74e"
+                "reference": "09f0e9fb61829f628205b7c94906c28740ff9540"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/serializable-closure/zipball/9e4b005daa20b0c161f3845040046dc9ddc1d74e",
-                "reference": "9e4b005daa20b0c161f3845040046dc9ddc1d74e",
+                "url": "https://api.github.com/repos/laravel/serializable-closure/zipball/09f0e9fb61829f628205b7c94906c28740ff9540",
+                "reference": "09f0e9fb61829f628205b7c94906c28740ff9540",
                 "shasum": ""
             },
             "require": {
@@ -1315,7 +1315,7 @@
                 "issues": "https://github.com/laravel/serializable-closure/issues",
                 "source": "https://github.com/laravel/serializable-closure"
             },
-            "time": "2022-02-11T19:23:53+00:00"
+            "time": "2022-05-16T17:09:47+00:00"
         },
         {
             "name": "laravel/tinker",
@@ -2545,16 +2545,16 @@
         },
         {
             "name": "nfephp-org/sped-nfe",
-            "version": "v5.1.1",
+            "version": "v5.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nfephp-org/sped-nfe.git",
-                "reference": "70019b1db776f3da11dbe40d1158ef3d97e8b112"
+                "reference": "4e170cf4485cf797e1cb2d26cdc41df4e589255c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nfephp-org/sped-nfe/zipball/70019b1db776f3da11dbe40d1158ef3d97e8b112",
-                "reference": "70019b1db776f3da11dbe40d1158ef3d97e8b112",
+                "url": "https://api.github.com/repos/nfephp-org/sped-nfe/zipball/4e170cf4485cf797e1cb2d26cdc41df4e589255c",
+                "reference": "4e170cf4485cf797e1cb2d26cdc41df4e589255c",
                 "shasum": ""
             },
             "require": {
@@ -2621,9 +2621,9 @@
             ],
             "support": {
                 "issues": "https://github.com/nfephp-org/sped-nfe/issues",
-                "source": "https://github.com/nfephp-org/sped-nfe/tree/v5.1.1"
+                "source": "https://github.com/nfephp-org/sped-nfe/tree/v5.1.2"
             },
-            "time": "2022-03-14T15:04:20+00:00"
+            "time": "2022-05-20T12:10:16+00:00"
         },
         {
             "name": "nikic/php-parser",
@@ -6053,31 +6053,33 @@
         },
         {
             "name": "tecnickcom/tc-lib-barcode",
-            "version": "1.15.4",
+            "version": "1.17.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tecnickcom/tc-lib-barcode.git",
-                "reference": "34b0224f71ebfe83adcef9f14f3d81965fb55493"
+                "reference": "aca01b1be997404aa14e327f70ef51299423b6c6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tecnickcom/tc-lib-barcode/zipball/34b0224f71ebfe83adcef9f14f3d81965fb55493",
-                "reference": "34b0224f71ebfe83adcef9f14f3d81965fb55493",
+                "url": "https://api.github.com/repos/tecnickcom/tc-lib-barcode/zipball/aca01b1be997404aa14e327f70ef51299423b6c6",
+                "reference": "aca01b1be997404aa14e327f70ef51299423b6c6",
                 "shasum": ""
             },
             "require": {
+                "ext-bcmath": "*",
+                "ext-date": "*",
+                "ext-gd": "*",
+                "ext-pcre": "*",
                 "php": ">=5.4",
-                "tecnickcom/tc-lib-color": "^1.12.1"
+                "tecnickcom/tc-lib-color": "^1.14"
             },
             "require-dev": {
-                "apigen/apigen": "^4.1.2",
-                "bartlett/php-compatinfo": "^5.0.0",
-                "pdepend/pdepend": "^2.2.2",
-                "phploc/phploc": "^2.1.5|^3.0.0",
-                "phpmd/phpmd": "^2.3.2",
-                "phpunit/phpunit": "4.8.19|^5.0.0",
-                "sebastian/phpcpd": "^2.0.2",
-                "squizlabs/php_codesniffer": "^2.5.0|^3.0.0"
+                "pdepend/pdepend": "2.10.2",
+                "phploc/phploc": "7.0.2 || 6.0.2 || 5.0.0 || 4.0.1 || 3.0.1 || 2.1.5",
+                "phpmd/phpmd": "2.11.1",
+                "phpunit/phpunit": "9.5.11 || 8.5.13 || 7.5.20 || 6.5.14 || 5.7.27 || 4.8.36",
+                "sebastian/phpcpd": "6.0.3 || 5.0.2 || 4.1.0 || 3.0.1 || 2.0.4",
+                "squizlabs/php_codesniffer": "3.6.2 || 2.9.2"
             },
             "type": "library",
             "autoload": {
@@ -6137,9 +6139,15 @@
             ],
             "support": {
                 "issues": "https://github.com/tecnickcom/tc-lib-barcode/issues",
-                "source": "https://github.com/tecnickcom/tc-lib-barcode/tree/master"
+                "source": "https://github.com/tecnickcom/tc-lib-barcode/tree/1.17.11"
             },
-            "time": "2016-11-17T18:13:54+00:00"
+            "funding": [
+                {
+                    "url": "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&currency_code=GBP&business=paypal@tecnick.com&item_name=donation%20for%20tc-lib-barcode%20project",
+                    "type": "custom"
+                }
+            ],
+            "time": "2021-12-31T09:42:39+00:00"
         },
         {
             "name": "tecnickcom/tc-lib-color",
@@ -7022,16 +7030,16 @@
         },
         {
             "name": "laravel/sail",
-            "version": "v1.14.4",
+            "version": "v1.14.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/sail.git",
-                "reference": "0e0e51f19c758c79acbda11e3870641fbad5b7d9"
+                "reference": "c049316f9bcb02598607307f18b514b66202b639"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/sail/zipball/0e0e51f19c758c79acbda11e3870641fbad5b7d9",
-                "reference": "0e0e51f19c758c79acbda11e3870641fbad5b7d9",
+                "url": "https://api.github.com/repos/laravel/sail/zipball/c049316f9bcb02598607307f18b514b66202b639",
+                "reference": "c049316f9bcb02598607307f18b514b66202b639",
                 "shasum": ""
             },
             "require": {
@@ -7078,7 +7086,7 @@
                 "issues": "https://github.com/laravel/sail/issues",
                 "source": "https://github.com/laravel/sail"
             },
-            "time": "2022-05-12T12:53:10+00:00"
+            "time": "2022-05-21T17:14:14+00:00"
         },
         {
             "name": "mockery/mockery",

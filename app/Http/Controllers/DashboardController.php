@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\DB;
 
 
 // Essa controller é utilizada UNICA E EXCLUSIVAMENTE para retornar os dados de dashboards do sistema
-class DashBoardController extends Controller
+class DashboardController extends Controller
 {
     public function index()
     {
