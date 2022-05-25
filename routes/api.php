@@ -24,7 +24,7 @@ use App\Http\Controllers\FormaPagamentoController;
 use App\Http\Controllers\ContaBancariaController;
 use App\Http\Controllers\CompraController;
 use App\Http\Controllers\ConfiguracaoController;
-use App\Http\Controllers\DashBoardController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EstoqueController;
 use App\Http\Controllers\NotaFiscalController;
 use App\Http\Controllers\OutrosFavorecidosController;
@@ -369,6 +369,6 @@ Route::middleware(['jwt', 'check.jwt.tenant'])->group(function () {
     Route::delete('configuracoes/{id}', [ConfiguracaoController::class, 'destroy']);
 
     //============================ CONFIGURACOES ==============================
-    Route::get('dashboards', [DashBoardController::class, 'index']);
+    Route::get('dashboards', [DashboardController::class, 'index']);
 
 });
