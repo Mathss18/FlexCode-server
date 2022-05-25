@@ -175,6 +175,7 @@ class ProdutoController extends Controller
 
         }
 
+        $produto->save();
         DB::commit();
         $response = APIHelper::APIResponse(true, 200, "Produto cadastrado com sucesso", $produto);
         return response()->json($response, 200);

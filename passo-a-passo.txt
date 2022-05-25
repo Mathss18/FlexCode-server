@@ -3,3 +3,8 @@
 - php artinsan key:generate
 - generate jwt key
 - php artisan vendor:publish --tag=laravel-mail (Para poder editar template do email)
+
+ssh:
+ssh -p 22 root@162.240.74.248 -> VHM
+ssh allmac88@162.240.74.248 -> Cpanel
+
