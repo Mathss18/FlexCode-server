@@ -7,4 +7,5 @@
 ssh:
 ssh -p 22 root@162.240.74.248 -> VHM
 ssh allmac88@162.240.74.248 -> Cpanel
+dar ALL PRIVILEGES para usuario no banco se necessario
 
