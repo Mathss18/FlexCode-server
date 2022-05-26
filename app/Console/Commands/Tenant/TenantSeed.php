@@ -48,7 +48,7 @@ class TenantSeed extends Command
             try{
                 $tenant = Tenant::findOrFail($this->argument('id'));
                 $this->managerTenant->setConnection($tenant);
-                $this->runMigration($tenant);
+                $this->runSeed($tenant);
             }catch (\Exception $e){
                 $this->error($e->getMessage());
             }
@@ -56,14 +56,14 @@ class TenantSeed extends Command
         else{
             $tenants = Tenant::all();
             foreach ($tenants as $tenant) {
-                $this->runMigration($tenant);
+                $this->runSeed($tenant);
             }
         }
 
 
     }
 
-    public function runMigration(Tenant $tenant)
+    public function runSeed(Tenant $tenant)
     {
         $this->managerTenant->setConnection($tenant);
 
