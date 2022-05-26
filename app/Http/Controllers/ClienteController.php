@@ -56,7 +56,6 @@ class ClienteController extends Controller
         $cliente->celular = $request->input('celular');
         $cliente->codigoMunicipio = $request->input('codigoMunicipio');
 
-
         try {
             $cliente->save();
             $response = APIHelper::APIResponse(true, 200, 'Sucesso ao cadastrar o cliente', $cliente);

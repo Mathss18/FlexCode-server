@@ -64,7 +64,6 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'jwt' => \App\Http\Middleware\ApiJwtRoutes::class,
-        'check.main.doamin' => \App\Http\Middleware\Tenant\CheckMainDomain::class,
         'check.jwt.tenant' => \App\Http\Middleware\Tenant\CheckJwtTenant::class,
     ];
 }

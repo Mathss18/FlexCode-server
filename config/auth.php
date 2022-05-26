@@ -46,6 +46,12 @@ return [
             'provider' => 'jwtauth',
             'hash' => false,
         ],
+
+        'tenants' => [
+            'driver' => 'jwt',
+            'provider' => 'jwtauth',
+            'hash' => false,
+        ],
     ],
 
     /*

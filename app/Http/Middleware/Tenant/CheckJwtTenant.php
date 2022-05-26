@@ -22,7 +22,7 @@ class CheckJwtTenant
         if ($payload->get('tenant') == session('tenant')->nome) {
             return $next($request);
         } else {
-            abort(401, 'Unauthorized');
+            abort(401, '[Wrong JWT] Unauthorized');
         }
     }
 }

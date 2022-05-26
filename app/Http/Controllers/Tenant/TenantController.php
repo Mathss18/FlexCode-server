@@ -14,14 +14,26 @@ class TenantController extends Controller
 {
     public function index()
     {
-        $tenants = Tenant::all();
-        return response()->json($tenants, 200);
+        try {
+            $tenants = Tenant::orderBy('id', 'desc')->get();
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso', $tenants);
+            return response()->json($response, 200);
+        } catch (Exception  $ex) {
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+            return response()->json($response, 500);
+        }
     }
 
     public function show($id)
     {
-        $tenants = Tenant::findOrFail($id);
-        return response()->json($tenants, 200);
+        try {
+            $tenants = Tenant::findOrFail($id);
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso', $tenants);
+            return response()->json($response, 200);
+        } catch (Exception  $ex) {
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+            return response()->json($response, 500);
+        }
     }
 
     public function store(Request $request)
@@ -69,14 +81,20 @@ class TenantController extends Controller
         $tenants->situacao = $request->input('situacao');
         $tenants->vencimento = $request->input('vencimento');
         $tenants->pagamento = $request->input('pagamento');
-        $tenants->save();
-        return response()->json($tenants, 200);
+
+        try {
+            $tenants->save();
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso ao editar o tenant', $tenants);
+            return response()->json($response, 200);
+        } catch (Exception  $ex) {
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+            return response()->json($response, 500);
+        }
     }
 
     public function destroy($id)
     {
-        $tenants = Tenant::findOrFail($id);
-        $tenants->delete();
-        return response()->json($tenants, 200);
+        $response = APIHelper::APIResponse(true, 405, 'Metodo não permitido', null);
+        return response()->json($response, 405);
     }
 }
