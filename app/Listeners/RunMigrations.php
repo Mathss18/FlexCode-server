@@ -37,10 +37,10 @@ class RunMigrations
             throw new Exception('Error running migrations');
         }
 
-        // $resp2 = Artisan::call('db:seed'); <- Deu erro em servidor remoto
-        $resp2 = Artisan::call('tenants:seed', [
-            'id' => $tenant->id,
-        ]);
+        $resp2 = Artisan::call('db:seed');
+        // $resp2 = Artisan::call('tenants:seed', [
+        //     'id' => $tenant->id,
+        // ]);
 
         if ($resp2 !== 0) {
             throw new Exception('Error running seeders');
