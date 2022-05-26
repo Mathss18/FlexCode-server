@@ -22,7 +22,7 @@ class TenantMiddleware
         // return response()->json($request->getHost(),500);
         $manager = app(ManagerTenant::class);
 
-        if ($manager->isMainDomain()) {
+        if ($manager->isAdmDomain()) {
             return $next($request);
         }
 

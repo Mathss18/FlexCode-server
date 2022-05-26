@@ -32,7 +32,7 @@ class ManagerTenant{
         config()->set('mail.from.name', session('tenant')->nome);
     }
 
-    public function isMainDomain(){
-        return request()->getHost() == config('tenant.main_domain');
+    public function isAdmDomain(){
+        return request()->getHost() == config('tenant.adm_domain');
     }
 }

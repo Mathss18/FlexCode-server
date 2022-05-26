@@ -21,8 +21,8 @@ class DatabaseManager
         return $resp;
     }
 
-    public function isMainDomain()
+    public function isAdmDomain()
     {
-        return request()->getHost() == config('tenant.main_domain');
+        return request()->getHost() == config('tenant.adm_domain');
     }
 }
