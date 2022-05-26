@@ -33,7 +33,7 @@ class TenantMiddleware
             return response()->json(['error' => '[Middleware] Cliente não encontrado'], 404);
         } else {
             if($tenant->situacao == false){
-                return response()->json(['error' => '[Middleware] Cliente Inativo'], 403);
+                return response()->json(['error' => '[Middleware] Cliente Inativo'], 401);
             }
             $manager->setConnection($tenant);
             $this->setSession('tenant', $tenant);
