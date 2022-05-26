@@ -19,7 +19,8 @@ class TenantMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        dd(config('tenant.adm_domain'));
+        // dd(response()->json($request->getHost(),500));
+        // dd(config('tenant.adm_domain'));
         $manager = app(ManagerTenant::class);
 
         if ($manager->isAdmDomain()) {
