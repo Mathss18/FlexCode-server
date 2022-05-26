@@ -37,7 +37,7 @@ class RunMigrations
             throw new Exception('Error running migrations');
         }
 
-        $resp2 = Artisan::call('db:seed');
+        $resp2 = Artisan::call('db:seed', ['--force' => true]);
         // $resp2 = Artisan::call('tenants:seed', [
         //     'id' => $tenant->id,
         // ]);
