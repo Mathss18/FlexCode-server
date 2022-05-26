@@ -30,8 +30,11 @@ class TenantMiddleware
         $tenant = $this->getTenant($request->getHost());
 
         if (!$tenant) {
-            return response()->json(['error' => '[Middleware] Tenant not found'], 404);
+            return response()->json(['error' => '[Middleware] Cliente não encontrado'], 404);
         } else {
+            if($tenant->situacao == false){
+                return response()->json(['error' => '[Middleware] Cliente Inativo'], 404);
+            }
             $manager->setConnection($tenant);
             $this->setSession('tenant', $tenant);
 
