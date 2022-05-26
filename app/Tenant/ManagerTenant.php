@@ -33,6 +33,7 @@ class ManagerTenant{
     }
 
     public function isAdmDomain(){
+        return response(config('tenant.adm_domain'),500);
         return request()->getHost() == config('tenant.adm_domain');
     }
 }
