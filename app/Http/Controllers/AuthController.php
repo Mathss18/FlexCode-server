@@ -14,18 +14,14 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $email = $request->input('email');
-        $senha = $request->input('senha');
+        $credentials = $request->only(['email', 'senha']);
 
-        $user = Usuario::where('email', '=', $email)->first();
-        if (!$user) {
+        if (!auth('api')->attempt($credentials)) {
             $response = APIHelper::APIResponse(false, 403, 'Unauthorized');
             return response()->json($response, 403);
         }
-        if (!Hash::check($senha, $user->senha)) {
-            $response = APIHelper::APIResponse(false, 403, 'Unauthorized');
-            return response()->json($response, 403);
-        }
+
+        $user = Usuario::where('email', $request->input('email'))->where('senha', $request->input('senha'))->first();
 
         $payload = JWTFactory::sub($user->id)
             ->tenant(session('tenant')->nome)
