@@ -5,8 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Funcionario;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use App\Helpers\APIHelper;
 use Exception;
 
@@ -82,7 +80,7 @@ class FuncionarioController extends Controller
             $usuario = new Usuario;
             $usuario->nome = $request->input('nome');
             $usuario->email = $request->input('email');
-            $usuario->senha = $request->input('senha');
+            $usuario->senha = Hash::make($request->input('senha'));
             $usuario->situacao = 1;
 
             //Verifica se o usuario foi salvo com sucesso e então atribui o usuario_id ao funcionario
@@ -144,12 +142,12 @@ class FuncionarioController extends Controller
             $usuario = new Usuario;
             $usuario->nome = $request->input('nome');
             $usuario->email = $request->input('email');
-            $usuario->senha = $request->input('senha');
+            $usuario->senha = Hash::make($request->input('senha'));
             $usuario->situacao = $request->input('situacao');
         } else {
             //Se sim, atualiza o usuario existente
             $usuario->email = $request->input('email');
-            $usuario->senha =  $request->input('senha') != null ? $request->input('senha') : $usuario->senha;
+            $usuario->senha =  $request->input('senha') != null ? Hash::make($request->input('senha')) : $usuario->senha;
         }
 
         // Verifica se o usuario foi salvo com sucesso e então atribui o usuario_id ao funcionario
