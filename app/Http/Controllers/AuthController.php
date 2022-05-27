@@ -17,7 +17,7 @@ class AuthController extends Controller
         $email = $request->input('email');
         $senha = $request->input('senha');
 
-        $user = Usuario::where('email', '=', $email)->first();
+        $user = Usuario::where('email', '=', $email)->where('situacao', 1)->first();
         if (!$user) {
             $response = APIHelper::APIResponse(false, 403, 'Unauthorized');
             return response()->json($response, 403);

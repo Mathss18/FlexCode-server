@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Usuario;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\Hash;
 
 class UsuarioFactory extends Factory
 {
@@ -24,7 +25,7 @@ class UsuarioFactory extends Factory
         return [
             'nome' =>  'Admin Teste',//$this->faker->name(),
             'email' => 'a@a.com', //$this->faker->unique()->safeEmail(),
-            'senha' => '1234',
+            'senha' => Hash::make('1234'),
             'situacao' => 1 // 1 -> ativo, 2 -> inativo
         ];
     }

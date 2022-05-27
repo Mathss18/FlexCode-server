@@ -7,6 +7,7 @@ use App\Http\Resources\Json;
 use App\Models\Usuario;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class UsuarioController extends Controller
 {
@@ -40,7 +41,7 @@ class UsuarioController extends Controller
         $usuarios = new Usuario;
         $usuarios->nome = $request->input('nome');
         $usuarios->email = $request->input('email');
-        $usuarios->senha = $request->input('senha');
+        $usuarios->senha = Hash::make($request->input('senha'));
 
         try {
             $usuarios->save();
@@ -57,7 +58,7 @@ class UsuarioController extends Controller
         $usuarios = Usuario::findOrFail($request->id);
         $usuarios->nome = $request->input('nome');
         $usuarios->email = $request->input('email');
-        $usuarios->senha = $request->input('senha');
+        $usuarios->senha = Hash::make($request->input('senha')) ?? $usuarios->senha;
 
         try {
             $usuarios->save();

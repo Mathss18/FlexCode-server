@@ -8,7 +8,6 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use App\Models\Message;
-use Illuminate\Support\Facades\Hash;
 
 class Usuario extends Authenticatable implements JWTSubject
 {
@@ -56,10 +55,6 @@ class Usuario extends Authenticatable implements JWTSubject
     public function getAuthPassword()
     {
         return $this->senha;
-    }
-
-    public function setSenhaAtribbute($senha){
-        $this->attributes['senha'] = Hash::make($senha);
     }
 
     public function messages()
