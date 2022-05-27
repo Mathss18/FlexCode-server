@@ -7,6 +7,7 @@ use App\Models\Usuario;
 use Illuminate\Http\Request;
 use App\Helpers\APIHelper;
 use Exception;
+use Illuminate\Support\Facades\Hash;
 
 class FuncionarioController extends Controller
 {
