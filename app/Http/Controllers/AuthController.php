@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Helpers\APIHelper;
 use App\Models\Usuario;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Facades\JWTFactory;
 
