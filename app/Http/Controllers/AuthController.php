@@ -6,7 +6,6 @@ use App\Helpers\APIHelper;
 use App\Models\Usuario;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Facades\JWTFactory;
 
@@ -34,7 +33,7 @@ class AuthController extends Controller
 
         $token = JWTAuth::encode($payload)->get();
 
-        return $this->respondWithToken($token);
+        return $this->respondWithToken($token, $user);
     }
 
     public function me()
@@ -59,10 +58,10 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function refresh()
-    {
-        return $this->respondWithToken(auth('api')->refresh());
-    }
+    // public function refresh()
+    // {
+    //     return $this->respondWithToken(auth('api')->refresh());
+    // }
 
     /**
      * Get the token array structure.
@@ -71,10 +70,8 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function respondWithToken($token)
+    protected function respondWithToken($token, $userLoggedInfo)
     {
-        $userLoggedInfo = auth('api')->user()->getAttributes(); // pega o usuario logado
-        $userLoggedInfo = (object) $userLoggedInfo; // transforma em objeto
         unset($userLoggedInfo->senha); // remove a senha do objeto para retornar
 
         return response()->json([
