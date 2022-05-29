@@ -28,6 +28,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EstoqueController;
 use App\Http\Controllers\NotaFiscalController;
 use App\Http\Controllers\OutrosFavorecidosController;
+use App\Http\Controllers\RelatorioController;
 use App\Http\Controllers\TransacaoController;
 use App\Http\Controllers\VendaController;
 
@@ -368,7 +369,11 @@ Route::middleware(['jwt', 'check.jwt.tenant'])->group(function () {
 
     Route::delete('configuracoes/{id}', [ConfiguracaoController::class, 'destroy']);
 
-    //============================ CONFIGURACOES ==============================
+    //============================ DASHBOARDS ==============================
     Route::get('dashboards', [DashboardController::class, 'index']);
+
+    //============================ RELATORIOS ==============================
+    Route::get('relatorios/rendimentos-vs-despesas', [RelatorioController::class, 'rendimentosVsDespesas']);
+    Route::get('relatorios/patrimonio-ao-longo-do-tempo', [RelatorioController::class, 'patrimonioAoLongoDoTempo']);
 
 });
