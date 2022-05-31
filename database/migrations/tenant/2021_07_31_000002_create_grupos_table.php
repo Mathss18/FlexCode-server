@@ -28,12 +28,8 @@ class CreateGruposTable extends Migration
             $table->string('horaInicio');
             $table->string('horaFim');
 
-            $table->string('clientes');
-            $table->string('fornecedores');
-            $table->string('grupos');
-            $table->string('transportadoras');
-            $table->string('usuarios');
-            $table->string('funcionarios');
+            $table->json('acessos');
+
             $table->timestamps();
         });
     }

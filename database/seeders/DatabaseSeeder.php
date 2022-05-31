@@ -24,11 +24,11 @@ class DatabaseSeeder extends Seeder
     {
         Configuracao::factory(1)->create();
         Usuario::factory(1)->create();
+        Grupo::factory(1)->create();
+        Funcionario::factory(1)->create();
         Cliente::factory(20)->create();
         Fornecedor::factory(20)->create();
         Transportadora::factory(20)->create();
-        Grupo::factory(1)->create();
-        Funcionario::factory(5)->create();
         UnidadeProduto::factory(1)->create();
         PorcentagemLucro::factory(1)->create();
     }

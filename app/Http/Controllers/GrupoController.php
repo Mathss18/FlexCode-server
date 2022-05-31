@@ -50,12 +50,7 @@ class GrupoController extends Controller
         $grupo->horaInicio = $request->input('horaInicio');
         $grupo->horaFim = $request->input('horaFim');
 
-        $grupo->clientes = $request->input('clientes');
-        $grupo->fornecedores = $request->input('fornecedores');
-        $grupo->grupos = $request->input('grupos');
-        $grupo->transportadoras = $request->input('transportadoras');
-        $grupo->usuarios = $request->input('usuarios');
-        $grupo->funcionarios = $request->input('funcionarios');
+        $grupo->acessos = $request->input('acessos');
 
         try {
             $grupo->save();
@@ -83,12 +78,7 @@ class GrupoController extends Controller
         $grupo->horaInicio = $request->input('horaInicio');
         $grupo->horaFim = $request->input('horaFim');
 
-        $grupo->clientes = $request->input('clientes');
-        $grupo->fornecedores = $request->input('fornecedores');
-        $grupo->grupos = $request->input('grupos');
-        $grupo->transportadoras = $request->input('transportadoras');
-        $grupo->usuarios = $request->input('usuarios');
-        $grupo->funcionarios = $request->input('funcionarios');
+        $grupo->acessos = $request->input('acessos');
 
         try {
             $grupo->save();

@@ -23,13 +23,13 @@ class ManagerTenant{
     }
 
     public function setSmtp(){
-        config()->set('mail.mailers.tenant.host', session('config')->servidorSmtp);
-        config()->set('mail.mailers.tenant.port', session('config')->portaSmtp);
-        config()->set('mail.mailers.tenant.username', session('config')->usuarioSmtp);
-        config()->set('mail.mailers.tenant.password', session('config')->senhaSmtp);
+        config()->set('mail.mailers.tenant.host', session('config')->servidorSmtp ?? null);
+        config()->set('mail.mailers.tenant.port', session('config')->portaSmtp ?? null);
+        config()->set('mail.mailers.tenant.username', session('config')->usuarioSmtp ?? null);
+        config()->set('mail.mailers.tenant.password', session('config')->senhaSmtp ?? null);
 
-        config()->set('mail.from.address', session('config')->email);
-        config()->set('mail.from.name', session('tenant')->nome);
+        config()->set('mail.from.address', session('config')->email ?? null);
+        config()->set('mail.from.name', session('tenant')->nome ?? null);
     }
 
     public function isAdmDomain(){

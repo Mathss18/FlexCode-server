@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\APIHelper;
+use App\Models\Funcionario;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -18,6 +19,7 @@ class AuthController extends Controller
         $senha = $request->input('senha');
 
         $user = Usuario::where('email', '=', $email)->where('situacao', 1)->first();
+
         if (!$user) {
             $response = APIHelper::APIResponse(false, 403, 'Unauthorized');
             return response()->json($response, 403);
@@ -73,10 +75,20 @@ class AuthController extends Controller
     protected function respondWithToken($token, $userLoggedInfo)
     {
         unset($userLoggedInfo->senha); // remove a senha do objeto para retornar
+        try {
+            $funcionario = Funcionario::with(['grupo', 'usuario'])->where('usuario_id', '=', $userLoggedInfo->id)->first();
+            $grupo = $funcionario->grupo->getAttributes();
+            $foto = $funcionario->foto;
+        } catch (\Throwable $th) {
+            $grupo = null;
+            $foto = null;
+        }
 
         return response()->json([
             'access_token' => $token,
             'config' => session('config')->getAttributes(),
+            'grupo' => $grupo,
+            'foto' => $foto,
             'token_type' => 'bearer',
             'expires_in' => auth('api')->factory()->getTTL() * 60,
             'user' => $userLoggedInfo

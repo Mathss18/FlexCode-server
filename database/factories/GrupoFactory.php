@@ -24,22 +24,17 @@ class GrupoFactory extends Factory
     {
 
         return [
-                "nome" => "Admministrador",
-                "domingo" => 1,
-                "segunda" => 1,
-                "terca" => 1,
-                "quarta" => 1,
-                "quinta" => 1,
-                "sexta" => 1,
-                "sabado" => 1,
-                "horaInicio" => "07:00:00",
-                "horaFim" => "17:00:00",
-                "clientes" => "1.1.1.1",
-                "fornecedores" => "1.1.1.1",
-                "grupos" => "1.1.1.1",
-                "transportadoras" => "1.1.1.1",
-                "usuarios" => "1.1.1.1",
-                "funcionarios" => "1.1.1.1"
+            "nome" => "Administrador",
+            "domingo" => 1,
+            "segunda" => 1,
+            "terca" => 1,
+            "quarta" => 1,
+            "quinta" => 1,
+            "sexta" => 1,
+            "sabado" => 1,
+            "horaInicio" => "00:00:00",
+            "horaFim" => "23:55:00",
+            "acessos" => '[{"path":"/","situacao":true},{"path":"/ordens-servicos-funcionarios","situacao":true},{"path":"/clientes","situacao":true},{"path":"/fornecedores","situacao":true},{"path":"/transportadoras","situacao":true},{"path":"/funcionarios","situacao":true},{"path":"/grupos","situacao":true},{"path":"/produtos","situacao":true},{"path":"/grupos-produtos","situacao":true},{"path":"/unidades-produtos","situacao":true},{"path":"/porcentagens-lucros","situacao":true},{"path":"/servicos","situacao":true},{"path":"/money","situacao":true},{"path":"/contas-bancarias","situacao":true},{"path":"/compras","situacao":true},{"path":"/vendas","situacao":true},{"path":"/orcamentos","situacao":true},{"path":"/ordens-servicos","situacao":true},{"path":"/formas-pagamentos","situacao":true},{"path":"/notas-fiscais","situacao":true},{"path":"/estoques","situacao":true},{"path":"/relatorios","situacao":true}]',
         ];
     }
 }

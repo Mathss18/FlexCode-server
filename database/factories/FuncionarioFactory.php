@@ -24,24 +24,25 @@ class FuncionarioFactory extends Factory
     {
 
         return [
-            "situacao" => $this->faker->randomElement([1, 0]),
-            "nome" => $this->faker->name(),
-            "cpf" => $this->faker->numerify('###########'),
-            "rg" => $this->faker->numerify('#########'),
-            "dataNascimento" => $this->faker->date($format = 'Y-m-d', $max = 'now'),
-            "sexo" => $this->faker->randomElement(['masculino', 'feminino']),
-            "comissao" => $this->faker->randomFloat(2, 0, 100),
-            "email" => $this->faker->email(),
-            "foto" => $this->faker->imageUrl(640, 480, 'animals', true),
-            "rua" => $this->faker->word(),
-            "cidade" => $this->faker->word(),
-            "numero" => $this->faker->numberBetween($min = 0, $max = 100),
-            "cep" => $this->faker->numerify('########'),
-            "bairro" => $this->faker->word(),
-            "estado" => $this->faker->randomElement(['SP', 'RJ', 'ES', 'MG']),
-            "telefone" => $this->faker->numerify('##########'),
-            "celular" => $this->faker->numerify('##########'),
-            "grupo_id" => 1
+            "situacao" => 1,
+            "nome" => 'Administrador',
+            // "cpf" => $this->faker->numerify('###########'),
+            // "rg" => $this->faker->numerify('#########'),
+            // "dataNascimento" => $this->faker->date($format = 'Y-m-d', $max = 'now'),
+            "sexo" => 'masculino',
+            "comissao" => 0,//$this->faker->randomFloat(2, 0, 100),
+            // "email" => $this->faker->email(),
+            // "foto" => $this->faker->imageUrl(640, 480, 'animals', true),
+            // "rua" => $this->faker->word(),
+            // "cidade" => $this->faker->word(),
+            // "numero" => $this->faker->numberBetween($min = 0, $max = 100),
+            // "cep" => $this->faker->numerify('########'),
+            // "bairro" => $this->faker->word(),
+            // "estado" => $this->faker->randomElement(['SP', 'RJ', 'ES', 'MG']),
+            // "telefone" => $this->faker->numerify('##########'),
+            // "celular" => $this->faker->numerify('##########'),
+            "grupo_id" => 1,
+            "usuario_id" => 1
         ];
     }
 }
