@@ -342,19 +342,22 @@ class NfeService
         $nfe->tagtransp($transp);
 
         //====================TAG TRANSPORTADORA===================
-        $transpo = new stdClass();
-        $transpo->xNome = $transportadora->nome;
-        $transpo->IE = $transportadora->inscricaoEstadual;
-        $transpo->xEnder = $this->tirarAcentos($transportadora->rua);
-        $transpo->xMun = $transportadora->cidade;
-        $transpo->UF = $transportadora->estado;
-        if (strlen($transportadora->cpfCnpj) == 14) {
-            $transpo->CNPJ = $transportadora->cpfCnpj;
-        } else {
-            $transpo->CPF = $transportadora->cpfCnpj;
+        if ($transportadora) {
+            $transpo = new stdClass();
+            $transpo->xNome = $transportadora->nome;
+            $transpo->IE = $transportadora->inscricaoEstadual;
+            $transpo->xEnder = $this->tirarAcentos($transportadora->rua);
+            $transpo->xMun = $transportadora->cidade;
+            $transpo->UF = $transportadora->estado;
+            if (strlen($transportadora->cpfCnpj) == 14) {
+                $transpo->CNPJ = $transportadora->cpfCnpj;
+            } else {
+                $transpo->CPF = $transportadora->cpfCnpj;
+            }
+
+            $nfe->tagtransporta($transpo);
         }
 
-        $nfe->tagtransporta($transpo);
 
         //====================TAG VOLUME===================
         $vol = new stdClass();
@@ -414,8 +417,7 @@ class NfeService
         $stdInfo = new stdClass();
         if (array_key_exists("infAdFisco", $dados)) {
             $stdInfo->infAdFisco = $dados['infAdFisco'] . " --- DOCUMENTO EMITIDO POR ME OU EPP OPTANTE PELO SIMPLES NACIONAL, CONFORME LEI COMPLEMENTAR 123/2006 II - NAO GERA DIREITO A CREDITO FISCAL DE IPI. III - PERMITE O APROVEITAMENTO DO CREDITO DE ICMS NO VALOR DE R$ " . $icms->vCredICMSSN . " CORRESPONDENTE A ALIQUOTA DE " . $aliquota . ", NOS TERMOS DO ART. 23 DA LC 123/2006";
-        }
-        else{
+        } else {
             $stdInfo->infAdFisco = " --- DOCUMENTO EMITIDO POR ME OU EPP OPTANTE PELO SIMPLES NACIONAL, CONFORME LEI COMPLEMENTAR 123/2006 II - NAO GERA DIREITO A CREDITO FISCAL DE IPI. III - PERMITE O APROVEITAMENTO DO CREDITO DE ICMS NO VALOR DE R$ " . $icms->vCredICMSSN . " CORRESPONDENTE A ALIQUOTA DE " . $aliquota . ", NOS TERMOS DO ART. 23 DA LC 123/2006";
         }
 
@@ -763,7 +765,8 @@ class NfeService
         }
     }
 
-    function getLogo(){
+    function getLogo()
+    {
         $logo = '';
         if (Storage::disk('local')->exists("public/" . session('tenant')->nome . "/configuracoes/logo/logo.png")) {
             $logoPath = Storage::disk('local')->path("public/" . session('tenant')->nome . "/configuracoes/logo/logo.png");

@@ -86,6 +86,9 @@ class NotaFiscalController extends Controller
             if ($request->input('transportadora_id')) {
                 $transportadora = Transportadora::findOrFail($request->input('transportadora_id')['value']);
             }
+            else{
+                $transportadora = null;
+            }
 
             $aliquota = session('config')->aliquota ?? 0.00; // TODO: Pegar do banco de dados
 
