@@ -27,7 +27,7 @@ class ManagerTenant{
         config()->set('mail.mailers.smtp.port', 465);
         config()->set('mail.mailers.smtp.username', 'flexmol@flexmol.com.br');
         config()->set('mail.mailers.smtp.password', 'buflex20200');
-        config()->set('mail.mailers.smtp.encryption', 'tls');
+        config()->set('mail.mailers.smtp.encryption', '');
 
         config()->set('mail.from.address', 'flexmol@flexmol.com.br');
         config()->set('mail.from.name', session('tenant')->nome ?? null);
