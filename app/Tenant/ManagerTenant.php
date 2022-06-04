@@ -28,7 +28,7 @@ class ManagerTenant{
         config()->set('mail.mailers.tenant.port', session('config')->portaSmtp);
         config()->set('mail.mailers.tenant.username', session('config')->usuarioSmtp);
         config()->set('mail.mailers.tenant.password', session('config')->senhaSmtp);
-        config()->set('mail.mailers.tenant.encryption', 'tls');
+        config()->set('mail.mailers.tenant.encryption', '');
 
 
         config()->set('mail.from.address', session('config')->email);
