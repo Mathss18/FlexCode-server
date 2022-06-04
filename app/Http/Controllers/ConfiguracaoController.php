@@ -69,6 +69,7 @@ class ConfiguracaoController extends Controller
         $configuracoes->proxyPass = $request->input('proxyPass');
         $configuracoes->servidorSmtp = $request->input('servidorSmtp');
         $configuracoes->portaSmtp = $request->input('portaSmtp');
+        $configuracoes->encryptionSmtp = $request->input('encryptionSmtp');
         // $configuracoes->emailSmtp = $request->input('emailSmtp');
         $configuracoes->usuarioSmtp = $request->input('usuarioSmtp');
         $configuracoes->senhaSmtp = $request->input('senhaSmtp');
@@ -157,6 +158,7 @@ class ConfiguracaoController extends Controller
         $configuracoes->proxyPass = $request->input('proxyPass');
         $configuracoes->servidorSmtp = $request->input('servidorSmtp');
         $configuracoes->portaSmtp = $request->input('portaSmtp');
+        $configuracoes->encryptionSmtp = $request->input('encryptionSmtp');
         // $configuracoes->emailSmtp = $request->input('emailSmtp');
         $configuracoes->usuarioSmtp = $request->input('usuarioSmtp');
         $configuracoes->senhaSmtp = $request->input('senhaSmtp');

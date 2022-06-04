@@ -23,16 +23,15 @@ class ManagerTenant{
     }
 
     public function setSmtp(){
-        // dd(session('config'));
         config()->set('mail.mailers.tenant.host', session('config')->servidorSmtp);
         config()->set('mail.mailers.tenant.port', session('config')->portaSmtp);
         config()->set('mail.mailers.tenant.username', session('config')->usuarioSmtp);
         config()->set('mail.mailers.tenant.password', session('config')->senhaSmtp);
-        // config()->set('mail.mailers.tenant.encryption', '');
+        config()->set('mail.mailers.tenant.encryption', session('config')->encryptionSmtp);
 
 
-        // config()->set('mail.from.address', session('config')->email);
-        // config()->set('mail.from.name', session('tenant')->nome);
+        config()->set('mail.from.address', 'flexmol@flexmol.com.br');
+        config()->set('mail.from.name', session('tenant')->nome);
     }
 
     public function isAdmDomain(){

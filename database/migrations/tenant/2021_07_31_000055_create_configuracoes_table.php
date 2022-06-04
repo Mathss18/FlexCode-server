@@ -48,6 +48,7 @@ class CreateConfiguracoesTable extends Migration
             // $table->string('emailSmtp')->nullable();
             $table->string('usuarioSmtp')->nullable();
             $table->string('senhaSmtp')->nullable();
+            $table->string('encryptionSmtp')->nullable();
             $table->integer('quantidadeCasasDecimaisValor')->default(2);
             $table->integer('quantidadeCasasDecimaisQuantidade')->default(2);
             $table->integer('registrosPorPagina')->default(10);
