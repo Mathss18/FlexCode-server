@@ -23,14 +23,14 @@ class ManagerTenant{
     }
 
     public function setSmtp(){
-        config()->set('mail.mailers.smtp.host', 'mail.flexmol.com.br');
-        config()->set('mail.mailers.smtp.port', 465);
-        config()->set('mail.mailers.smtp.username', 'flexmol@flexmol.com.br');
-        config()->set('mail.mailers.smtp.password', 'buflex20200');
-        config()->set('mail.mailers.smtp.encryption', '');
+        config()->set('mail.mailers.tenant.host', session('config')->servidorSmtp);
+        config()->set('mail.mailers.tenant.port', session('config')->portaSmtp);
+        config()->set('mail.mailers.tenant.username', session('config')->usuarioSmtp);
+        config()->set('mail.mailers.tenant.password', session('config')->senhaSmtp);
+        config()->set('mail.mailers.tenant.encryption', 'ssl');
 
-        config()->set('mail.from.address', 'flexmol@flexmol.com.br');
-        config()->set('mail.from.name', session('tenant')->nome ?? null);
+        config()->set('mail.from.address', session('config')->email);
+        config()->set('mail.from.name', session('tenant')->nome);
     }
 
     public function isAdmDomain(){
