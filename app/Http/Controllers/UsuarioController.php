@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\APIHelper;
-use App\Http\Resources\Json;
 use App\Models\Usuario;
 use Exception;
 use Illuminate\Http\Request;
