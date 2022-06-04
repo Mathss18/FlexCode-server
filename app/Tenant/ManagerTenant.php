@@ -23,7 +23,7 @@ class ManagerTenant{
     }
 
     public function setSmtp(){
-        dd(session('config'));
+        // dd(session('config'));
         config()->set('mail.mailers.tenant.host', session('config')->servidorSmtp);
         config()->set('mail.mailers.tenant.port', session('config')->portaSmtp);
         config()->set('mail.mailers.tenant.username', session('config')->usuarioSmtp);
