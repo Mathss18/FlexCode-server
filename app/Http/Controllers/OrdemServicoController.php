@@ -212,7 +212,7 @@ class OrdemServicoController extends Controller
                     $stausOrdemServicoFuncionario = 0;
                 }
                 else if($ordensServicos->situacao == 1){
-                    $stausOrdemServicoFuncionario = 2;
+                    $stausOrdemServicoFuncionario = 1;
                 }
                 else if($ordensServicos->situacao == 3){
                     $stausOrdemServicoFuncionario = 2;

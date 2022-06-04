@@ -9,6 +9,7 @@ use App\Models\OrdemServicoFuncionario;
 use App\Models\Usuario;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class OrdemServicoFuncionarioController extends Controller
 {
@@ -114,6 +115,7 @@ class OrdemServicoFuncionarioController extends Controller
         try {
 
             //TRANSECTION BEGIN
+            DB::beginTransaction();
             $ordemServicoFuncionario->save();
 
             // Verifica se a ordem de serviço está finalizada por todos os funcionários, se sim, altera o status da ordem de serviço para finalizada
@@ -122,8 +124,7 @@ class OrdemServicoFuncionarioController extends Controller
                     $ordemServico->situacao = 2;
                     $ordemServico->save();
                 }
-            }
-            else if ($this->verificarSeAlgumFuncionarioFazendoOrdemServico($request)) {
+            } else if ($this->verificarSeAlgumFuncionarioFazendoOrdemServico($request)) {
                 if ($ordemServico->situacao == 0) {
                     $ordemServico->situacao = 1;
                     $ordemServico->save();
@@ -133,10 +134,13 @@ class OrdemServicoFuncionarioController extends Controller
 
 
             //TRANSACTION END
+            DB::commit();
 
             $response = APIHelper::APIResponse(true, 200, 'Sucesso ao editar a ordemServicoFuncionario', $ordemServicoFuncionario);
             return response()->json($response, 200);
         } catch (Exception  $ex) {
+            //TRANSACTION ROLLBACK
+            DB::rollBack();
             $response = APIHelper::APIResponse(false, 500, null, null, $ex);
             return response()->json($response, 500);
         }
@@ -153,7 +157,38 @@ class OrdemServicoFuncionarioController extends Controller
         }
     }
 
+    public function marcarFazendoProduto(Request $request)
+    {
 
+        try {
+            $ordem_servico_id = $request->input('ordem_servico_id');
+            $produto_id = $request->input('produto_id');
+            $situacao = $request->input('situacao');
+
+            $ordensServicosProdutos = DB::table('ordens_servicos_produtos')->where('ordem_servico_id', $ordem_servico_id)->where('produto_id', $produto_id)->update(['situacao' => $situacao]);
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso', $ordensServicosProdutos);
+            return response()->json($response, 200);
+        } catch (Exception  $ex) {
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+            return response()->json($response, 500);
+        }
+    }
+
+    public function marcarFazendoServico(Request $request)
+    {
+        try {
+            $ordem_servico_id = $request->input('ordem_servico_id');
+            $servico_id = $request->input('servico_id');
+            $situacao = $request->input('situacao');
+
+            $ordensServicosServicos = DB::table('ordens_servicos_servicos')->where('ordem_servico_id', $ordem_servico_id)->where('servico_id', $servico_id)->update(['situacao' => $situacao]);
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso', $ordensServicosServicos);
+            return response()->json($response, 200);
+        } catch (Exception  $ex) {
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+            return response()->json($response, 500);
+        }
+    }
 
     private function verificarSeTodosFuncionariosFinalizaramOrdemServico(Request $request)
     {

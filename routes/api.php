@@ -237,6 +237,10 @@ Route::middleware(['jwt', 'check.jwt.tenant'])->group(function () {
 
     Route::delete('ordens-servicos-funcionarios/{id}', [OrdemServicoFuncionarioController::class, 'destroy']);
 
+    Route::post('ordens-servicos-funcionarios-produtos-marcar', [OrdemServicoFuncionarioController::class, 'marcarFazendoProduto']);
+
+    Route::post('ordens-servicos-funcionarios-servicos-marcar', [OrdemServicoFuncionarioController::class, 'marcarFazendoServico']);
+
     //============================ ORCAMENTOS ==============================
     Route::get('orcamentos', [OrcamentoController::class, 'index']);
 

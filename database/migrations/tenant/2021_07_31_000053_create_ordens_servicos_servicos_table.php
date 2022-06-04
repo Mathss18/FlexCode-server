@@ -20,6 +20,7 @@ class CreateOrdensServicosServicosTable extends Migration
             $table->double('quantidade', 8, 4);
             $table->double('preco', 8, 4);
             $table->double('total', 8, 4);
+            $table->json('situacao')->nullable();
             $table->string('observacao')->nullable();
             $table->timestamps();
         });
