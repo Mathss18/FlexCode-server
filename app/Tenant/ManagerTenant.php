@@ -25,8 +25,9 @@ class ManagerTenant{
     public function setSmtp(){
         config()->set('mail.mailers.smtp.host', 'mail.flexmol.com.br');
         config()->set('mail.mailers.smtp.port', 465);
-        config()->set('mail.mailers.smtp.username', 'flexmol@flexmol.com.brr');
+        config()->set('mail.mailers.smtp.username', 'flexmol@flexmol.com.br');
         config()->set('mail.mailers.smtp.password', 'buflex2020');
+        config()->set('mail.mailers.smtp.encryption', 'ssl');
 
         config()->set('mail.from.address', session('config')->email ?? null);
         config()->set('mail.from.name', session('tenant')->nome ?? null);
