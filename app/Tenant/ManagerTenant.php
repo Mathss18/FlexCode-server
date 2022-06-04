@@ -23,11 +23,11 @@ class ManagerTenant{
     }
 
     public function setSmtp(){
-        // config()->set('mail.mailers.smtp.host', 'mail.flexmol.com.br');
-        // config()->set('mail.mailers.smtp.port', 465);
-        // config()->set('mail.mailers.smtp.username', 'flexmol@flexmol.com.br');
-        // config()->set('mail.mailers.smtp.password', 'buflex20200');
-        // config()->set('mail.mailers.smtp.encryption', 'ssl');
+        config()->set('mail.mailers.smtp.host', 'mail.flexmol.com.br');
+        config()->set('mail.mailers.smtp.port', 465);
+        config()->set('mail.mailers.smtp.username', 'flexmol@flexmol.com.br');
+        config()->set('mail.mailers.smtp.password', 'buflex20200');
+        config()->set('mail.mailers.smtp.encryption', 'tls');
 
         config()->set('mail.from.address', 'flexmol@flexmol.com.br');
         config()->set('mail.from.name', session('tenant')->nome ?? null);
