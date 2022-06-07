@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\APIHelper;
 use App\Http\Resources\Json;
+use App\Http\Resources\ProdutoCollection;
 use App\Models\FotoProduto;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -21,6 +22,19 @@ class ProdutoController extends Controller
         //$produtos = Produto::paginate(15);
         try {
             $produtos = Produto::with(['foto_produto','fornecedores','cliente','unidade_produto','grupo_produto','grupo_produto.porcentagem_lucro'])->orderBy('id', 'desc')->get();
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso', $produtos);
+            return response()->json($response, 200);
+        } catch (Exception  $ex) {
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+            return response()->json($response, 500);
+        }
+    }
+
+    public function indexMini()
+    {
+        //$produtos = Produto::paginate(15);
+        try {
+            $produtos = ProdutoCollection::collection(Produto::with(['fornecedores','cliente','grupo_produto'])->orderBy('id', 'desc')->get());
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', $produtos);
             return response()->json($response, 200);
         } catch (Exception  $ex) {
