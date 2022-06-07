@@ -42,7 +42,6 @@ class NfeService
         $this->config = $config;
         try {
             $this->tools = new Tools(json_encode($config), Certificate::readPfx($certificadoDigital, session('config')->senhaCertificadoDigital));
-            // $this->tools->soap->timeout(120);
         } catch (\Exception $ex) {
             throw new \Exception($ex->getMessage());
         }
@@ -579,10 +578,6 @@ class NfeService
         if (Storage::disk('local')->exists("public/" . session('tenant')->nome . "/configuracoes/logo/logo.png")) {
             $logoPath = Storage::disk('local')->path("public/" . session('tenant')->nome . "/configuracoes/logo/logo.png");
             $logo = 'data://text/plain;base64,' . base64_encode(file_get_contents($logoPath)) ?? '';
-        } else if (Storage::disk('local')->exists("public/" . session('tenant')->nome . "/configuracoes/logo/logo.jpeg")) {
-
-            $logoPath = Storage::disk('local')->path("public/" . session('tenant')->nome . "/configuracoes/logo/logo.jpeg");
-            $logo = 'data://text/plain;base64,' . base64_encode(file_get_contents($logoPath)) ?? '';
         } else if (Storage::disk('local')->exists("public/" . session('tenant')->nome . "/configuracoes/logo/logo.jpg")) {
 
             $logoPath = Storage::disk('local')->path("public/" . session('tenant')->nome . "/configuracoes/logo/logo.jpg");
@@ -598,11 +593,10 @@ class NfeService
             $danfe->creditsIntegratorFooter('Sistema Allmacoding - www.allmacoding.com (19) 98313-6930');
             //Gera o PDF
             $pdf = $danfe->render($logo);
-            header('Content-Type: application/pdf');
-            dd($danfe);
+            // header('Content-Type: application/pdf');
+            // echo ($pdf);
             return $pdf;
         } catch (\Exception $ex) {
-            dd("Ocorreu um erro durante a geração da DANFE :" . $ex->getMessage());
             return "Ocorreu um erro durante a geração da DANFE :" . $ex->getMessage();
             throw $ex;
         }
