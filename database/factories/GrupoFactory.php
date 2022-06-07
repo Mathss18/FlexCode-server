@@ -24,7 +24,7 @@ class GrupoFactory extends Factory
     {
         $acessos = '[
             {"path":"/","situacao":true},
-            {"path":"/ordens-servicos-funcionarios","situacao":true},
+            {"path":"/minhas-tarefas","situacao":true},
             {"path":"/clientes","situacao":true},
             {"path":"/fornecedores","situacao":true},
             {"path":"/transportadoras","situacao":true},

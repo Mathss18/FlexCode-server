@@ -225,23 +225,23 @@ Route::middleware(['jwt', 'check.jwt.tenant'])->group(function () {
     Route::delete('ordens-servicos/{id}', [OrdemServicoController::class, 'destroy']);
 
     //============================ ORDENS SERVICOS FUNCIOARIOS ==============================
-    Route::get('ordens-servicos-funcionarios', [OrdemServicoFuncionarioController::class, 'index']);
+    Route::get('minhas-tarefas', [OrdemServicoFuncionarioController::class, 'index']);
 
-    Route::get('ordens-servicos-funcionarios/{idUsuario}/abertas', [OrdemServicoFuncionarioController::class, 'showAbertas']);
+    Route::get('minhas-tarefas/{idUsuario}/abertas', [OrdemServicoFuncionarioController::class, 'showAbertas']);
 
-    Route::get('ordens-servicos-funcionarios/{idUsuario}/fazendo', [OrdemServicoFuncionarioController::class, 'showFazendo']);
+    Route::get('minhas-tarefas/{idUsuario}/fazendo', [OrdemServicoFuncionarioController::class, 'showFazendo']);
 
-    Route::get('ordens-servicos-funcionarios/{idUsuario}/finalizadas', [OrdemServicoFuncionarioController::class, 'showFinalizadas']);
+    Route::get('minhas-tarefas/{idUsuario}/finalizadas', [OrdemServicoFuncionarioController::class, 'showFinalizadas']);
 
-    Route::post('ordens-servicos-funcionarios', [OrdemServicoFuncionarioController::class, 'store']);
+    Route::post('minhas-tarefas', [OrdemServicoFuncionarioController::class, 'store']);
 
-    Route::put('ordens-servicos-funcionarios/{id}', [OrdemServicoFuncionarioController::class, 'update']);
+    Route::put('minhas-tarefas/{id}', [OrdemServicoFuncionarioController::class, 'update']);
 
-    Route::delete('ordens-servicos-funcionarios/{id}', [OrdemServicoFuncionarioController::class, 'destroy']);
+    Route::delete('minhas-tarefas/{id}', [OrdemServicoFuncionarioController::class, 'destroy']);
 
-    Route::post('ordens-servicos-funcionarios-produtos-marcar', [OrdemServicoFuncionarioController::class, 'marcarFazendoProduto']);
+    Route::post('minhas-tarefas-produtos-marcar', [OrdemServicoFuncionarioController::class, 'marcarFazendoProduto']);
 
-    Route::post('ordens-servicos-funcionarios-servicos-marcar', [OrdemServicoFuncionarioController::class, 'marcarFazendoServico']);
+    Route::post('minhas-tarefas-servicos-marcar', [OrdemServicoFuncionarioController::class, 'marcarFazendoServico']);
 
     //============================ ORCAMENTOS ==============================
     Route::get('orcamentos', [OrcamentoController::class, 'index']);
