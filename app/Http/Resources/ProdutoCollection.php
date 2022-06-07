@@ -14,8 +14,11 @@ class ProdutoCollection extends JsonResource
      */
     public function toArray($request)
     {
-        foreach ($this->fornecedores as $fornecedor => $value) {
-            dd($fornecedor);
+        $fornecedores = [];
+        foreach ($this->fornecedores as $index => $fornecedor) {
+            array_push($fornecedores, [
+                'nome' => $fornecedor->nome,
+            ]);
         }
         return [
             'id' => $this->id,
@@ -29,7 +32,7 @@ class ProdutoCollection extends JsonResource
             'cliente' => [
                 'nome' => $this->cliente->nome ?? null,
             ],
-            'fornecedores' => collect($this->fornecedores->nome),
+            'fornecedores' => $fornecedores,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
 
