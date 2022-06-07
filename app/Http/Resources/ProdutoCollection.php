@@ -26,8 +26,8 @@ class ProdutoCollection extends JsonResource
             'custoFinal' => $this->custoFinal,
             'quantidadeAtual' => $this->quantidadeAtual,
             'cliente' => [
-                'id' => $this->cliente->id,
-                'nome' => $this->cliente->nome,
+                'id' => $this->cliente->id ?? null,
+                'nome' => $this->cliente->nome ?? null,
             ],
             'fornecedores' => collect($this->fornecedores)->pluck('nome'),
             'created_at' => $this->created_at,
