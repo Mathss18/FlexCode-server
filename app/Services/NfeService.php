@@ -598,7 +598,7 @@ class NfeService
             //Gera o PDF
             $pdf = $danfe->render($logo);
             header('Content-Type: application/pdf');
-            echo ($pdf);
+            dd($danfe);
             return $pdf;
         } catch (\Exception $ex) {
             return "Ocorreu um erro durante a geração da DANFE :" . $ex->getMessage();
