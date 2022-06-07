@@ -14,7 +14,9 @@ class ProdutoCollection extends JsonResource
      */
     public function toArray($request)
     {
-        // dd(collect($this->fornecedores)->pluck('nome'));
+        foreach ($this->fornecedores as $fornecedor => $value) {
+            dd($fornecedor);
+        }
         return [
             'id' => $this->id,
             'nome' => $this->nome,
