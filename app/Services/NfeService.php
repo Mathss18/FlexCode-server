@@ -597,8 +597,8 @@ class NfeService
             $danfe->creditsIntegratorFooter('Sistema Allmacoding - www.allmacoding.com (19) 98313-6930');
             //Gera o PDF
             $pdf = $danfe->render($logo);
-            // header('Content-Type: application/pdf');
-            // echo ($pdf);
+            header('Content-Type: application/pdf');
+            echo ($pdf);
             return $pdf;
         } catch (\Exception $ex) {
             return "Ocorreu um erro durante a geração da DANFE :" . $ex->getMessage();

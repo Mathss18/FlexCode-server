@@ -324,4 +324,39 @@ class NotaFiscalController extends Controller
             return response()->json($response, 500);
         }
     }
+
+    public function gerarDanfe($chave){
+        $config = [
+            "atualizacao" => "2015-10-02 06:01:21",
+            "tpAmb" => session('config')->ambienteNfe,
+            "razaosocial" => $this->tirarAcentos(session('config')->nome),
+            "siglaUF" => session('config')->estado,
+            "cnpj" => session('config')->cpfCnpj,
+            "schemes" => "PL_009_V4",
+            "versao" => "4.00",
+            "tokenIBPT" => "AAAAAAA",
+            "CSC" => "GPB0JBWLUR6HWFTVEAS6RJ69GPCROFPBBB8G",
+            "CSCid" => "000002",
+            "aProxyConf" => [
+                "proxyIp" => session('config')->proxyIp,
+                "proxyPort" => session('config')->proxyPort,
+                "proxyUser" => session('config')->proxyUser,
+                "proxyPass" => session('config')->proxyPass
+            ]
+        ];
+        try {
+            $nfeService = new NfeService($config);
+            $danfe = $nfeService->gerarDanfe($chave);
+
+            // exibir o danfe em formato pdf
+            header('Content-Type: application/pdf');
+            echo $danfe;
+            return $danfe;
+            // $response = APIHelper::APIResponse(true, 200, 'Sucesso ao corrigir NFe', $danfe);
+            // return response()->json($response, 200);
+        } catch (\Exception $ex) {
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+            return response()->json($response, 500);
+        }
+    }
 }

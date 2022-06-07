@@ -364,6 +364,8 @@ Route::middleware(['jwt', 'check.jwt.tenant'])->group(function () {
 
     Route::post('notas-fiscais-email-nfe', [NotaFiscalController::class, 'sendEmailNfe']); // Email nfe
 
+    Route::get('notas-fiscais-gerar-danfe/{chave}', [NotaFiscalController::class, 'gerarDanfe']); // Gerar danfe avulsa
+
     //============================ CONFIGURACOES ==============================
     Route::get('configuracoes', [ConfiguracaoController::class, 'index']);
 
