@@ -18,22 +18,22 @@ class ProdutoCollection extends JsonResource
             'id' => $this->id,
             'nome' => $this->nome,
             'codigoInterno' => $this->codigoInterno,
-            'grupo_produto' => [
-                'id' => $this->grupo_produto->id,
-                'nome' => $this->grupo_produto->nome,
-            ],
+            // 'grupo_produto' => [
+            //     'id' => $this->grupo_produto->id,
+            //     'nome' => $this->grupo_produto->nome,
+            // ],
             'custoFinal' => $this->custoFinal,
             'quantidadeAtual' => $this->quantidadeAtual,
-            'cliente' => [
-                'id' => $this->cliente->id,
-                'nome' => $this->cliente->nome,
-            ],
-            'fornecedores' => [
-                [
-                    'id' => $this->fornecedores[0]->id,
-                    'nome' => $this->fornecedores[0]->nome,
-                ],
-            ],
+            // 'cliente' => [
+            //     'id' => $this->cliente->id,
+            //     'nome' => $this->cliente->nome,
+            // ],
+            // 'fornecedores' => [
+            //     [
+            //         'id' => $this->fornecedores[0]->id,
+            //         'nome' => $this->fornecedores[0]->nome,
+            //     ],
+            // ],
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
 
