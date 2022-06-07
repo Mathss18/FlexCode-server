@@ -14,6 +14,7 @@ class ProdutoCollection extends JsonResource
      */
     public function toArray($request)
     {
+        dd($this);
         return [
             'id' => $this->id,
             'nome' => $this->nome,
@@ -24,10 +25,10 @@ class ProdutoCollection extends JsonResource
             ],
             'custoFinal' => $this->custoFinal,
             'quantidadeAtual' => $this->quantidadeAtual,
-            // 'cliente' => [
-            //     'id' => $this->cliente->id,
-            //     'nome' => $this->cliente->nome,
-            // ],
+            'cliente' => [
+                'id' => $this->cliente->id,
+                'nome' => $this->cliente->nome,
+            ],
             // 'fornecedores' => [
             //     [
             //         'id' => $this->fornecedores[0]->id,
