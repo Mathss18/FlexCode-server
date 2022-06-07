@@ -601,6 +601,7 @@ class NfeService
             dd($danfe);
             return $pdf;
         } catch (\Exception $ex) {
+            dd("Ocorreu um erro durante a geração da DANFE :" . $ex->getMessage());
             return "Ocorreu um erro durante a geração da DANFE :" . $ex->getMessage();
             throw $ex;
         }
