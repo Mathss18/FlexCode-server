@@ -23,10 +23,10 @@ class CreateOrdensServicosTable extends Migration
             $table->string('horaEntrada');
             $table->string('dataSaida')->nullable();
             $table->string('horaSaida')->nullable();
-            $table->double('frete', 8, 4);
-            $table->double('outros', 8, 4);
-            $table->double('desconto', 8, 4);
-            $table->double('total', 8, 4);
+            $table->double('frete', 9, 4);
+            $table->double('outros', 9, 4);
+            $table->double('desconto', 9, 4);
+            $table->double('total', 9, 4);
             $table->string('observacao')->nullable();
             $table->string('observacaoInterna')->nullable();
             $table->timestamps();

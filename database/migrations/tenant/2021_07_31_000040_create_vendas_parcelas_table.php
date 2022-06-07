@@ -17,7 +17,7 @@ class CreateVendasParcelasTable extends Migration
             $table->bigIncrements('id');
             $table->foreignId('venda_id')->constrained('vendas');
             $table->string('dataVencimento');
-            $table->double('valorParcela', 8, 4);
+            $table->double('valorParcela', 9, 4);
             $table->foreignId('forma_pagamento_id')->constrained('formas_pagamentos');
             $table->string('observacao')->nullable();
             $table->timestamps();

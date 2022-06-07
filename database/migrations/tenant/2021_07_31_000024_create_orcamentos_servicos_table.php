@@ -17,9 +17,9 @@ class CreateOrcamentosServicosTable extends Migration
             $table->bigIncrements('id');
             $table->foreignId('servico_id')->nullable()->constrained('servicos');
             $table->foreignId('orcamento_id')->nullable()->constrained('orcamentos');
-            $table->double('quantidade', 8, 4);
-            $table->double('preco', 8, 4);
-            $table->double('total', 8, 4);
+            $table->double('quantidade', 9, 4);
+            $table->double('preco', 9, 4);
+            $table->double('total', 9, 4);
             $table->string('observacao')->nullable();
             $table->timestamps();
         });

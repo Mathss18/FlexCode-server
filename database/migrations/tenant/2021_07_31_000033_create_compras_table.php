@@ -24,10 +24,10 @@ class CreateComprasTable extends Migration
             $table->foreignId('transportadora_id')->nullable()->constrained('transportadoras');
             $table->boolean('somarFreteAoTotal')->default(true);
 
-            $table->double('frete', 8, 4);
-            $table->double('impostos', 8, 4);
-            $table->double('desconto', 8, 4);
-            $table->double('total', 8, 4);
+            $table->double('frete', 9, 4);
+            $table->double('impostos', 9, 4);
+            $table->double('desconto', 9, 4);
+            $table->double('total', 9, 4);
 
             $table->foreignId('forma_pagamento_id')->constrained('formas_pagamentos');
             $table->string('tipoFormaPagamento'); // 0 - A VISTA, 1 - A PRAZO

@@ -25,13 +25,13 @@ class CreateNotasFiscaisTable extends Migration
             $table->string('tipoFavorecido');                   // Tipo do Favorecido ('clientes' ou 'fornecedores')
             $table->string('chaveNF');                          // Chave da Nota Fiscal
             $table->string('protocolo');                        // Protocolo da Nota Fiscal
-            $table->double('totalFinal', 8, 4);                 // Valor da Nota Fiscal
-            $table->double('totalProdutos', 8, 4);              // Valor da Nota Fiscal
-            $table->double('desconto', 8, 4)->nullable();       // Desconto da Nota Fiscal
-            $table->double('frete', 8, 4)->nullable();          // Frete da Nota Fiscal
-            $table->double('pesoL', 8, 4)->nullable();          // Peso Líquido da Nota Fiscal
-            $table->double('pesoB', 8, 4)->nullable();          // Peso Bruto da Nota Fiscal
-            $table->double('qVol', 8, 4)->nullable();           // Peso Bruto da Nota Fiscal
+            $table->double('totalFinal', 9, 4);                 // Valor da Nota Fiscal
+            $table->double('totalProdutos', 9, 4);              // Valor da Nota Fiscal
+            $table->double('desconto', 9, 4)->nullable();       // Desconto da Nota Fiscal
+            $table->double('frete', 9, 4)->nullable();          // Frete da Nota Fiscal
+            $table->double('pesoL', 9, 4)->nullable();          // Peso Líquido da Nota Fiscal
+            $table->double('pesoB', 9, 4)->nullable();          // Peso Bruto da Nota Fiscal
+            $table->double('qVol', 9, 4)->nullable();           // Peso Bruto da Nota Fiscal
             $table->integer('modFrete')->nullable();
             $table->integer('quantidadeParcelas')->nullable();
             $table->string('tipoFormaPagamento')->nullable();

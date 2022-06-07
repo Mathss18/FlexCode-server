@@ -17,9 +17,9 @@ class CreateOrdensServicosServicosTable extends Migration
             $table->bigIncrements('id');
             $table->foreignId('servico_id')->nullable()->constrained('servicos');
             $table->foreignId('ordem_servico_id')->nullable()->constrained('ordens_servicos');
-            $table->double('quantidade', 8, 4);
-            $table->double('preco', 8, 4);
-            $table->double('total', 8, 4);
+            $table->double('quantidade', 9, 4);
+            $table->double('preco', 9, 4);
+            $table->double('total', 9, 4);
             $table->json('situacao')->nullable();
             $table->string('observacao')->nullable();
             $table->timestamps();

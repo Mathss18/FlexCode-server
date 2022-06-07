@@ -38,7 +38,7 @@ class CreateConfiguracoesTable extends Migration
             $table->integer('nNF')->nullable();
             $table->integer('serie')->nullable();
             $table->integer('ambienteNfe')->default(2);
-            $table->double('aliquota', 8, 4);
+            $table->double('aliquota', 9, 4);
             $table->string('proxyIp')->nullable();
             $table->string('proxyPort')->nullable();
             $table->string('proxyUser')->nullable();

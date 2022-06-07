@@ -16,8 +16,8 @@ class CreateContasBancariasTable extends Migration
         Schema::create('contas_bancarias', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('nome')->unique();
-            $table->double('saldoInicial', 8, 2);
-            $table->double('saldo', 8, 2)->nullable();
+            $table->double('saldoInicial',9, 2);
+            $table->double('saldo', 9, 2)->nullable();
             $table->timestamps();
         });
     }

@@ -18,7 +18,7 @@ class CreateTransacoesTable extends Migration
             $table->string('data');
             $table->string('title');
             $table->string('observacao')->nullable();
-            $table->double('valor', 8 ,2);
+            $table->double('valor',9 ,2);
             $table->string('tipo');
             $table->string('situacao');
             $table->timestamp('dataTransacaoRegistrada')->nullable();

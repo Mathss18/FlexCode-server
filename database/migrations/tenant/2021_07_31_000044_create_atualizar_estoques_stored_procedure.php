@@ -16,7 +16,7 @@ class CreateAtualizarEstoquesStoredProcedure extends Migration
     {
         $script = <<<SQL
         DROP PROCEDURE IF EXISTS `SP_atualizar_estoques`;
-        CREATE PROCEDURE `SP_atualizar_estoques`( `prod_id` int, `qtde` decimal(8,4))
+        CREATE PROCEDURE `SP_atualizar_estoques`( `prod_id` int, `qtde` decimal(9,4))
             BEGIN
                 declare contador int(11);
 

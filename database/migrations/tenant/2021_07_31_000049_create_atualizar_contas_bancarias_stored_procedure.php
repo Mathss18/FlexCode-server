@@ -16,7 +16,7 @@ class CreateAtualizarContasBancariasStoredProcedure extends Migration
     {
         $script = <<<SQL
         DROP PROCEDURE IF EXISTS `SP_atualizar_contas_bancarias`;
-        CREATE PROCEDURE `SP_atualizar_contas_bancarias`( `conta_bancaria_id` int, `valor` decimal(8,2))
+        CREATE PROCEDURE `SP_atualizar_contas_bancarias`( `conta_bancaria_id` int, `valor` decimal(9,2))
             BEGIN
                 declare contador int(11);
 
