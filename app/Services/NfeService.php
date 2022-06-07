@@ -42,7 +42,7 @@ class NfeService
         $this->config = $config;
         try {
             $this->tools = new Tools(json_encode($config), Certificate::readPfx($certificadoDigital, session('config')->senhaCertificadoDigital));
-            $this->tools->soap->timeout(120);
+            // $this->tools->soap->timeout(120);
         } catch (\Exception $ex) {
             throw new \Exception($ex->getMessage());
         }
