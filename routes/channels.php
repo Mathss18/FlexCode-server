@@ -17,7 +17,7 @@ Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
     return (int) $user->id === (int) $id;
 });
 
-Broadcast::channel('chat', function ($user) {
+Broadcast::channel('chat-{tenant_name}', function ($user) {
     if(auth()->check()){
         unset($user->senha); // remove a senha do objeto para retornar
         return $user;
@@ -25,7 +25,7 @@ Broadcast::channel('chat', function ($user) {
 
 });
 
-Broadcast::channel('chat-{tenant_db}-{usuario_receptor_id}', function ($tenant_db, $usuario_receptor_id) {
+Broadcast::channel('chat-{tenant_name}-{usuario_receptor_id}', function ($tenant_db, $usuario_receptor_id) {
 
     return auth()->check();
 });

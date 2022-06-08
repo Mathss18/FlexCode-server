@@ -35,6 +35,6 @@ class PrivateMessageSent implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('chat-'.config('database.connections.tenant.database').'-'.$this->message['usuario_receptor_id']);
+        return new PrivateChannel('chat-'.session('tenant')->nome.'-'.$this->message['usuario_receptor_id']);
     }
 }
