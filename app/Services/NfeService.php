@@ -592,7 +592,7 @@ class NfeService
             $danfe->debugMode(false);
             $danfe->creditsIntegratorFooter('Sistema Allmacoding - www.allmacoding.com (19) 98313-6930');
             //Gera o PDF
-            $pdf = $danfe->render($logo);
+            $pdf = $danfe->render();
             // header('Content-Type: application/pdf');
             // echo ($pdf);
             return $pdf;
