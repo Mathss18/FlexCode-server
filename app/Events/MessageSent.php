@@ -38,6 +38,6 @@ class MessageSent implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new PresenceChannel('chat-'.session('tenant')->nome);
+        return new PresenceChannel('chat-'.explode(" ", session('tenant')->sub_dominio)[0]);
     }
 }
