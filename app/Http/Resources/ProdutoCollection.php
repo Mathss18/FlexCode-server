@@ -32,6 +32,7 @@ class ProdutoCollection extends JsonResource
             'cliente' => [
                 'nome' => $this->cliente->nome ?? null,
             ],
+            'cfop' => $this->cfop,
             'fornecedores' => $fornecedores,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
