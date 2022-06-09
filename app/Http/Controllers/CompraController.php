@@ -102,7 +102,7 @@ class CompraController extends Controller
 
                     $parcela = new CompraParcela;
                     $parcela->dataVencimento = $value['dataVencimento'];
-                    $parcela->valorParcela = number_format((float)$value['valorParcela'], 2, '.', '');
+                    $parcela->valorParcela = number_format((float)$value['valorParcela'], session('config')->quantidadeCasasDecimaisValor, '.', '');
                     $parcela->forma_pagamento_id = $value['forma_pagamento_id'];
                     $parcela->observacao = $value['observacao'];
                     $parcela->compra_id = $compras->id;
@@ -272,7 +272,7 @@ class CompraController extends Controller
                             new CompraParcela(
                                 [
                                     'dataVencimento' => $parcela['dataVencimento'],
-                                    'valorParcela' => number_format((float)$parcela['valorParcela'], 2, '.', ''),
+                                    'valorParcela' => number_format((float)$parcela['valorParcela'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
                                     'forma_pagamento_id' => $parcela['forma_pagamento_id'],
                                     'observacao' => $parcela['observacao'],
                                     'created_at' => Carbon::now('GMT-3'),
