@@ -45,6 +45,8 @@ class ClienteController extends Controller
         $cliente->nome = $request->input('nome');
         $cliente->cpfCnpj = $request->input('cpfCnpj');
         $cliente->email = $request->input('email');
+        $cliente->emailDocumento = $request->input('emailDocumento');
+        $cliente->observacao = $request->input('observacao');
         $cliente->contato = $request->input('contato');
         $cliente->rua = $request->input('rua');
         $cliente->cidade = $request->input('cidade');
@@ -52,6 +54,7 @@ class ClienteController extends Controller
         $cliente->cep = $request->input('cep');
         $cliente->bairro = $request->input('bairro');
         $cliente->estado = $request->input('estado');
+        $cliente->complemento = $request->input('complemento');
         $cliente->telefone = $request->input('telefone');
         $cliente->celular = $request->input('celular');
         $cliente->codigoMunicipio = $request->input('codigoMunicipio');
@@ -76,6 +79,8 @@ class ClienteController extends Controller
         $cliente->nome = $request->input('nome');
         $cliente->cpfCnpj = $request->input('cpfCnpj');
         $cliente->email = $request->input('email');
+        $cliente->emailDocumento = $request->input('emailDocumento');
+        $cliente->observacao = $request->input('observacao');
         $cliente->contato = $request->input('contato');
         $cliente->rua = $request->input('rua');
         $cliente->cidade = $request->input('cidade');
@@ -83,6 +88,7 @@ class ClienteController extends Controller
         $cliente->cep = $request->input('cep');
         $cliente->bairro = $request->input('bairro');
         $cliente->estado = $request->input('estado');
+        $cliente->complemento = $request->input('complemento');
         $cliente->telefone = $request->input('telefone');
         $cliente->celular = $request->input('celular');
         $cliente->codigoMunicipio = $request->input('codigoMunicipio');

@@ -45,6 +45,8 @@ class FornecedorController extends Controller
         $fornecedor->nome = $request->input('nome');
         $fornecedor->cpfCnpj = $request->input('cpfCnpj');
         $fornecedor->email = $request->input('email');
+        $fornecedor->emailDocumento = $request->input('emailDocumento');
+        $fornecedor->observacao = $request->input('observacao');
         $fornecedor->contato = $request->input('contato');
         $fornecedor->rua = $request->input('rua');
         $fornecedor->cidade = $request->input('cidade');
@@ -52,6 +54,7 @@ class FornecedorController extends Controller
         $fornecedor->cep = $request->input('cep');
         $fornecedor->bairro = $request->input('bairro');
         $fornecedor->estado = $request->input('estado');
+        $fornecedor->complemento = $request->input('complemento');
         $fornecedor->telefone = $request->input('telefone');
         $fornecedor->celular = $request->input('celular');
         $fornecedor->codigoMunicipio = $request->input('codigoMunicipio');
@@ -77,6 +80,8 @@ class FornecedorController extends Controller
         $fornecedor->nome = $request->input('nome');
         $fornecedor->cpfCnpj = $request->input('cpfCnpj');
         $fornecedor->email = $request->input('email');
+        $fornecedor->emailDocumento = $request->input('emailDocumento');
+        $fornecedor->observacao = $request->input('observacao');
         $fornecedor->contato = $request->input('contato');
         $fornecedor->rua = $request->input('rua');
         $fornecedor->cidade = $request->input('cidade');
@@ -84,6 +89,7 @@ class FornecedorController extends Controller
         $fornecedor->cep = $request->input('cep');
         $fornecedor->bairro = $request->input('bairro');
         $fornecedor->estado = $request->input('estado');
+        $fornecedor->complemento = $request->input('complemento');
         $fornecedor->telefone = $request->input('telefone');
         $fornecedor->celular = $request->input('celular');
         $fornecedor->codigoMunicipio = $request->input('codigoMunicipio');

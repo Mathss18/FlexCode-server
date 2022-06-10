@@ -44,6 +44,8 @@ class TransportadoraController extends Controller
         $transportadora->nome = $request->input('nome');
         $transportadora->cpfCnpj = $request->input('cpfCnpj');
         $transportadora->email = $request->input('email');
+        $transportadora->emailDocumento = $request->input('emailDocumento');
+        $transportadora->observacao = $request->input('observacao');
         $transportadora->contato = $request->input('contato');
         $transportadora->rua = $request->input('rua');
         $transportadora->cidade = $request->input('cidade');
@@ -51,6 +53,7 @@ class TransportadoraController extends Controller
         $transportadora->cep = $request->input('cep');
         $transportadora->bairro = $request->input('bairro');
         $transportadora->estado = $request->input('estado');
+        $transportadora->complemento = $request->input('complemento');
         $transportadora->telefone = $request->input('telefone');
         $transportadora->celular = $request->input('celular');
         $transportadora->codigoMunicipio = $request->input('codigoMunicipio');
@@ -75,6 +78,8 @@ class TransportadoraController extends Controller
         $transportadora->nome = $request->input('nome');
         $transportadora->cpfCnpj = $request->input('cpfCnpj');
         $transportadora->email = $request->input('email');
+        $transportadora->emailDocumento = $request->input('emailDocumento');
+        $transportadora->observacao = $request->input('observacao');
         $transportadora->contato = $request->input('contato');
         $transportadora->rua = $request->input('rua');
         $transportadora->cidade = $request->input('cidade');
@@ -82,6 +87,7 @@ class TransportadoraController extends Controller
         $transportadora->cep = $request->input('cep');
         $transportadora->bairro = $request->input('bairro');
         $transportadora->estado = $request->input('estado');
+        $transportadora->complemento = $request->input('complemento');
         $transportadora->telefone = $request->input('telefone');
         $transportadora->celular = $request->input('celular');
         $transportadora->codigoMunicipio = $request->input('codigoMunicipio');

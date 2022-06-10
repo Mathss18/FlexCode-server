@@ -22,6 +22,8 @@ class CreateFornecedoresTable extends Migration
             $table->string('nome')->unique();
             $table->string('cpfCnpj')->unique()->nullable();
             $table->string('email')->nullable();
+            $table->text('emailDocumento')->nullable();
+            $table->text('observacao')->nullable();
             $table->string('contato')->nullable();
             $table->string('rua')->nullable();
             $table->string('cidade')->nullable();
@@ -29,6 +31,7 @@ class CreateFornecedoresTable extends Migration
             $table->string('cep')->nullable();
             $table->string('bairro')->nullable();
             $table->string('estado')->nullable();
+            $table->string('complemento')->nullable();
             $table->string('telefone')->nullable();
             $table->string('celular')->nullable();
             $table->string('codigoMunicipio')->nullable();
