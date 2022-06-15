@@ -767,11 +767,7 @@ class NfeService
         if (Storage::disk('local')->exists("public/" . session('tenant')->nome . "/configuracoes/logo/logo.png")) {
             $logoPath = Storage::disk('local')->path("public/" . session('tenant')->nome . "/configuracoes/logo/logo.png");
             $logo = 'data://text/plain;base64,' . base64_encode(file_get_contents($logoPath)) ?? '';
-        } else if (Storage::disk('local')->exists("public/" . session('tenant')->nome . "/configuracoes/logo/logo.jpeg")) {
-
-            $logoPath = Storage::disk('local')->path("public/" . session('tenant')->nome . "/configuracoes/logo/logo.jpeg");
-            $logo = 'data://text/plain;base64,' . base64_encode(file_get_contents($logoPath)) ?? '';
-        } else if (Storage::disk('local')->exists("public/" . session('tenant')->nome . "/configuracoes/logo/logo.jpg")) {
+        }else if (Storage::disk('local')->exists("public/" . session('tenant')->nome . "/configuracoes/logo/logo.jpg")) {
 
             $logoPath = Storage::disk('local')->path("public/" . session('tenant')->nome . "/configuracoes/logo/logo.jpg");
             $logo = 'data://text/plain;base64,' . base64_encode(file_get_contents($logoPath)) ?? '';
