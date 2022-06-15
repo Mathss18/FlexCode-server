@@ -680,7 +680,7 @@ class NfeService
                         return $url;
                     }
                 } else {
-                    throw new \Exception('Erro Ao Tirar Carta de Correção!  Erro numero: ' . $std->cStat);
+                    throw new \Exception('Erro Ao Tirar Carta de Correção!  Erro numero: ' . $std->cStat . ' / '.$std->retEvento->infEvento->cStat);
                 }
             }
         } catch (\Exception $ex) {
