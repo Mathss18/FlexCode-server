@@ -408,14 +408,16 @@ class NfeService
 
         //====================TAG DETALHE PAGAMENTO===================
         if(count($dados['parcelas']) >= 1){
-            $formaPag = '01';
+            $tipoFormaPag = '01';
+            $totalFinalFormaPag = $dados['totalFinal'];
         }
         else{
-            $formaPag = '90';
+            $tipoFormaPag = '90';
+            $totalFinalFormaPag = null;
         }
         $detPag = new stdClass();
-        $detPag->tPag = $formaPag; //01-Dinheiro; 02-Cheque; 03-Cartão de Crédito; 04-Cartão de Débito; 05-Crédito Loja; 10-Vale Alimentação; 11-Vale Refeição; 12-Vale Presente; 13-Vale Combustível; 99-Outros
-        $detPag->vPag = $dados['totalFinal']; //Obs: deve ser informado o valor pago pelo cliente change 0.00
+        $detPag->tPag = $tipoFormaPag; //01-Dinheiro; 02-Cheque; 03-Cartão de Crédito; 04-Cartão de Débito; 05-Crédito Loja; 10-Vale Alimentação; 11-Vale Refeição; 12-Vale Presente; 13-Vale Combustível; 99-Outros
+        $detPag->vPag = $totalFinalFormaPag; //Obs: deve ser informado o valor pago pelo cliente change 0.00
         //$detPag->CNPJ = '12345678901234';
         //$detPag->tBand = '01';
         //$detPag->cAut = '3333333';
