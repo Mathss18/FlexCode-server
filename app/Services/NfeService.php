@@ -49,7 +49,7 @@ class NfeService
         }
 
         $this->soap = new SoapCurl(Certificate::readPfx($certificadoDigital, session('config')->senhaCertificadoDigital));
-        $this->soap->timeout(600); // 10 minutos de timeout
+        $this->soap->timeout(600); // 10 minutos de timeout // Aumentar tbm na pastar vendor arquivo -> SoapBase.php
     }
 
     public function gerarNfe($dados, $favorecido, $produtos, $transportadora, $aliquota)
@@ -407,8 +407,14 @@ class NfeService
         $nfe->tagpag($pag);
 
         //====================TAG DETALHE PAGAMENTO===================
+        if(count($dados['parcelas']) >= 1){
+            $formaPag = '01';
+        }
+        else{
+            $formaPag = '90';
+        }
         $detPag = new stdClass();
-        $detPag->tPag = '01'; //01-Dinheiro; 02-Cheque; 03-Cartão de Crédito; 04-Cartão de Débito; 05-Crédito Loja; 10-Vale Alimentação; 11-Vale Refeição; 12-Vale Presente; 13-Vale Combustível; 99-Outros
+        $detPag->tPag = $formaPag; //01-Dinheiro; 02-Cheque; 03-Cartão de Crédito; 04-Cartão de Débito; 05-Crédito Loja; 10-Vale Alimentação; 11-Vale Refeição; 12-Vale Presente; 13-Vale Combustível; 99-Outros
         $detPag->vPag = $dados['totalFinal']; //Obs: deve ser informado o valor pago pelo cliente change 0.00
         //$detPag->CNPJ = '12345678901234';
         //$detPag->tBand = '01';
