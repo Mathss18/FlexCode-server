@@ -413,7 +413,7 @@ class NfeService
         }
         else{
             $tipoFormaPag = '90';
-            $totalFinalFormaPag = 0.00;
+            $totalFinalFormaPag = 0;
         }
         $detPag = new stdClass();
         $detPag->tPag = $tipoFormaPag; //01-Dinheiro; 02-Cheque; 03-Cartão de Crédito; 04-Cartão de Débito; 05-Crédito Loja; 10-Vale Alimentação; 11-Vale Refeição; 12-Vale Presente; 13-Vale Combustível; 99-Outros
