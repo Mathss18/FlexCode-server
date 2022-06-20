@@ -10,6 +10,7 @@ use NFePHP\NFe\Make;
 use NFePHP\NFe\Tools;
 use NFePHP\Common\Keys;
 use NFePHP\Common\Certificate;
+use NFePHP\Common\Soap\SoapCurl;
 use NFePHP\NFe\Common\Standardize;
 use NFePHP\NFe\Complements;
 use NFePHP\DA\NFe\Danfe;
@@ -24,6 +25,7 @@ class NfeService
     private $chave;
     private $success = false;
     private $error;
+    private $soap;
 
     private $tools;
 
@@ -45,6 +47,9 @@ class NfeService
         } catch (\Exception $ex) {
             throw new \Exception($ex->getMessage());
         }
+
+        $this->soap = new SoapCurl(Certificate::readPfx($certificadoDigital, session('config')->senhaCertificadoDigital));
+        $this->soap->timeout(600); // 10 minutos de timeout
     }
 
     public function gerarNfe($dados, $favorecido, $produtos, $transportadora, $aliquota)
