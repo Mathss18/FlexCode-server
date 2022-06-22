@@ -384,7 +384,7 @@ class NfeService
             $fat->nFat = $ide->nNF;
             $fat->vOrig = 43331.20;//array_reduce($dados['parcelas'], array($this, "sum"));
             $fat->vDesc = $dados['desconto'];
-            $fat->vLiq =  $fat->vOrig - $fat->vDesc;
+            $fat->vLiq =  43331.20;//$fat->vOrig - $fat->vDesc;
             $nfe->tagfat($fat);
             //====================TAG DUPLICATA===================
 
