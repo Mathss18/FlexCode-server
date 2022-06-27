@@ -376,9 +376,16 @@ class NfeService
 
         $nfe->tagvol($vol);
 
-        $valorTotalDasParcelasSomadas = 0;
+
         if (count($dados['parcelas']) >= 1) {
 
+            //====================TAG FATURA===================
+            $fat = new stdClass();
+            $fat->nFat = $ide->nNF;
+            $fat->vOrig = array_reduce($dados['parcelas'], array($this, "sum"));
+            $fat->vDesc = $dados['desconto'];
+            $fat->vLiq =  $fat->vOrig - $fat->vDesc;
+            $nfe->tagfat($fat);
             //====================TAG DUPLICATA===================
 
             for ($i = 0; $i < count($dados['parcelas']); $i++) {
@@ -388,21 +395,10 @@ class NfeService
                 $dup->nDup = str_pad($i + 1, 3, "0", STR_PAD_LEFT);
                 $date = DateTime::createFromFormat('d/m/Y', $dados['parcelas'][$i]['dataVencimento']);
                 $dup->dVenc = $date->format('Y-m-d');
-                $dup->vDup = 1231.46;//number_format($dados['parcelas'][$i]['valorParcela'], 2);
+                $dup->vDup = $dados['parcelas'][$i]['valorParcela'];
                 $nfe->tagdup($dup);
-                // $valorTotalDasParcelasSomadas = $valorTotalDasParcelasSomadas + (float)number_format((float)$dados['parcelas'][$i]['valorParcela'], 2);
             }
-
-            //====================TAG FATURA===================
-            $fat = new stdClass();
-            $fat->nFat = $ide->nNF;
-            $fat->vOrig = array_reduce($dados['parcelas'], array($this, "sum"));
-            $fat->vDesc = $dados['desconto'];
-            $fat->vLiq =  1231.46;//$fat->vOrig - $fat->vDesc;
-            // $fat->vLiq =  $valorTotalDasParcelasSomadas;
-            $nfe->tagfat($fat);
         }
-
 
         //====================TAG PAGAMENTO===================
         $pag = new stdClass();
@@ -411,11 +407,11 @@ class NfeService
         $nfe->tagpag($pag);
 
         //====================TAG DETALHE PAGAMENTO===================
-        if (count($dados['parcelas']) >= 1) {
+        if(count($dados['parcelas']) >= 1){
             $tipoFormaPag = '01';
-            // $totalFinalFormaPag = $dados['totalFinal'];
-            $totalFinalFormaPag = $valorTotalDasParcelasSomadas;
-        } else {
+            $totalFinalFormaPag = $dados['totalFinal'];
+        }
+        else{
             $tipoFormaPag = '90';
             $totalFinalFormaPag = 0;
         }
@@ -697,7 +693,7 @@ class NfeService
                         return $url;
                     }
                 } else {
-                    throw new \Exception('Erro Ao Tirar Carta de Correção!  Erro numero: ' . $std->cStat . ' / ' . $std->retEvento->infEvento->cStat);
+                    throw new \Exception('Erro Ao Tirar Carta de Correção!  Erro numero: ' . $std->cStat . ' / '.$std->retEvento->infEvento->cStat);
                 }
             }
         } catch (\Exception $ex) {
@@ -784,7 +780,7 @@ class NfeService
         if (Storage::disk('local')->exists("public/" . session('tenant')->nome . "/configuracoes/logo/logo.png")) {
             $logoPath = Storage::disk('local')->path("public/" . session('tenant')->nome . "/configuracoes/logo/logo.png");
             $logo = 'data://text/plain;base64,' . base64_encode(file_get_contents($logoPath)) ?? '';
-        } else if (Storage::disk('local')->exists("public/" . session('tenant')->nome . "/configuracoes/logo/logo.jpg")) {
+        }else if (Storage::disk('local')->exists("public/" . session('tenant')->nome . "/configuracoes/logo/logo.jpg")) {
 
             $logoPath = Storage::disk('local')->path("public/" . session('tenant')->nome . "/configuracoes/logo/logo.jpg");
             $logo = 'data://text/plain;base64,' . base64_encode(file_get_contents($logoPath)) ?? '';
