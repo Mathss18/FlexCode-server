@@ -388,9 +388,9 @@ class NfeService
                 $dup->nDup = str_pad($i + 1, 3, "0", STR_PAD_LEFT);
                 $date = DateTime::createFromFormat('d/m/Y', $dados['parcelas'][$i]['dataVencimento']);
                 $dup->dVenc = $date->format('Y-m-d');
-                $dup->vDup = (float)number_format($dados['parcelas'][$i]['valorParcela'], 2);
+                $dup->vDup = 1231.46;//number_format($dados['parcelas'][$i]['valorParcela'], 2);
                 $nfe->tagdup($dup);
-                $valorTotalDasParcelasSomadas = $valorTotalDasParcelasSomadas + (float)number_format((float)$dados['parcelas'][$i]['valorParcela'], 2);
+                // $valorTotalDasParcelasSomadas = $valorTotalDasParcelasSomadas + (float)number_format((float)$dados['parcelas'][$i]['valorParcela'], 2);
             }
 
             //====================TAG FATURA===================
@@ -398,8 +398,8 @@ class NfeService
             $fat->nFat = $ide->nNF;
             $fat->vOrig = array_reduce($dados['parcelas'], array($this, "sum"));
             $fat->vDesc = $dados['desconto'];
-            // $fat->vLiq =  $fat->vOrig - $fat->vDesc;
-            $fat->vLiq =  $valorTotalDasParcelasSomadas;
+            $fat->vLiq =  1231.46;//$fat->vOrig - $fat->vDesc;
+            // $fat->vLiq =  $valorTotalDasParcelasSomadas;
             $nfe->tagfat($fat);
         }
 
