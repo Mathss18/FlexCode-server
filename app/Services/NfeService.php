@@ -390,7 +390,7 @@ class NfeService
                 $dup->dVenc = $date->format('Y-m-d');
                 $dup->vDup = number_format($dados['parcelas'][$i]['valorParcela'], 2);
                 $nfe->tagdup($dup);
-                $valorTotalDasParcelasSomadas = $valorTotalDasParcelasSomadas + number_format($dados['parcelas'][$i]['valorParcela'], 2);
+                $valorTotalDasParcelasSomadas = $valorTotalDasParcelasSomadas + (float)number_format((float)$dados['parcelas'][$i]['valorParcela'], 2);
             }
 
             //====================TAG FATURA===================
