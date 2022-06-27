@@ -382,9 +382,9 @@ class NfeService
             //====================TAG FATURA===================
             $fat = new stdClass();
             $fat->nFat = $ide->nNF;
-            $fat->vOrig = array_reduce($dados['parcelas'], array($this, "sum"));
+            $fat->vOrig = 1231.46;//array_reduce($dados['parcelas'], array($this, "sum"));
             $fat->vDesc = $dados['desconto'];
-            $fat->vLiq =  1231.46;//$fat->vOrig - $fat->vDesc;
+            $fat->vLiq =  $fat->vOrig - $fat->vDesc;
             $nfe->tagfat($fat);
             //====================TAG DUPLICATA===================
 
