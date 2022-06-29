@@ -395,7 +395,7 @@ class NfeService
                 $dup->nDup = str_pad($i + 1, 3, "0", STR_PAD_LEFT);
                 $date = DateTime::createFromFormat('d/m/Y', $dados['parcelas'][$i]['dataVencimento']);
                 $dup->dVenc = $date->format('Y-m-d');
-                $dup->vDup = number_format($dados['parcelas'][$i]['valorParcela'], 2);
+                $dup->vDup = number_format((float)$dados['parcelas'][$i]['valorParcela'], 2);
                 $nfe->tagdup($dup);
             }
         }
