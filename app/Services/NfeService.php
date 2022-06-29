@@ -382,22 +382,69 @@ class NfeService
             //====================TAG FATURA===================
             $fat = new stdClass();
             $fat->nFat = $ide->nNF;
-            $fat->vOrig = array_reduce($dados['parcelas'], array($this, "sum"));
+            $fat->vOrig = 44267.20;//array_reduce($dados['parcelas'], array($this, "sum"));
             $fat->vDesc = $dados['desconto'];
             $fat->vLiq =  $fat->vOrig - $fat->vDesc;
             $nfe->tagfat($fat);
             //====================TAG DUPLICATA===================
 
-            for ($i = 0; $i < count($dados['parcelas']); $i++) {
+            // for ($i = 0; $i < count($dados['parcelas']); $i++) {
 
-                $dup = new stdClass();
+            //     $dup = new stdClass();
 
-                $dup->nDup = str_pad($i + 1, 3, "0", STR_PAD_LEFT);
-                $date = DateTime::createFromFormat('d/m/Y', $dados['parcelas'][$i]['dataVencimento']);
-                $dup->dVenc = $date->format('Y-m-d');
-                $dup->vDup = number_format((float)$dados['parcelas'][$i]['valorParcela'], 2);
-                $nfe->tagdup($dup);
-            }
+            //     $dup->nDup = str_pad($i + 1, 3, "0", STR_PAD_LEFT);
+            //     $date = DateTime::createFromFormat('d/m/Y', $dados['parcelas'][$i]['dataVencimento']);
+            //     $dup->dVenc = $date->format('Y-m-d');
+            //     $dup->vDup = $dados['parcelas'][$i]['valorParcela'];
+            //     $nfe->tagdup($dup);
+            // }
+
+            $dup1 = new stdClass();
+            $dup1->nDup = '001';
+            $dup1->dVenc = '2022-07-27';
+            $dup1->vDup = 6323.88;
+            $nfe->tagdup($dup1);
+
+            $dup2 = new stdClass();
+            $dup2->nDup = '002';
+            $dup2->dVenc = '2022-08-03';
+            $dup2->vDup = 6323.88;
+            $nfe->tagdup($dup2);
+
+            $dup3 = new stdClass();
+            $dup3->nDup = '003';
+            $dup3->dVenc = '2022-08-10';
+            $dup3->vDup = 6323.88;
+            $nfe->tagdup($dup3);
+
+            $dup4 = new stdClass();
+            $dup4->nDup = '004';
+            $dup4->dVenc = '2022-08-17';
+            $dup4->vDup = 6323.88;
+            $nfe->tagdup($dup4);
+
+
+            $dup5 = new stdClass();
+            $dup5->nDup = '005';
+            $dup5->dVenc = '2022-08-24';
+            $dup5->vDup = 6323.88;
+            $nfe->tagdup($dup5);
+
+
+            $dup6 = new stdClass();
+            $dup6->nDup = '006';
+            $dup6->dVenc = '2022-08-31';
+            $dup6->vDup = 6323.88;
+            $nfe->tagdup($dup6);
+
+
+            $dup7 = new stdClass();
+            $dup7->nDup = '007';
+            $dup7->dVenc = '2022-09-07';
+            $dup7->vDup = 6323.92;
+            $nfe->tagdup($dup7);
+
+
         }
 
         //====================TAG PAGAMENTO===================
@@ -407,10 +454,11 @@ class NfeService
         $nfe->tagpag($pag);
 
         //====================TAG DETALHE PAGAMENTO===================
-        if (count($dados['parcelas']) >= 1) {
+        if(count($dados['parcelas']) >= 1){
             $tipoFormaPag = '01';
             $totalFinalFormaPag = $dados['totalFinal'];
-        } else {
+        }
+        else{
             $tipoFormaPag = '90';
             $totalFinalFormaPag = 0;
         }
@@ -692,7 +740,7 @@ class NfeService
                         return $url;
                     }
                 } else {
-                    throw new \Exception('Erro Ao Tirar Carta de Correção!  Erro numero: ' . $std->cStat . ' / ' . $std->retEvento->infEvento->cStat);
+                    throw new \Exception('Erro Ao Tirar Carta de Correção!  Erro numero: ' . $std->cStat . ' / '.$std->retEvento->infEvento->cStat);
                 }
             }
         } catch (\Exception $ex) {
@@ -779,7 +827,7 @@ class NfeService
         if (Storage::disk('local')->exists("public/" . session('tenant')->nome . "/configuracoes/logo/logo.png")) {
             $logoPath = Storage::disk('local')->path("public/" . session('tenant')->nome . "/configuracoes/logo/logo.png");
             $logo = 'data://text/plain;base64,' . base64_encode(file_get_contents($logoPath)) ?? '';
-        } else if (Storage::disk('local')->exists("public/" . session('tenant')->nome . "/configuracoes/logo/logo.jpg")) {
+        }else if (Storage::disk('local')->exists("public/" . session('tenant')->nome . "/configuracoes/logo/logo.jpg")) {
 
             $logoPath = Storage::disk('local')->path("public/" . session('tenant')->nome . "/configuracoes/logo/logo.jpg");
             $logo = 'data://text/plain;base64,' . base64_encode(file_get_contents($logoPath)) ?? '';
