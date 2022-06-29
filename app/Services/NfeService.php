@@ -379,6 +379,13 @@ class NfeService
 
         if (count($dados['parcelas']) >= 1) {
 
+            //====================TAG FATURA===================
+            $fat = new stdClass();
+            $fat->nFat = $ide->nNF;
+            $fat->vOrig = array_reduce($dados['parcelas'], array($this, "sum"));
+            $fat->vDesc = $dados['desconto'];
+            $fat->vLiq =  $fat->vOrig - $fat->vDesc;
+            $nfe->tagfat($fat);
             //====================TAG DUPLICATA===================
 
             for ($i = 0; $i < count($dados['parcelas']); $i++) {
@@ -388,17 +395,9 @@ class NfeService
                 $dup->nDup = str_pad($i + 1, 3, "0", STR_PAD_LEFT);
                 $date = DateTime::createFromFormat('d/m/Y', $dados['parcelas'][$i]['dataVencimento']);
                 $dup->dVenc = $date->format('Y-m-d');
-                $dup->vDup = $dados['parcelas'][$i]['valorParcela'];
+                $dup->vDup = number_format($dados['parcelas'][$i]['valorParcela'], 2);
                 $nfe->tagdup($dup);
             }
-
-            //====================TAG FATURA===================
-            $fat = new stdClass();
-            $fat->nFat = $ide->nNF;
-            $fat->vOrig = array_reduce($dados['parcelas'], array($this, "sum"));
-            $fat->vDesc = $dados['desconto'];
-            $fat->vLiq =  $fat->vOrig - $fat->vDesc;
-            $nfe->tagfat($fat);
         }
 
         //====================TAG PAGAMENTO===================
