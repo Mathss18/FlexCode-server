@@ -382,67 +382,67 @@ class NfeService
             //====================TAG FATURA===================
             $fat = new stdClass();
             $fat->nFat = $ide->nNF;
-            $fat->vOrig = 44267.20;//array_reduce($dados['parcelas'], array($this, "sum"));
+            $fat->vOrig = array_reduce($dados['parcelas'], array($this, "sum"));
             $fat->vDesc = $dados['desconto'];
             $fat->vLiq =  $fat->vOrig - $fat->vDesc;
             $nfe->tagfat($fat);
             //====================TAG DUPLICATA===================
 
-            // for ($i = 0; $i < count($dados['parcelas']); $i++) {
+            for ($i = 0; $i < count($dados['parcelas']); $i++) {
 
-            //     $dup = new stdClass();
+                $dup = new stdClass();
 
-            //     $dup->nDup = str_pad($i + 1, 3, "0", STR_PAD_LEFT);
-            //     $date = DateTime::createFromFormat('d/m/Y', $dados['parcelas'][$i]['dataVencimento']);
-            //     $dup->dVenc = $date->format('Y-m-d');
-            //     $dup->vDup = $dados['parcelas'][$i]['valorParcela'];
-            //     $nfe->tagdup($dup);
-            // }
+                $dup->nDup = str_pad($i + 1, 3, "0", STR_PAD_LEFT);
+                $date = DateTime::createFromFormat('d/m/Y', $dados['parcelas'][$i]['dataVencimento']);
+                $dup->dVenc = $date->format('Y-m-d');
+                $dup->vDup = $dados['parcelas'][$i]['valorParcela'];
+                $nfe->tagdup($dup);
+            }
 
-            $dup1 = new stdClass();
-            $dup1->nDup = '001';
-            $dup1->dVenc = '2022-07-27';
-            $dup1->vDup = 6323.88;
-            $nfe->tagdup($dup1);
+            // $dup1 = new stdClass();
+            // $dup1->nDup = '001';
+            // $dup1->dVenc = '2022-07-27';
+            // $dup1->vDup = 6323.88;
+            // $nfe->tagdup($dup1);
 
-            $dup2 = new stdClass();
-            $dup2->nDup = '002';
-            $dup2->dVenc = '2022-08-03';
-            $dup2->vDup = 6323.88;
-            $nfe->tagdup($dup2);
+            // $dup2 = new stdClass();
+            // $dup2->nDup = '002';
+            // $dup2->dVenc = '2022-08-03';
+            // $dup2->vDup = 6323.88;
+            // $nfe->tagdup($dup2);
 
-            $dup3 = new stdClass();
-            $dup3->nDup = '003';
-            $dup3->dVenc = '2022-08-10';
-            $dup3->vDup = 6323.88;
-            $nfe->tagdup($dup3);
+            // $dup3 = new stdClass();
+            // $dup3->nDup = '003';
+            // $dup3->dVenc = '2022-08-10';
+            // $dup3->vDup = 6323.88;
+            // $nfe->tagdup($dup3);
 
-            $dup4 = new stdClass();
-            $dup4->nDup = '004';
-            $dup4->dVenc = '2022-08-17';
-            $dup4->vDup = 6323.88;
-            $nfe->tagdup($dup4);
-
-
-            $dup5 = new stdClass();
-            $dup5->nDup = '005';
-            $dup5->dVenc = '2022-08-24';
-            $dup5->vDup = 6323.88;
-            $nfe->tagdup($dup5);
+            // $dup4 = new stdClass();
+            // $dup4->nDup = '004';
+            // $dup4->dVenc = '2022-08-17';
+            // $dup4->vDup = 6323.88;
+            // $nfe->tagdup($dup4);
 
 
-            $dup6 = new stdClass();
-            $dup6->nDup = '006';
-            $dup6->dVenc = '2022-08-31';
-            $dup6->vDup = 6323.88;
-            $nfe->tagdup($dup6);
+            // $dup5 = new stdClass();
+            // $dup5->nDup = '005';
+            // $dup5->dVenc = '2022-08-24';
+            // $dup5->vDup = 6323.88;
+            // $nfe->tagdup($dup5);
 
 
-            $dup7 = new stdClass();
-            $dup7->nDup = '007';
-            $dup7->dVenc = '2022-09-07';
-            $dup7->vDup = 6323.92;
-            $nfe->tagdup($dup7);
+            // $dup6 = new stdClass();
+            // $dup6->nDup = '006';
+            // $dup6->dVenc = '2022-08-31';
+            // $dup6->vDup = 6323.88;
+            // $nfe->tagdup($dup6);
+
+
+            // $dup7 = new stdClass();
+            // $dup7->nDup = '007';
+            // $dup7->dVenc = '2022-09-07';
+            // $dup7->vDup = 6323.92;
+            // $nfe->tagdup($dup7);
 
 
         }
