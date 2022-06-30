@@ -17,7 +17,7 @@ class TransacaoController extends Controller
             $from = date($request->query('dataInicio'));
             $to = date($request->query('dataFim'));
 
-            $transacoes = Transacao::with(['conta_bancaria', 'compra', 'venda'])->whereBetween('data', [$from, $to])->orderBy('data', 'ASC')->orderBy('dataTransacaoRegistrada', 'ASC')->get();
+            $transacoes = Transacao::with(['conta_bancaria', 'compra', 'venda'])->whereBetween('data', [$from, $to])->orderBy('id', 'desc')->get();
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', $transacoes);
             return response()->json($response, 200);
         } catch (Exception  $ex) {
