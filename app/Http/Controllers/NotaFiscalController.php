@@ -14,6 +14,7 @@ use App\Models\Transportadora;
 use App\Services\NfeService;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
@@ -144,7 +145,14 @@ class NotaFiscalController extends Controller
                 $notasFiscais->danfe = $pathDANFE;
 
                 $notasFiscais->save();
-
+                if($notasFiscais->venda_id){
+                    ItemTable::where('item_type_id', '=', 1)->update(['color' => 'black']);
+                    DB::table('vendas_parcelas')->where('venda_id','=',$notasFiscais->venda_id)->update(
+                        [
+                            'observacao' => DB::raw("CONCAT(observacao,' NF: $notasFiscais->nNF')")
+                        ],$notasFiscais->nNF
+                    );
+                }
                 $response = APIHelper::APIResponse(true, 200, 'Sucesso ao emitir NF-e', $notasFiscais);
                 return response()->json($response, 200);
             } catch (\Throwable $ex) {
