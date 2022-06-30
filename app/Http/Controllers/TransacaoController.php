@@ -127,7 +127,7 @@ class TransacaoController extends Controller
     public function transacoes($contaBancariaId)
     {
         try {
-            $transacoes = Transacao::with(['conta_bancaria', 'compra', 'venda'])->where('conta_bancaria_id', $contaBancariaId)->where('situacao', 'registrada')->orderBy('dataTransacaoRegistrada', 'desc')->get();
+            $transacoes = Transacao::with(['conta_bancaria', 'compra', 'venda'])->where('conta_bancaria_id', $contaBancariaId)->where('situacao', 'registrada')->orderBy('data', 'desc')->orderBy('dataTransacaoRegistrada', 'desc')->get();
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', $transacoes);
             return response()->json($response, 200);
         } catch (Exception  $ex) {
