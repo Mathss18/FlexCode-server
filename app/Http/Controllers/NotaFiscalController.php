@@ -146,10 +146,11 @@ class NotaFiscalController extends Controller
 
                 $notasFiscais->save();
                 if($notasFiscais->venda_id){
-                    DB::table('vendas_parcelas')->where('venda_id','=',$notasFiscais->venda_id)->update(
+                    $numeroNfe = $notasFiscais->nNF;
+                    DB::table('transacoes')->where('venda_id','=',$notasFiscais->venda_id)->update(
                         [
-                            'observacao' => DB::raw("CONCAT(observacao,' NF: $notasFiscais->nNF')")
-                        ],$notasFiscais->nNF
+                            'observacao' => DB::raw("CONCAT(observacao,' NFe: $numeroNfe')")
+                        ],$numeroNfe
                     );
                 }
                 $response = APIHelper::APIResponse(true, 200, 'Sucesso ao emitir NF-e', $notasFiscais);
