@@ -146,7 +146,6 @@ class NotaFiscalController extends Controller
 
                 $notasFiscais->save();
                 if($notasFiscais->venda_id){
-                    ItemTable::where('item_type_id', '=', 1)->update(['color' => 'black']);
                     DB::table('vendas_parcelas')->where('venda_id','=',$notasFiscais->venda_id)->update(
                         [
                             'observacao' => DB::raw("CONCAT(observacao,' NF: $notasFiscais->nNF')")
