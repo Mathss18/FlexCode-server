@@ -119,7 +119,7 @@ class RelatorioController extends Controller
                     'mes' => str_pad($transacoes[$i]->mes, 2, "0", STR_PAD_LEFT),
                     'ano' => $transacoes[$i]->ano,
                     'total' => $transacoes[$i]->total,
-                    'balancoFinal' => (float)number_format($acumulador, 2)
+                    'balancoFinal' => (float)number_format($acumulador, 2, '', '')
                 ]);
             }
             $dadosFinal = [];
