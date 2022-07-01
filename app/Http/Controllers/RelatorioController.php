@@ -119,21 +119,19 @@ class RelatorioController extends Controller
                     'mes' => str_pad($transacoes[$i]->mes, 2, "0", STR_PAD_LEFT),
                     'ano' => $transacoes[$i]->ano,
                     'total' => $transacoes[$i]->total,
-                    'balancoFinal' => $acumulador
+                    'balancoFinal' => number_format($acumulador, 2)
                 ]);
             }
             $dadosFinal = [];
-            for ($i=0; $i < count($dados); $i++) {
+            for ($i = 0; $i < count($dados); $i++) {
                 // verifica se dados[i] está entre $to e $from, se não estiver, remove da lista
                 if ($dados[$i]['ano'] . '-' . $dados[$i]['mes'] < $from || $dados[$i]['ano'] . '-' . $dados[$i]['mes'] > $to) {
                     // unset($dados[$i]);
                     // caso não esteja, continua
-                }
-                else{
+                } else {
                     // caso esteja, adiciona na lista final
                     array_push($dadosFinal, $dados[$i]);
                 }
-
             }
 
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', [
