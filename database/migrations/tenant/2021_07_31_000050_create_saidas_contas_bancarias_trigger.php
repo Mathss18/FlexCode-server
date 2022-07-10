@@ -35,7 +35,7 @@ class CreateSaidasContasBancariasTrigger extends Migration
             CREATE TRIGGER `TRG_transacoes_after_update` AFTER UPDATE ON `transacoes`
             FOR EACH ROW
             BEGIN
-            IF(old.situacao = 'aberta' AND new.situacao = 'aberta') THEN
+            IF(old.situacao = 'aberta' AND new.situacao = 'aberta') THEN -- se a transação estava aberta e foi aberta, não faz nada
                 CALL SP_atualizar_contas_bancarias (new.conta_bancaria_id, 0);
             ELSEIF(old.situacao = 'aberta' AND new.situacao = 'registrada') THEN -- se a transação estava aberta e foi registrada
                 IF(new.tipo = 'rendimento') THEN
@@ -66,7 +66,7 @@ class CreateSaidasContasBancariasTrigger extends Migration
                     CALL SP_atualizar_contas_bancarias (new.conta_bancaria_id, new.valor * -1);
                 END IF;
             END IF;
-            END;
+            END
         SQL;
 
         $script3 =
