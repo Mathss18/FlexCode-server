@@ -62,7 +62,7 @@ class DashboardController extends Controller
     {
         $contasBancarias = ContaBancaria::orderBy('id', 'desc')->get();
         foreach ($contasBancarias as $index => $contaBancaria) {
-            $contasBancarias[$index]->transacoes = Transacao::where('conta_bancaria_id', $contaBancaria->id)->where('situacao', 'registrada')->orderBy('dataTransacaoRegistrada', 'asc')->get();
+            $contasBancarias[$index]->transacoes = Transacao::where('conta_bancaria_id', $contaBancaria->id)->where('situacao', 'registrada')->orderBy('dataTransacaoRegistrada', 'asc')->take(10)->get();
         }
         return $contasBancarias;
     }
