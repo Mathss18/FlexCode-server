@@ -153,14 +153,21 @@ class RelatorioController extends Controller
             $vendasAbertas = DB::select(DB::raw("SELECT v.numero,v.total, v.dataEntrada, c.nome FROM vendas v, clientes c WHERE v.cliente_id = c.id
             AND v.situacao = 0 AND v.dataEntrada BETWEEN '{$from}' AND '{$to}' ORDER BY v.dataEntrada DESC"));
 
+            $totalVendasAbertas = DB::select(DB::raw("SELECT sum(v.total) as total WHERE v.situacao = 0 AND v.dataEntrada BETWEEN '{$from}' AND '{$to}'"));
+
+
             $vendasRealizadas = DB::select(DB::raw("SELECT v.numero,v.total, v.dataEntrada, c.nome FROM vendas v, clientes c WHERE v.cliente_id = c.id
             AND v.situacao = 1 AND v.dataEntrada BETWEEN '{$from}' AND '{$to}' ORDER BY v.dataEntrada DESC"));
+
+            $totalVendasRealizadas = DB::select(DB::raw("SELECT sum(v.total) as total WHERE v.situacao = 1 AND v.dataEntrada BETWEEN '{$from}' AND '{$to}'"));
 
 
 
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', [
                 'vendasAbertas' => $vendasAbertas,
+                'totalVendasAbertas' => $totalVendasAbertas,
                 'vendasRealizadas' => $vendasRealizadas,
+                'totalVendasRealizadas' => $totalVendasRealizadas,
             ]);
             return response()->json($response, 200);
         } catch (Exception  $ex) {
