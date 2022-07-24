@@ -165,9 +165,9 @@ class RelatorioController extends Controller
 
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', [
                 'vendasAbertas' => $vendasAbertas,
-                'totalVendasAbertas' => $totalVendasAbertas,
+                'totalVendasAbertas' => $totalVendasAbertas[0]['total'],
                 'vendasRealizadas' => $vendasRealizadas,
-                'totalVendasRealizadas' => $totalVendasRealizadas,
+                'totalVendasRealizadas' => $totalVendasRealizadas[0]['total'],
             ]);
             return response()->json($response, 200);
         } catch (Exception  $ex) {
