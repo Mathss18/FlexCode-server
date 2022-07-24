@@ -149,8 +149,8 @@ class RelatorioController extends Controller
         $from = date($request->query('startDate'));
         $to = date($request->query('endDate'));
 
-        $fromFull = $from . " 00:00:00";
-        $toFull = $from . " 00:00:00";
+        $fromFull = date($request->query('startDate') . ' 00:00:00');
+        $toFull = date($request->query('endDate') . ' 23:59:59');
         try {
             // --- Abertas ---
             $vendasAbertas = DB::select(DB::raw("SELECT v.numero,v.total, v.dataEntrada, c.nome FROM vendas v, clientes c WHERE v.cliente_id = c.id
