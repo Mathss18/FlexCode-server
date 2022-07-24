@@ -148,6 +148,9 @@ class RelatorioController extends Controller
     {
         $from = date($request->query('startDate'));
         $to = date($request->query('endDate'));
+
+        $fromFull = $from . "00:00:00";
+        $toFull = $from . "00:00:00";
         try {
             // --- Abertas ---
             $vendasAbertas = DB::select(DB::raw("SELECT v.numero,v.total, v.dataEntrada, c.nome FROM vendas v, clientes c WHERE v.cliente_id = c.id
@@ -157,7 +160,7 @@ class RelatorioController extends Controller
 
 
             $vendasRealizadas = DB::select(DB::raw("SELECT v.numero,v.total, v.dataEntrada, c.nome FROM vendas v, clientes c WHERE v.cliente_id = c.id
-            AND v.situacao = 1 AND v.dataEntrada BETWEEN '{$from}' AND '{$to}' ORDER BY v.dataEntrada DESC"));
+            AND v.situacao = 1 AND v.updated_at BETWEEN '{$fromFull}' AND '{$toFull}' ORDER BY v.updated_at DESC"));
 
             $totalVendasRealizadas = DB::select(DB::raw("SELECT sum(v.total) as total FROM vendas v WHERE v.situacao = 1 AND v.dataEntrada BETWEEN '{$from}' AND '{$to}'"));
 
