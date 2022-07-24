@@ -151,10 +151,10 @@ class RelatorioController extends Controller
         try {
             // --- Abertas ---
             $vendasAbertas = DB::select(DB::raw("SELECT v.numero,v.total, v.dataEntrada, c.nome FROM vendas v, clientes c WHERE v.cliente_id = c.id
-            AND v.situacao = 0 AND v.dataEntrada BETWEEN '{$from}' AND '{$to}' ORDER BY t.dataEntrada DESC"));
+            AND v.situacao = 0 AND v.dataEntrada BETWEEN '{$from}' AND '{$to}' ORDER BY v.dataEntrada DESC"));
 
             $vendasRealizadas = DB::select(DB::raw("SELECT v.numero,v.total, v.dataEntrada, c.nome FROM vendas v, clientes c WHERE v.cliente_id = c.id
-            AND v.situacao = 1 AND v.dataEntrada BETWEEN '{$from}' AND '{$to}' ORDER BY t.dataEntrada DESC"));
+            AND v.situacao = 1 AND v.dataEntrada BETWEEN '{$from}' AND '{$to}' ORDER BY v.dataEntrada DESC"));
 
 
 
