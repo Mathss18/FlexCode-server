@@ -383,5 +383,6 @@ Route::middleware(['jwt', 'check.jwt.tenant'])->group(function () {
     //============================ RELATORIOS ==============================
     Route::get('relatorios/rendimentos-vs-despesas', [RelatorioController::class, 'rendimentosVsDespesas']);
     Route::get('relatorios/patrimonio-ao-longo-do-tempo', [RelatorioController::class, 'patrimonioAoLongoDoTempo']);
+    Route::get('relatorios/vendas', [RelatorioController::class, 'vendas']);
 
 });

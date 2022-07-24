@@ -143,4 +143,29 @@ class RelatorioController extends Controller
             return response()->json($response, 500);
         }
     }
+
+    public function vendas(Request $request)
+    {
+        $from = date($request->query('startDate'));
+        $to = date($request->query('endDate'));
+        try {
+            // --- Abertas ---
+            $vendasAbertas = DB::select(DB::raw("SELECT v.numero,v.total, v.dataEntrada, c.nome FROM vendas v, clientes c WHERE v.cliente_id = c.id
+            AND v.situacao = 0 AND v.dataEntrada BETWEEN '{$from}' AND '{$to}' ORDER BY t.dataEntrada DESC"));
+
+            $vendasRealizadas = DB::select(DB::raw("SELECT v.numero,v.total, v.dataEntrada, c.nome FROM vendas v, clientes c WHERE v.cliente_id = c.id
+            AND v.situacao = 1 AND v.dataEntrada BETWEEN '{$from}' AND '{$to}' ORDER BY t.dataEntrada DESC"));
+
+
+
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso', [
+                'vendasAbertas' => $vendasAbertas,
+                'vendasRealizadas' => $vendasRealizadas,
+            ]);
+            return response()->json($response, 200);
+        } catch (Exception  $ex) {
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+            return response()->json($response, 500);
+        }
+    }
 }
