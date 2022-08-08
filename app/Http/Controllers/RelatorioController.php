@@ -143,4 +143,39 @@ class RelatorioController extends Controller
             return response()->json($response, 500);
         }
     }
+
+    public function vendas(Request $request)
+    {
+        $from = date($request->query('startDate'));
+        $to = date($request->query('endDate'));
+
+        $fromFull = date($request->query('startDate') . ' 00:00:00');
+        $toFull = date($request->query('endDate') . ' 23:59:59');
+        try {
+            // --- Abertas ---
+            $vendasAbertas = DB::select(DB::raw("SELECT v.numero,v.total, v.dataEntrada, c.nome FROM vendas v, clientes c WHERE v.cliente_id = c.id
+            AND v.situacao = 0 AND v.dataEntrada BETWEEN '{$from}' AND '{$to}' ORDER BY v.dataEntrada DESC"));
+
+            $totalVendasAbertas = DB::select(DB::raw("SELECT sum(v.total) as total FROM vendas v WHERE v.situacao = 0 AND v.dataEntrada BETWEEN '{$from}' AND '{$to}'"));
+
+
+            $vendasRealizadas = DB::select(DB::raw("SELECT v.numero,v.total, v.dataEntrada, c.nome FROM vendas v, clientes c WHERE v.cliente_id = c.id
+            AND v.situacao = 1 AND v.updated_at BETWEEN '{$fromFull}' AND '{$toFull}' ORDER BY v.updated_at DESC"));
+
+            $totalVendasRealizadas = DB::select(DB::raw("SELECT sum(v.total) as total FROM vendas v WHERE v.situacao = 1 AND v.updated_at BETWEEN '{$fromFull}' AND '{$toFull}'"));
+
+
+
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso', [
+                'vendasAbertas' => $vendasAbertas,
+                'totalVendasAbertas' => $totalVendasAbertas[0]->total,
+                'vendasRealizadas' => $vendasRealizadas,
+                'totalVendasRealizadas' => $totalVendasRealizadas[0]->total,
+            ]);
+            return response()->json($response, 200);
+        } catch (Exception  $ex) {
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+            return response()->json($response, 500);
+        }
+    }
 }
