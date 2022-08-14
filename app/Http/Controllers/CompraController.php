@@ -116,7 +116,7 @@ class CompraController extends Controller
                         $transacao = new Transacao;
                         $transacao->title = $request->input('fornecedor_id')['label'];
                         $transacao->data  = DateTime::createFromFormat('d/m/Y', $value['dataVencimento'])->format("Y-m-d");
-                        $transacao->observacao = 'Compra nº ' . $compras->numero . ' - Parcela ' . ($key + 1);
+                        $transacao->observacao = 'Compra nº ' . $compras->numero . ' - Parcela ' . ($key + 1) . ' ' . "NFe $compras->numeroNF";
                         $transacao->valor = number_format((float)$value['valorParcela'], 2, '.', '');
                         $transacao->tipo = 'despesa';
                         $transacao->situacao = 'aberta';
@@ -290,7 +290,7 @@ class CompraController extends Controller
                         $transacao = new Transacao;
                         $transacao->title = $request->input('fornecedor_id')['label'];
                         $transacao->data  = DateTime::createFromFormat('d/m/Y', $parcela['dataVencimento'])->format("Y-m-d");
-                        $transacao->observacao = 'Compra nº ' . $compras->numero . ' - Parcela ' . ($index+1);
+                        $transacao->observacao = 'Compra nº ' . $compras->numero . ' - Parcela ' . ($index + 1) . ' ' . "NFe $compras->numeroNF";
                         $transacao->valor = number_format((float)$parcela['valorParcela'], 2, '.', '');
                         $transacao->tipo = 'despesa';
                         $transacao->situacao = 'aberta';
@@ -441,5 +441,4 @@ class CompraController extends Controller
             return response()->json($response, 500);
         }
     }
-
 }
