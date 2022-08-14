@@ -302,6 +302,9 @@ class VendaController extends Controller
                 if ($oldVendas->situacao == 0 && $vendas->situacao == 1) {
                     DB::table('transacoes')->where('venda_id', $vendas->id)->delete();
                 }
+                if ($oldVendas->situacao == 1 && $vendas->situacao == 3) {
+                    DB::table('transacoes')->where('venda_id', $vendas->id)->delete();
+                }
                 if ($oldVendas->situacao == 1 && $vendas->situacao == 0) {
                     DB::table('transacoes')->where('venda_id', $vendas->id)->delete();
                 }
@@ -325,7 +328,7 @@ class VendaController extends Controller
 
                     );
 
-                    if ($oldVendas->situacao == 0 && $vendas->situacao == 1) {
+                    if ($oldVendas->situacao == 0 && $vendas->situacao == 1 || $oldVendas->situacao == 3 && $vendas->situacao == 1) {
                         //Cadastra as parcelas no money
                         $formaPagamento = FormaPagamento::with(['conta_bancaria'])->findOrFail($parcela['forma_pagamento_id']);
 
@@ -385,7 +388,7 @@ class VendaController extends Controller
             }
 
             // Se a venda estiver em aberto e depois for realizada, então retira os produtos no estoque
-            if ($oldVendas->situacao == 0 && $vendas->situacao == 1) {
+            if ($oldVendas->situacao == 0 && $vendas->situacao == 1 || $oldVendas->situacao == 3 && $vendas->situacao == 1) {
                 $user = JWTAuth::user();
                 foreach ($produtos as $produto) {
                     $prodBanco = Produto::find($produto['produto_id']);
