@@ -350,7 +350,7 @@ class CompraController extends Controller
                     if ($prodBanco->movimentaEstoque) {
                         DB::table('entradas_produtos')->insert(
                             [
-                                'produto_id'        => $produto['id'],
+                                'produto_id'        => $produto['produto_id'],
                                 'quantidade'        => number_format((float)$produto['quantidade'], session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
                                 'quantidadeMomento' => number_format((float)$prodBanco->quantidadeAtual, session('config')->quantidadeCasasDecimaisQuantidade, '.', '') + number_format((float)$produto['quantidade'], session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
                                 'preco'             => number_format((float)$produto['preco'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
