@@ -238,7 +238,7 @@ class NfeService
             ) {
                 $icms->CSOSN = '400';
                 $icms->pCredSN = $aliquota;
-                $icms->vCredICMSSN = 0.00;
+                $icms->vCredICMSSN = $dados['totalProdutos'] * ($aliquota / 100);
             } else {
                 $icms->CSOSN = '900';
                 $icms->pCredSN = $aliquota;
