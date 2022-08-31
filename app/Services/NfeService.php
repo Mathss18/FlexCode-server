@@ -242,7 +242,7 @@ class NfeService
             } else {
                 $icms->CSOSN = '900';
                 $icms->pCredSN = $aliquota;
-                $icms->vCredICMSSN = 0.00;
+                $icms->vCredICMSSN = $dados['totalProdutos'] * ($aliquota / 100);
             }
             //$icms->modBCST = null;
             //$icms->pMVAST = null;
