@@ -233,6 +233,8 @@ Route::middleware(['jwt', 'check.jwt.tenant'])->group(function () {
 
     Route::get('minhas-tarefas/{idUsuario}/finalizadas', [OrdemServicoFuncionarioController::class, 'showFinalizadas']);
 
+    Route::get('minhas-tarefas/getSituacao/{id}', [OrdemServicoFuncionarioController::class, 'getSituacao']);
+
     Route::post('minhas-tarefas', [OrdemServicoFuncionarioController::class, 'store']);
 
     Route::put('minhas-tarefas/{id}', [OrdemServicoFuncionarioController::class, 'update']);
