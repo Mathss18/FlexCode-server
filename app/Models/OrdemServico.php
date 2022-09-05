@@ -16,12 +16,12 @@ class OrdemServico extends Model
 
     public function produtos()
     {
-        return $this->belongsToMany(Produto::class, 'ordens_servicos_produtos')->withPivot('produto_id','ordem_servico_id', 'quantidade', 'preco', 'situacao', 'total', 'observacao');
+        return $this->belongsToMany(Produto::class, 'ordens_servicos_produtos')->withPivot('id','produto_id','ordem_servico_id', 'quantidade', 'preco', 'situacao', 'total', 'observacao');
     }
 
     public function servicos()
     {
-        return $this->belongsToMany(Servico::class, 'ordens_servicos_servicos')->withPivot('servico_id','ordem_servico_id', 'quantidade', 'preco', 'situacao', 'total', 'observacao');
+        return $this->belongsToMany(Servico::class, 'ordens_servicos_servicos')->withPivot('id','servico_id','ordem_servico_id', 'quantidade', 'preco', 'situacao', 'total', 'observacao');
     }
 
     public function funcionarios()
