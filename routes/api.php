@@ -224,7 +224,7 @@ Route::middleware(['jwt', 'check.jwt.tenant'])->group(function () {
 
     Route::delete('ordens-servicos/{id}', [OrdemServicoController::class, 'destroy']);
 
-    //============================ ORDENS SERVICOS FUNCIOARIOS ==============================
+    //============================ ORDENS SERVICOS FUNCIONARIOS ==============================
     Route::get('minhas-tarefas', [OrdemServicoFuncionarioController::class, 'index']);
 
     Route::get('minhas-tarefas/{idUsuario}/abertas', [OrdemServicoFuncionarioController::class, 'showAbertas']);
@@ -234,6 +234,8 @@ Route::middleware(['jwt', 'check.jwt.tenant'])->group(function () {
     Route::get('minhas-tarefas/{idUsuario}/finalizadas', [OrdemServicoFuncionarioController::class, 'showFinalizadas']);
 
     Route::get('minhas-tarefas/getSituacao/{id}', [OrdemServicoFuncionarioController::class, 'getSituacao']);
+
+    Route::get('minhas-tarefas/getServico/{id}', [OrdemServicoFuncionarioController::class, 'getServico']);
 
     Route::post('minhas-tarefas', [OrdemServicoFuncionarioController::class, 'store']);
 

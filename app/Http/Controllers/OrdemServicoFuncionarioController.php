@@ -89,6 +89,18 @@ class OrdemServicoFuncionarioController extends Controller
         }
     }
 
+    public function getServico($id)
+    {
+        try {
+            $servicoJson = DB::table('ordens_servicos_servicos')->where("id", "=", $id)->select(["situacao"])->first();
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso', $servicoJson);
+            return response()->json($response, 200);
+        } catch (Exception  $ex) {
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+            return response()->json($response, 500);
+        }
+    }
+
     public function getAcompanhemntoOrdemServico($idOrdemServico)
     {
         try {
