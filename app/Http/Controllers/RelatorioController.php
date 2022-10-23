@@ -264,9 +264,18 @@ class RelatorioController extends Controller
                 }
             }
 
+            $dadosFormatados = [];
+            foreach ($valoesPorContaBancaria as $nomeBanco => $value) {
+                $valores = [];
+                foreach ($value as $value2) {
+                    array_push($valores, $value2->total);
+                }
+                array_push($dadosFormatados, ["name" => $nomeBanco, "data" => $valores]);
+            }
+
             $dados = [
                 'datas' => $this->date_range($from, $to, '+1 day', 'd/m/Y'),
-                'valores' => $valoesPorContaBancaria
+                'valores' => $dadosFormatados
             ];
 
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', $dados);
