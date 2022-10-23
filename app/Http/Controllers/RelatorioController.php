@@ -207,8 +207,7 @@ class RelatorioController extends Controller
                 });
                 $valoesPorContaBancaria[$nomeBanco] = $aux;
             }
-            dd($valoesPorContaBancaria);
-            
+
             // Soma os totais com o saldo do dia
             foreach ($valoesPorContaBancaria as $nomeBanco => $value) {
 
