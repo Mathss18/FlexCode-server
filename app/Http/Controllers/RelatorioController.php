@@ -3,9 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\APIHelper;
-use App\Http\Resources\Json;
-use App\Models\FormaPagamento;
-use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -176,6 +173,53 @@ class RelatorioController extends Controller
                 'totalVendasAbertas' => $totalVendasAbertas[0]->total,
                 'vendasRealizadas' => $vendasRealizadas,
                 'totalVendasRealizadas' => $totalVendasRealizadas[0]->total,
+            ]);
+            return response()->json($response, 200);
+        } catch (Exception  $ex) {
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+            return response()->json($response, 500);
+        }
+    }
+
+    public function previsaoDeSaldo(Request $request)
+    {
+        $from = date($request->query('startDate'));
+        $to = date($request->query('endDate'));
+        try {
+            $totalContasBancariasInicial = DB::select(DB::raw("SELECT sum(saldoInicial) as totalInicial FROM contas_bancarias"));
+            $totalContasBancariasInicial = $totalContasBancariasInicial[0]->totalInicial;
+
+            $transacoes = DB::select(DB::raw("SELECT DAY(t.data) as dia, MONTH(t.data) as mes, YEAR(t.data) as ano, SUM(case when t.tipo = 'rendimento' then t.valor else t.valor * -1 end) as total FROM
+             transacoes t WHERE t.situacao = 'registrada' AND t.data GROUP BY YEAR(t.data), MONTH(t.data)"));
+
+
+            dd($transacoes);
+            $acumulador = $totalContasBancariasInicial;
+            $dados = [];
+            for ($i = 0; $i < count($transacoes); $i++) {
+                $acumulador += $transacoes[$i]->total;
+                array_push($dados, [
+                    'periodo' => str_pad($transacoes[$i]->mes, 2, "0", STR_PAD_LEFT) . '/' . $transacoes[$i]->ano,
+                    'mes' => str_pad($transacoes[$i]->mes, 2, "0", STR_PAD_LEFT),
+                    'ano' => $transacoes[$i]->ano,
+                    'total' => $transacoes[$i]->total,
+                    'balancoFinal' => (float)number_format($acumulador, 2, '.', '')
+                ]);
+            }
+            $dadosFinal = [];
+            for ($i = 0; $i < count($dados); $i++) {
+                // verifica se dados[i] está entre $to e $from, se não estiver, remove da lista
+                if ($dados[$i]['ano'] . '-' . $dados[$i]['mes'] < $from || $dados[$i]['ano'] . '-' . $dados[$i]['mes'] > $to) {
+                    // unset($dados[$i]);
+                    // caso não esteja, continua
+                } else {
+                    // caso esteja, adiciona na lista final
+                    array_push($dadosFinal, $dados[$i]);
+                }
+            }
+
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso', [
+                'transacoes' => $dadosFinal,
             ]);
             return response()->json($response, 200);
         } catch (Exception  $ex) {
