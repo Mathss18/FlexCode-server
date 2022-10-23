@@ -201,14 +201,13 @@ class RelatorioController extends Controller
             }
             ksort($valoesPorContaBancaria, SORT_NUMERIC);
 
-            // dd($valoesPorContaBancaria, $contasBancarias);
-
+            // Soma os totais com o saldo do dia
             foreach ($valoesPorContaBancaria as $key => $value) {
 
                 $saldo = ContaBancaria::where("nome", $key)->select('saldo')->first()->saldo;
                 $index = 0;
                 $prev = 0;
-                foreach ($value as $key2 => $value2) {
+                foreach ($value as $value2) {
                     if ($index === 0) {
                         $value2->total += $saldo;
                     } else {
@@ -220,7 +219,7 @@ class RelatorioController extends Controller
                 }
             }
 
-
+            // Verifica qual data está faltando e cria um objeto com a data faltante, porem com total = null
             foreach ($valoesPorContaBancaria as $key => $value) {
                 $auxIntervaloDatas = $intervaloDatas;
                 foreach ($value as $value2) {
@@ -247,7 +246,7 @@ class RelatorioController extends Controller
                 $valoesPorContaBancaria[$key] = $aux;
             }
 
-
+            // Se o total for null, então coloca o valor do dia anterior, se não houver coloca o saldo do banco
             foreach ($valoesPorContaBancaria as $key => $value) {
 
                 $saldo = ContaBancaria::where("nome", $key)->select('saldo')->first()->saldo;
@@ -267,15 +266,10 @@ class RelatorioController extends Controller
                 }
             }
 
-
-            dd($valoesPorContaBancaria, $intervaloDatas);
             $dados = [
-                'contasBancarias' => $contasBancarias,
-                // 'datas' => $this->date_range($from, $to, '+1 day', 'd/m/Y'),
+                'datas' => $this->date_range($from, $to, '+1 day', 'd/m/Y'),
                 'valores' => $valoesPorContaBancaria
             ];
-            dd($dados);
-
 
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', $dados);
             return response()->json($response, 200);
