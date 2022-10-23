@@ -193,20 +193,18 @@ class RelatorioController extends Controller
              transacoes t, contas_bancarias cb WHERE t.data BETWEEN '{$from}' AND '{$to}' AND cb.id = t.conta_bancaria_id GROUP BY dia, mes, ano, cb.nome"));
 
 
+            $valoesPorContaBancaria = [];
+            foreach ($transacoes as $key => $item) {
+                $valoesPorContaBancaria[$item->nomeBanco][$key] = $item;
+             }
 
+            ksort($valoesPorContaBancaria, SORT_NUMERIC);
+            dd($valoesPorContaBancaria);
 
             $dados = [
                 'datas' => $this->date_range($from, $to, '+1 day', 'd/m/Y'),
-                'valores' => []
+                'valores' => $valoesPorContaBancaria
             ];
-
-            $arr = [];
-            foreach ($transacoes as $key => $item) {
-                $arr[$item->nomeBanco][$key] = $item;
-             }
-
-            ksort($arr, SORT_NUMERIC);
-            dd($arr);
 
 
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', $dados);
