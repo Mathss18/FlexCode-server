@@ -213,7 +213,7 @@ class RelatorioController extends Controller
                     else{
                         $value2->total =  $value2->total + $prev;
                     }
-                    dd($value, $value2->total);
+                    // dd($value, $value2->total);
                     $index++;
                 }
             }
