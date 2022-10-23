@@ -199,7 +199,6 @@ class RelatorioController extends Controller
              }
 
             ksort($valoesPorContaBancaria, SORT_NUMERIC);
-            dd($valoesPorContaBancaria);
 
             $dados = [
                 'datas' => $this->date_range($from, $to, '+1 day', 'd/m/Y'),
