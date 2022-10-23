@@ -199,7 +199,16 @@ class RelatorioController extends Controller
             }
             ksort($valoesPorContaBancaria, SORT_NUMERIC);
 
+            // Ordena por data ASC
+            foreach ($valoesPorContaBancaria as $nomeBanco => $value) {
+                $aux = $valoesPorContaBancaria[$nomeBanco];
+                usort($aux, function ($a, $b) {
+                    return strtotime(str_replace('/', '-', $a->dataFormatada)) <=> strtotime(str_replace('/', '-', $b->dataFormatada));
+                });
+                $valoesPorContaBancaria[$nomeBanco] = $aux;
+            }
             dd($valoesPorContaBancaria);
+            
             // Soma os totais com o saldo do dia
             foreach ($valoesPorContaBancaria as $nomeBanco => $value) {
 
