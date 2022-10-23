@@ -209,11 +209,12 @@ class RelatorioController extends Controller
                     $prev = 0;
                     if($index === 0){
                         $value2->total += $saldo;
+                        $prev = $value2->total;
                     }
                     else{
+                        dd($value2->total, $prev);
                         $value2->total += $prev;
                     }
-                    $prev = $value2->total;
 
                     $index++;
                 }
