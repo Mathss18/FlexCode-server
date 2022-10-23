@@ -238,7 +238,17 @@ class RelatorioController extends Controller
                 }
             }
 
-            ksort($valoesPorContaBancaria, SORT_NUMERIC);
+            foreach ($valoesPorContaBancaria as $key => $value) {
+                uasort(
+                    $value,
+                    function($a, $b) {
+                        return strtotime($a->dataFormatada) <=> strtotime($b->dataFormatada);
+                    }
+                );
+            }
+
+
+
 
             // foreach ($valoesPorContaBancaria as $key => $value) {
             //     foreach ($value as $value2) {
