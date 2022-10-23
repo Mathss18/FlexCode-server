@@ -204,7 +204,7 @@ class RelatorioController extends Controller
             foreach ($valoesPorContaBancaria as $key => $value) {
                 $saldo = ContaBancaria::where("nome", $key)->select('saldo')->first()->saldo;
                 foreach ($value as $key2 => $value2) {
-                    dd($value);
+                    dd($value, $value2);
                 }
             }
 
