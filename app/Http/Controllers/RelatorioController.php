@@ -189,7 +189,7 @@ class RelatorioController extends Controller
             $totalContasBancariasInicial = DB::select(DB::raw("SELECT sum(saldoInicial) as totalInicial FROM contas_bancarias"));
             $totalContasBancariasInicial = $totalContasBancariasInicial[0]->totalInicial;
 
-            $transacoes = DB::select(DB::raw("SELECT cb.nome, DAY(t.data) as dia, MONTH(t.data) as mes, YEAR(t.data) as ano, DATE_FORMAT(date,'%d/%m/%Y') as dataFormatada, SUM(case when t.tipo = 'rendimento' then t.valor else t.valor * -1 end) as total FROM
+            $transacoes = DB::select(DB::raw("SELECT cb.nome, DAY(t.data) as dia, MONTH(t.data) as mes, YEAR(t.data) as ano, DATE_FORMAT(t.data,'%d/%m/%Y') as dataFormatada, SUM(case when t.tipo = 'rendimento' then t.valor else t.valor * -1 end) as total FROM
              transacoes t, contas_bancarias cb WHERE t.data BETWEEN '{$from}' AND '{$to}' AND cb.id = t.conta_bancaria_id GROUP BY dia, mes, ano, cb.nome"));
 
 
