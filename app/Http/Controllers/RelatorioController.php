@@ -191,7 +191,7 @@ class RelatorioController extends Controller
             $results = [];
             foreach ($contasBancarias as $contaBancaria) {
                 $result = $transacoes = DB::select(DB::raw("SELECT cb.nome as nomeBanco, DATE_FORMAT(t.data,'%d/%m/%Y') as dataFormatada, SUM(case when t.tipo = 'rendimento' then t.valor else t.valor * -1 end) as total FROM
-                 transacoes t, contas_bancarias cb WHERE t.data BETWEEN '{$from}' AND '{$to}' AND cb.id = $contaBancaria->id GROUP BY DAY(t.data), MONTH(t.data), YEAR(t.data)"));
+                 transacoes t, contas_bancarias cb WHERE t.data BETWEEN '{$from}' AND '{$to}' AND t.conta_bancaria_id = $contaBancaria->id GROUP BY DAY(t.data), MONTH(t.data), YEAR(t.data)"));
                 array_push($results, $result);
             }
             dd($results);
