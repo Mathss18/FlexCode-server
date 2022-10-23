@@ -220,7 +220,7 @@ class RelatorioController extends Controller
                 }
             }
 
-            foreach ($intervaloDatas as $key => $value) {
+            foreach ($intervaloDatas as $intervaloData) {
                 foreach ($valoesPorContaBancaria as $key => $value) {
                     $auxIntervaloDatas = $intervaloDatas;
                     foreach ($value as $key2 => $value2) {
@@ -235,7 +235,7 @@ class RelatorioController extends Controller
                         array_push($value, $obj);
                     }
                 }
-                dd($value);
+
             }
 
             dd($valoesPorContaBancaria, $intervaloDatas);
