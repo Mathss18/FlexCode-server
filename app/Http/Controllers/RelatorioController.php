@@ -204,10 +204,21 @@ class RelatorioController extends Controller
             foreach ($valoesPorContaBancaria as $key => $value) {
                 $saldo = ContaBancaria::where("nome", $key)->select('saldo')->first()->saldo;
                 foreach ($value as $key2 => $value2) {
-                    dd($value, $value2);
+                    $index = 0;
+                    $prev = 0;
+                    if($index === 0){
+                        $value2->total += $saldo;
+                        $prev = $value2->total;
+                    }
+                    else{
+                        $value2->total =  $value2->total + $prev;
+                    }
+                    dd($value, $value2->total);
+                    $index++;
                 }
             }
 
+            dd($valoesPorContaBancaria);
             $dados = [
                 'contasBancarias' => $contasBancarias,
                 // 'datas' => $this->date_range($from, $to, '+1 day', 'd/m/Y'),
