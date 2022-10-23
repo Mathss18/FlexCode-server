@@ -239,6 +239,7 @@ class RelatorioController extends Controller
             }
 
             foreach ($valoesPorContaBancaria as $key => $value) {
+                dd($valoesPorContaBancaria[$key]);
                 ksort($valoesPorContaBancaria[$key], SORT_LOCALE_STRING);
                 // uasort(
                 //     $valoesPorContaBancaria[$key],
