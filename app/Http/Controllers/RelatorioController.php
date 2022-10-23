@@ -240,7 +240,7 @@ class RelatorioController extends Controller
 
             foreach ($valoesPorContaBancaria as $key => $value) {
                 $aux = $valoesPorContaBancaria[$key];
-                usort($cu, function($a, $b) { return strtotime(str_replace('/', '-', $a->dataFormatada)) <=> strtotime(str_replace('/', '-', $b->dataFormatada));});
+                usort($aux, function($a, $b) { return strtotime(str_replace('/', '-', $a->dataFormatada)) <=> strtotime(str_replace('/', '-', $b->dataFormatada));});
                 $valoesPorContaBancaria[$key] = $aux;
             }
 
