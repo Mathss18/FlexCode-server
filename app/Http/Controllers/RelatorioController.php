@@ -209,14 +209,13 @@ class RelatorioController extends Controller
                 foreach ($value as $key2 => $value2) {
                     if($index === 0){
                         $value2->total += $saldo;
-                        $prev = $value2->total;
                     }
                     else{
-                        dd($value2->total, $prev);
                         $value2->total += $prev;
                     }
+                    $prev = $value2->total;
 
-                    $index += 1;
+                    $index++;
                 }
                 dd($value);
             }
