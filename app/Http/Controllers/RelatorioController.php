@@ -205,7 +205,7 @@ class RelatorioController extends Controller
 
                 $saldo = ContaBancaria::where("nome", $key)->select('saldo')->first()->saldo;
                 foreach ($value as $key2 => $value2) {
-                    $index = 1;
+                    $index = 0;
                     $prev = 0;
                     if($index === 0){
                         $value2->total += $saldo;
