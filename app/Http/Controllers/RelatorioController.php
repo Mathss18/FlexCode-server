@@ -186,27 +186,25 @@ class RelatorioController extends Controller
         $from = date($request->query('startDate'));
         $to = date($request->query('endDate'));
         try {
-            $contasBancarias = DB::select(DB::raw("SELECT id, nome, saldo FROM contas_bancarias"));
+            $contasBancarias = DB::select(DB::raw("SELECT nome, saldo FROM contas_bancarias"));
 
-            $results = [];
-            foreach ($contasBancarias as $contaBancaria) {
-                $result = $transacoes = DB::select(DB::raw("SELECT cb.nome as nomeBanco, DATE_FORMAT(t.data,'%d/%m/%Y') as dataFormatada, SUM(case when t.tipo = 'rendimento' then t.valor else t.valor * -1 end) as total FROM
-                 transacoes t, contas_bancarias cb WHERE t.conta_bancaria_id = 10 AND t.data BETWEEN '{$from}' AND '{$to}' GROUP BY DAY(t.data), MONTH(t.data), YEAR(t.data), t.conta_bancaria_id"));
-                dd($result);
-                array_push($results, $result);
-            }
-            dd($results);
+            dd($contasBancarias);
+
+            $transacoes = DB::select(DB::raw("SELECT cb.nome as nomeBanco, DATE_FORMAT(t.data,'%d/%m/%Y') as dataFormatada, SUM(case when t.tipo = 'rendimento' then t.valor else t.valor * -1 end) as total FROM
+             transacoes t, contas_bancarias cb WHERE t.data BETWEEN '{$from}' AND '{$to}' AND cb.id = t.conta_bancaria_id GROUP BY DAY(t.data), MONTH(t.data), YEAR(t.data), cb.nome"));
+
 
             $valoesPorContaBancaria = [];
             foreach ($transacoes as $key => $item) {
                 $valoesPorContaBancaria[$item->nomeBanco][$key] = $item;
-            }
+             }
             ksort($valoesPorContaBancaria, SORT_NUMERIC);
 
+            dd($transacoes, $contasBancarias);
 
             $dados = [
                 'contasBancarias' => $contasBancarias,
-                'datas' => $this->date_range($from, $to, '+1 day', 'd/m/Y'),
+                // 'datas' => $this->date_range($from, $to, '+1 day', 'd/m/Y'),
                 'valores' => $valoesPorContaBancaria
             ];
             dd($dados);
@@ -220,14 +218,13 @@ class RelatorioController extends Controller
         }
     }
 
-    private function date_range($first, $last, $step = '+1 day', $output_format = 'd/m/Y')
-    {
+    private function date_range($first, $last, $step = '+1 day', $output_format = 'd/m/Y' ) {
 
         $dates = array();
         $current = strtotime($first);
         $last = strtotime($last);
 
-        while ($current <= $last) {
+        while( $current <= $last ) {
 
             $dates[] = date($output_format, $current);
             $current = strtotime($step, $current);
