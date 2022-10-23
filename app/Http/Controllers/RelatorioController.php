@@ -229,7 +229,11 @@ class RelatorioController extends Controller
                             unset($auxIntervaloDatas[$pos]);
                         }
                     }
-                    dd($auxIntervaloDatas);
+                    foreach ($auxIntervaloDatas as $key3 => $value3) {
+                        $obj = new \stdClass;
+                        $obj->dataFormatada = $value3;
+                        array_push($value2, $obj);
+                    }
                 }
             }
 
