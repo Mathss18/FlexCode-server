@@ -224,7 +224,7 @@ class RelatorioController extends Controller
                 $index = 0;
                 $prev = null;
                 foreach ($value as $key2 => $value2) {
-                    if (!in_array($value2->dataFormatada, $intervaloDatas)) {
+                    if (in_array($value2->dataFormatada, $intervaloDatas)) {
                         dd($value2, $intervaloDatas);
                     }
                     $prev = $value2;
