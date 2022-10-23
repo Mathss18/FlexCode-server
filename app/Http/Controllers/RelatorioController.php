@@ -198,7 +198,7 @@ class RelatorioController extends Controller
             }
             ksort($valoesPorContaBancaria, SORT_NUMERIC);
 
-            dd($transacoes, $contasBancarias);
+            dd($valoesPorContaBancaria, $contasBancarias);
 
             $dados = [
                 'contasBancarias' => $contasBancarias,
