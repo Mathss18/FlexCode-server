@@ -211,7 +211,7 @@ class RelatorioController extends Controller
                         $value2->total += $saldo;
                     }
                     else{
-                        $value2->total + $prev;
+                        $value2->total += $prev;
                     }
                     $prev = $value2->total;
 
