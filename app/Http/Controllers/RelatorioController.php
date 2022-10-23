@@ -201,7 +201,7 @@ class RelatorioController extends Controller
             foreach ($valoesPorContaBancaria as $key => $value) {
                 $idBanco = $value[0]->idBanco;
                 $saldoInicial = DB::select(DB::raw("SELECT saldo FROM contas_bancarias WHERE id = $idBanco"));
-                dd($saldoInicial[0]);
+                dd($saldoInicial[0]->saldo);
 
             }
 
