@@ -190,10 +190,11 @@ class RelatorioController extends Controller
             $totalContasBancariasInicial = $totalContasBancariasInicial[0]->totalInicial;
 
             $transacoes = DB::select(DB::raw("SELECT DAY(t.data) as dia, MONTH(t.data) as mes, YEAR(t.data) as ano, SUM(case when t.tipo = 'rendimento' then t.valor else t.valor * -1 end) as total FROM
-             transacoes t WHERE t.situacao = 'registrada' AND t.data GROUP BY YEAR(t.data), MONTH(t.data)"));
+             transacoes t WHERE t.situacao = 'registrada' AND t.data GROUP BY DAY(t.data), MONTH(t.data)"));
 
 
             dd($transacoes);
+            
             $acumulador = $totalContasBancariasInicial;
             $dados = [];
             for ($i = 0; $i < count($transacoes); $i++) {
