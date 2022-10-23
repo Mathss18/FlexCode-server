@@ -239,7 +239,7 @@ class RelatorioController extends Controller
             }
 
             foreach ($valoesPorContaBancaria as $key => $value) {
-                usort($valoesPorContaBancaria[$key], function($a, $b) { return strtotime(str_replace('/', '-', $a->dataFormatada)) <=> strtotime(str_replace('/', '-', $b->dataFormatada));});
+                dd(usort($valoesPorContaBancaria[$key], function($a, $b) { return strtotime(str_replace('/', '-', $a->dataFormatada)) <=> strtotime(str_replace('/', '-', $b->dataFormatada));}));
             }
 
 
