@@ -220,23 +220,23 @@ class RelatorioController extends Controller
                 }
             }
 
-            foreach ($intervaloDatas as $intervaloData) {
-                foreach ($valoesPorContaBancaria as $key => $value) {
-                    $auxIntervaloDatas = $intervaloDatas;
-                    foreach ($value as $key2 => $value2) {
-                        if(in_array($value2->dataFormatada, $auxIntervaloDatas)){
-                            $pos = array_search($value2->dataFormatada, $auxIntervaloDatas);
-                            unset($auxIntervaloDatas[$pos]);
-                        }
-                    }
-                    foreach ($auxIntervaloDatas as $key3 => $value3) {
-                        $obj = new \stdClass;
-                        $obj->dataFormatada = $value3;
-                        array_push($value, $obj);
+
+            foreach ($valoesPorContaBancaria as $key => $value) {
+                $auxIntervaloDatas = $intervaloDatas;
+                foreach ($value as $key2 => $value2) {
+                    if (in_array($value2->dataFormatada, $auxIntervaloDatas)) {
+                        $pos = array_search($value2->dataFormatada, $auxIntervaloDatas);
+                        unset($auxIntervaloDatas[$pos]);
                     }
                 }
-
+                foreach ($auxIntervaloDatas as $key3 => $value3) {
+                    $obj = new \stdClass;
+                    $obj->dataFormatada = $value3;
+                    array_push($value, $obj);
+                }
             }
+
+
 
             dd($valoesPorContaBancaria, $intervaloDatas);
             $dados = [
