@@ -199,6 +199,7 @@ class RelatorioController extends Controller
             }
             ksort($valoesPorContaBancaria, SORT_NUMERIC);
 
+            dd($valoesPorContaBancaria);
             // Soma os totais com o saldo do dia
             foreach ($valoesPorContaBancaria as $nomeBanco => $value) {
 
