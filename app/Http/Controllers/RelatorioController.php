@@ -232,7 +232,7 @@ class RelatorioController extends Controller
                 foreach ($auxIntervaloDatas as $key3 => $value3) {
                     $obj = new \stdClass;
                     $obj->dataFormatada = $value3;
-                    array_push($value, $obj);
+                    array_push($valoesPorContaBancaria[$key], $obj);
                 }
             }
 
