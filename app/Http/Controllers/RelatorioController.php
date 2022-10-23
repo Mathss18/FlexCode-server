@@ -278,7 +278,7 @@ class RelatorioController extends Controller
             foreach ($valoesPorContaBancaria as $nomeBanco => $value) {
                 $valores = [];
                 foreach ($value as $value2) {
-                    array_push($valores, (float)number_format($value2->total, 2, '.', ''));
+                    array_push($valores, floatval(number_format($value2->total, 2, '.', '')));
                 }
                 array_push($dadosFormatados, ["name" => $nomeBanco, "data" => $valores, "color" => $this->getColorName($i)]);
                 $i++;
