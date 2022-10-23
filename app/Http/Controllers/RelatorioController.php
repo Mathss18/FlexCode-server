@@ -210,11 +210,11 @@ class RelatorioController extends Controller
                 $prev = 0;
                 foreach ($value as $key2 => $value2) {
                     if ($index === 0) {
-                        $value2->totalSomado += $saldo;
+                        $value2->total += $saldo;
                     } else {
-                        $value2->totalSomado += $prev;
+                        $value2->total += $prev;
                     }
-                    $prev = $value2->totalSomado;
+                    $prev = $value2->total;
 
                     $index++;
                 }
