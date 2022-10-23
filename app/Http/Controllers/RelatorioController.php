@@ -189,8 +189,6 @@ class RelatorioController extends Controller
         $intervaloDatas = $this->date_range($from, $to, '+1 day', 'd/m/Y');
 
         try {
-            $contasBancarias = DB::select(DB::raw("SELECT id, nome, saldo FROM contas_bancarias"));
-
             $transacoes = DB::select(DB::raw("SELECT cb.nome as nomeBanco, DATE_FORMAT(t.data,'%d/%m/%Y') as dataFormatada, SUM(case when t.tipo = 'rendimento' then t.valor else t.valor * -1 end) as total FROM
              transacoes t, contas_bancarias cb WHERE t.data BETWEEN '{$from}' AND '{$to}' AND cb.id = t.conta_bancaria_id GROUP BY DAY(t.data), MONTH(t.data), YEAR(t.data), cb.nome"));
 
@@ -202,9 +200,9 @@ class RelatorioController extends Controller
             ksort($valoesPorContaBancaria, SORT_NUMERIC);
 
             // Soma os totais com o saldo do dia
-            foreach ($valoesPorContaBancaria as $key => $value) {
+            foreach ($valoesPorContaBancaria as $nomeBanco => $value) {
 
-                $saldo = ContaBancaria::where("nome", $key)->select('saldo')->first()->saldo;
+                $saldo = ContaBancaria::where("nome", $nomeBanco)->select('saldo')->first()->saldo;
                 $index = 0;
                 $prev = 0;
                 foreach ($value as $value2) {
@@ -220,7 +218,7 @@ class RelatorioController extends Controller
             }
 
             // Verifica qual data está faltando e cria um objeto com a data faltante, porem com total = null
-            foreach ($valoesPorContaBancaria as $key => $value) {
+            foreach ($valoesPorContaBancaria as $nomeBanco => $value) {
                 $auxIntervaloDatas = $intervaloDatas;
                 foreach ($value as $value2) {
                     if (in_array($value2->dataFormatada, $auxIntervaloDatas)) {
@@ -230,26 +228,26 @@ class RelatorioController extends Controller
                 }
                 foreach ($auxIntervaloDatas as $value3) {
                     $obj = new \stdClass;
-                    $obj->nomeBanco = $key;
+                    $obj->nomeBanco = $nomeBanco;
                     $obj->dataFormatada = $value3;
                     $obj->total = null;
-                    array_push($valoesPorContaBancaria[$key], $obj);
+                    array_push($valoesPorContaBancaria[$nomeBanco], $obj);
                 }
             }
 
             // Ordena por data ASC
-            foreach ($valoesPorContaBancaria as $key => $value) {
-                $aux = $valoesPorContaBancaria[$key];
+            foreach ($valoesPorContaBancaria as $nomeBanco => $value) {
+                $aux = $valoesPorContaBancaria[$nomeBanco];
                 usort($aux, function ($a, $b) {
                     return strtotime(str_replace('/', '-', $a->dataFormatada)) <=> strtotime(str_replace('/', '-', $b->dataFormatada));
                 });
-                $valoesPorContaBancaria[$key] = $aux;
+                $valoesPorContaBancaria[$nomeBanco] = $aux;
             }
 
             // Se o total for null, então coloca o valor do dia anterior, se não houver coloca o saldo do banco
-            foreach ($valoesPorContaBancaria as $key => $value) {
+            foreach ($valoesPorContaBancaria as $nomeBanco => $value) {
 
-                $saldo = ContaBancaria::where("nome", $key)->select('saldo')->first()->saldo;
+                $saldo = ContaBancaria::where("nome", $nomeBanco)->select('saldo')->first()->saldo;
                 $index = 0;
                 $prev = null;
                 foreach ($value as $value2) {
