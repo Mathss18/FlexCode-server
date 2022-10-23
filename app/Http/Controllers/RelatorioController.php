@@ -217,7 +217,6 @@ class RelatorioController extends Controller
 
                     $index++;
                 }
-                dd($value);
             }
 
             dd($valoesPorContaBancaria);
