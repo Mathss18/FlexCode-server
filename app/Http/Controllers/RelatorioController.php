@@ -223,11 +223,11 @@ class RelatorioController extends Controller
             foreach ($intervaloDatas as $key => $value) {
                 foreach ($valoesPorContaBancaria as $key => $value) {
                     foreach ($value as $key2 => $value2) {
-                        
+
                 }
             }
 
-            dd($valoesPorContaBancaria);
+            dd($valoesPorContaBancaria, $intervaloDatas);
             $dados = [
                 'contasBancarias' => $contasBancarias,
                 // 'datas' => $this->date_range($from, $to, '+1 day', 'd/m/Y'),
