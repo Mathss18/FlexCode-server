@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\APIHelper;
+use App\Models\ContaBancaria;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -199,6 +200,11 @@ class RelatorioController extends Controller
             ksort($valoesPorContaBancaria, SORT_NUMERIC);
 
             dd($valoesPorContaBancaria, $contasBancarias);
+
+            foreach ($valoesPorContaBancaria as $key => $value) {
+                $saldo = ContaBancaria::where("nome", $key)->select('saldo')->first();
+                dd($saldo);
+            }
 
             $dados = [
                 'contasBancarias' => $contasBancarias,
