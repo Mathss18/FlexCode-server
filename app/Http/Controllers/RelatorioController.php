@@ -225,7 +225,8 @@ class RelatorioController extends Controller
                     $auxIntervaloDatas = $intervaloDatas;
                     foreach ($value as $key2 => $value2) {
                         if(in_array($value2->dataFormatada, $auxIntervaloDatas)){
-                            unset($auxIntervaloDatas[$value2->dataFormatada]);
+                            $pos = array_search($value2->dataFormatada, $auxIntervaloDatas);
+                            unset($auxIntervaloDatas[$pos]);
                         }
                     }
                     dd($auxIntervaloDatas);
