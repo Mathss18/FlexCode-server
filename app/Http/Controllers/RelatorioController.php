@@ -191,7 +191,7 @@ class RelatorioController extends Controller
         try {
             $contasBancarias = DB::select(DB::raw("SELECT id, nome, saldo FROM contas_bancarias"));
 
-            $transacoes = DB::select(DB::raw("SELECT cb.id as idBanco, cb.nome as nomeBanco, DATE_FORMAT(t.data,'%d/%m/%Y') as dataFormatada, SUM(case when t.tipo = 'rendimento' then t.valor else t.valor * -1 end) as total FROM
+            $transacoes = DB::select(DB::raw("SELECT cb.nome as nomeBanco, DATE_FORMAT(t.data,'%d/%m/%Y') as dataFormatada, SUM(case when t.tipo = 'rendimento' then t.valor else t.valor * -1 end) as total FROM
              transacoes t, contas_bancarias cb WHERE t.data BETWEEN '{$from}' AND '{$to}' AND cb.id = t.conta_bancaria_id GROUP BY DAY(t.data), MONTH(t.data), YEAR(t.data), cb.nome"));
 
 
@@ -231,7 +231,9 @@ class RelatorioController extends Controller
                 }
                 foreach ($auxIntervaloDatas as $key3 => $value3) {
                     $obj = new \stdClass;
+                    $obj->nomeBanco = $key2;
                     $obj->dataFormatada = $value3;
+                    $obj->total = null;
                     array_push($valoesPorContaBancaria[$key], $obj);
                 }
             }
