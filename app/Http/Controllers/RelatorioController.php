@@ -186,6 +186,9 @@ class RelatorioController extends Controller
     {
         $from = date($request->query('startDate'));
         $to = date($request->query('endDate'));
+        $intervaloDatas = $this->date_range($from, $to, '+1 day', 'd/m/Y');
+        array_shift($intervaloDatas);
+
         try {
             $contasBancarias = DB::select(DB::raw("SELECT id, nome, saldo FROM contas_bancarias"));
 
@@ -207,15 +210,27 @@ class RelatorioController extends Controller
                 $index = 0;
                 $prev = 0;
                 foreach ($value as $key2 => $value2) {
-                    if($index === 0){
+                    if ($index === 0) {
                         $value2->total += $saldo;
-                    }
-                    else{
+                    } else {
                         $value2->total += $prev;
                     }
                     $prev = $value2->total;
 
                     $index++;
+                }
+            }
+
+            foreach ($valoesPorContaBancaria as $key => $value) {
+                $index = 0;
+                $prev = null;
+                foreach ($value as $key2 => $value2) {
+                    if (!in_array($value2->dataFormatada, $intervaloDatas)) {
+                        if(!$prev == null){
+                            array_push($value2, $prev);
+                        }
+                    }
+                    $prev = $value2;
                 }
             }
 
