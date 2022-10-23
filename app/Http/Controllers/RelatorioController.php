@@ -229,7 +229,7 @@ class RelatorioController extends Controller
                         unset($auxIntervaloDatas[$pos]);
                     }
                 }
-                foreach ($auxIntervaloDatas as $key3 => $value3) {
+                foreach ($auxIntervaloDatas as $value3) {
                     $obj = new \stdClass;
                     $obj->nomeBanco = $key;
                     $obj->dataFormatada = $value3;
@@ -238,6 +238,7 @@ class RelatorioController extends Controller
                 }
             }
 
+            // Ordena por data ASC
             foreach ($valoesPorContaBancaria as $key => $value) {
                 $aux = $valoesPorContaBancaria[$key];
                 usort($aux, function($a, $b) { return strtotime(str_replace('/', '-', $a->dataFormatada)) <=> strtotime(str_replace('/', '-', $b->dataFormatada));});
@@ -245,11 +246,23 @@ class RelatorioController extends Controller
             }
 
 
-            // foreach ($valoesPorContaBancaria as $key => $value) {
-            //     foreach ($value as $value2) {
-            //         if($value2->total)
-            //     }
-            // }
+            foreach ($valoesPorContaBancaria as $key => $value) {
+
+                $saldo = ContaBancaria::where("nome", $key)->select('saldo')->first()->saldo;
+                $index = 0;
+                $prev = null;
+                foreach ($value as $value2) {
+                   if($value2->total == null){
+                        if($prev == null){
+                            $value2->total = $saldo;
+                        }
+                        else{
+                            $value2->total = $prev;
+                        }
+                        $prev = $value2->total;
+                   }
+                }
+            }
 
 
             dd($valoesPorContaBancaria, $intervaloDatas);
