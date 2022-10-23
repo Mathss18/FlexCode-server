@@ -198,10 +198,16 @@ class RelatorioController extends Controller
             foreach ($transacoes as $key => $item) {
                 $valoesPorContaBancaria[$item->nomeBanco][$key] = $item;
              }
-
             ksort($valoesPorContaBancaria, SORT_NUMERIC);
 
+            foreach ($valoesPorContaBancaria as $key => $value) {
+                foreach ($totalContasBancarias as $key => $value) {
+                    # code...
+                }
+            }
+
             $dados = [
+                'totalContasBancarias' => $totalContasBancarias,
                 'datas' => $this->date_range($from, $to, '+1 day', 'd/m/Y'),
                 'valores' => $valoesPorContaBancaria
             ];
