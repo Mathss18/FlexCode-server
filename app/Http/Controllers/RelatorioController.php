@@ -200,9 +200,11 @@ class RelatorioController extends Controller
              }
             ksort($valoesPorContaBancaria, SORT_NUMERIC);
 
-            foreach ($valoesPorContaBancaria as $key => $value) {
-                foreach ($totalContasBancarias as $key => $value) {
-                    # code...
+            foreach ($valoesPorContaBancaria as $key1 => $value1) {
+                foreach ($totalContasBancarias as $key2 => $value2) {
+                    if($key1 == $value2->nome){
+                        $$value1->total = 69;
+                    }
                 }
             }
 
