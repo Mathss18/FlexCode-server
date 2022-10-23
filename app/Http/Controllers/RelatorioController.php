@@ -188,8 +188,6 @@ class RelatorioController extends Controller
         try {
             $contasBancarias = DB::select(DB::raw("SELECT nome, saldo FROM contas_bancarias"));
 
-            dd($contasBancarias);
-
             $transacoes = DB::select(DB::raw("SELECT cb.nome as nomeBanco, DATE_FORMAT(t.data,'%d/%m/%Y') as dataFormatada, SUM(case when t.tipo = 'rendimento' then t.valor else t.valor * -1 end) as total FROM
              transacoes t, contas_bancarias cb WHERE t.data BETWEEN '{$from}' AND '{$to}' AND cb.id = t.conta_bancaria_id GROUP BY DAY(t.data), MONTH(t.data), YEAR(t.data), cb.nome"));
 
@@ -197,7 +195,7 @@ class RelatorioController extends Controller
             $valoesPorContaBancaria = [];
             foreach ($transacoes as $key => $item) {
                 $valoesPorContaBancaria[$item->nomeBanco][$key] = $item;
-             }
+            }
             ksort($valoesPorContaBancaria, SORT_NUMERIC);
 
             dd($transacoes, $contasBancarias);
@@ -218,13 +216,14 @@ class RelatorioController extends Controller
         }
     }
 
-    private function date_range($first, $last, $step = '+1 day', $output_format = 'd/m/Y' ) {
+    private function date_range($first, $last, $step = '+1 day', $output_format = 'd/m/Y')
+    {
 
         $dates = array();
         $current = strtotime($first);
         $last = strtotime($last);
 
-        while( $current <= $last ) {
+        while ($current <= $last) {
 
             $dates[] = date($output_format, $current);
             $current = strtotime($step, $current);
