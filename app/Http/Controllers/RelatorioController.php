@@ -223,7 +223,7 @@ class RelatorioController extends Controller
 
             foreach ($valoesPorContaBancaria as $key => $value) {
                 $auxIntervaloDatas = $intervaloDatas;
-                foreach ($value as $key2 => $value2) {
+                foreach ($value as $value2) {
                     if (in_array($value2->dataFormatada, $auxIntervaloDatas)) {
                         $pos = array_search($value2->dataFormatada, $auxIntervaloDatas);
                         unset($auxIntervaloDatas[$pos]);
@@ -231,7 +231,7 @@ class RelatorioController extends Controller
                 }
                 foreach ($auxIntervaloDatas as $key3 => $value3) {
                     $obj = new \stdClass;
-                    $obj->nomeBanco = $key2;
+                    $obj->nomeBanco = $key;
                     $obj->dataFormatada = $value3;
                     $obj->total = null;
                     array_push($valoesPorContaBancaria[$key], $obj);
