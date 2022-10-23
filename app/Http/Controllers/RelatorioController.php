@@ -198,12 +198,6 @@ class RelatorioController extends Controller
             }
             ksort($valoesPorContaBancaria, SORT_NUMERIC);
 
-            foreach ($valoesPorContaBancaria as $key => $value) {
-                $idBanco = $value[0]->idBanco;
-                $resp = DB::select(DB::raw("SELECT saldo FROM contas_bancarias WHERE id = $idBanco"));
-                $saldoInicial = $resp[0]->saldo;
-            }
-
             dd($valoesPorContaBancaria, $contasBancarias);
 
             $dados = [
