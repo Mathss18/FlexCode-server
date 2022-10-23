@@ -220,19 +220,10 @@ class RelatorioController extends Controller
                 }
             }
 
-            dd($intervaloDatas);
-            foreach ($valoesPorContaBancaria as $key => $value) {
-                $index = 0;
-                $prev = null;
-                $arrayDatas = [];
-                foreach ($value as $key2 => $value2) {
-                    array_push($arrayDatas, $value2->dataFormatada);
-                }
-                $datasSemRegistro = array_diff($intervaloDatas, $arrayDatas);
-                if(is_array($datasSemRegistro) && count($datasSemRegistro) >= 1){
-                    foreach ($datasSemRegistro as $key => $value) {
-
-                    }
+            foreach ($intervaloDatas as $key => $value) {
+                foreach ($valoesPorContaBancaria as $key => $value) {
+                    foreach ($value as $key2 => $value2) {
+                        
                 }
             }
 
