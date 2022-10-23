@@ -284,7 +284,6 @@ class RelatorioController extends Controller
                 $i++;
             }
 
-            dd($dadosFormatados);
             $dados = [
                 'datas' => $this->date_range($from, $to, '+1 day', 'd/m/Y'),
                 'valores' => $dadosFormatados
