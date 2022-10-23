@@ -238,6 +238,13 @@ class RelatorioController extends Controller
                 }
             }
 
+            ksort($valoesPorContaBancaria, SORT_NUMERIC);
+
+            // foreach ($valoesPorContaBancaria as $key => $value) {
+            //     foreach ($value as $value2) {
+            //         if($value2->total)
+            //     }
+            // }
 
 
             dd($valoesPorContaBancaria, $intervaloDatas);
