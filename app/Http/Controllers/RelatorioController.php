@@ -193,7 +193,7 @@ class RelatorioController extends Controller
              transacoes t, contas_bancarias cb WHERE t.data BETWEEN '{$from}' AND '{$to}' AND cb.id = t.conta_bancaria_id GROUP BY dia, mes, ano, cb.nome"));
 
 
-            dd($transacoes[0]->nomeBanco);
+
 
             $dados = [
                 'datas' => $this->date_range($from, $to, '+1 day', 'd/m/Y'),
@@ -202,10 +202,11 @@ class RelatorioController extends Controller
 
             $arr = [];
             foreach ($transacoes as $key => $item) {
-                $arr[$item['nomeBanco']][$key] = $item;
+                $arr[$item->nomeBanco][$key] = $item;
              }
 
             ksort($arr, SORT_NUMERIC);
+            dd($arr);
 
 
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', $dados);
