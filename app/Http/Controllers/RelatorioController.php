@@ -279,7 +279,7 @@ class RelatorioController extends Controller
                 foreach ($value as $value2) {
                     array_push($valores, $value2->total);
                 }
-                array_push($dadosFormatados, ["name" => $nomeBanco, "data" => $valores]);
+                array_push($dadosFormatados, ["name" => $nomeBanco, "data" => $valores, "color" => "tomato"]);
             }
 
             $dados = [
