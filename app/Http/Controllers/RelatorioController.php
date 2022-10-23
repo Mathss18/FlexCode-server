@@ -240,7 +240,7 @@ class RelatorioController extends Controller
 
             foreach ($valoesPorContaBancaria as $key => $value) {
                 uasort(
-                    $value,
+                    $valoesPorContaBancaria[$key],
                     function($a, $b) {
                         return strtotime($a->dataFormatada) <=> strtotime($b->dataFormatada);
                     }
