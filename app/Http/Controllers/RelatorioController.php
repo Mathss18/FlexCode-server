@@ -241,7 +241,9 @@ class RelatorioController extends Controller
             // Ordena por data ASC
             foreach ($valoesPorContaBancaria as $key => $value) {
                 $aux = $valoesPorContaBancaria[$key];
-                usort($aux, function($a, $b) { return strtotime(str_replace('/', '-', $a->dataFormatada)) <=> strtotime(str_replace('/', '-', $b->dataFormatada));});
+                usort($aux, function ($a, $b) {
+                    return strtotime(str_replace('/', '-', $a->dataFormatada)) <=> strtotime(str_replace('/', '-', $b->dataFormatada));
+                });
                 $valoesPorContaBancaria[$key] = $aux;
             }
 
@@ -252,15 +254,16 @@ class RelatorioController extends Controller
                 $index = 0;
                 $prev = null;
                 foreach ($value as $value2) {
-                   if($value2->total == null){
-                        if($prev == null){
+                    if ($value2->total == null) {
+                        if ($prev == null) {
                             $value2->total = $saldo;
-                        }
-                        else{
+                        } else {
                             $value2->total = $prev;
                         }
                         $prev = $value2->total;
-                   }
+                    } else {
+                        $prev = $value2->total;
+                    }
                 }
             }
 
