@@ -223,7 +223,7 @@ class RelatorioController extends Controller
             foreach ($intervaloDatas as $key => $value) {
                 foreach ($valoesPorContaBancaria as $key => $value) {
                     foreach ($value as $key2 => $value2) {
-
+                    }
                 }
             }
 
