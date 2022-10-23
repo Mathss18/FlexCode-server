@@ -193,35 +193,15 @@ class RelatorioController extends Controller
              transacoes t, contas_bancarias cb WHERE t.data BETWEEN '{$from}' AND '{$to}' AND cb.id = t.conta_bancaria_id GROUP BY dia, mes, ano, cb.nome"));
 
 
-            dd($this->date_range($from, $to, '+1 day', 'd/m/Y'));
+            dd($transacoes);
+            
+            $dados = [
+                'datas' => $this->date_range($from, $to, '+1 day', 'd/m/Y'),
+                'valores' => []
+            ];
 
-            $acumulador = $totalContasBancariasInicial;
-            $dados = [];
-            for ($i = 0; $i < count($transacoes); $i++) {
-                $acumulador += $transacoes[$i]->total;
-                array_push($dados, [
-                    'periodo' => str_pad($transacoes[$i]->mes, 2, "0", STR_PAD_LEFT) . '/' . $transacoes[$i]->ano,
-                    'mes' => str_pad($transacoes[$i]->mes, 2, "0", STR_PAD_LEFT),
-                    'ano' => $transacoes[$i]->ano,
-                    'total' => $transacoes[$i]->total,
-                    'balancoFinal' => (float)number_format($acumulador, 2, '.', '')
-                ]);
-            }
-            $dadosFinal = [];
-            for ($i = 0; $i < count($dados); $i++) {
-                // verifica se dados[i] está entre $to e $from, se não estiver, remove da lista
-                if ($dados[$i]['ano'] . '-' . $dados[$i]['mes'] < $from || $dados[$i]['ano'] . '-' . $dados[$i]['mes'] > $to) {
-                    // unset($dados[$i]);
-                    // caso não esteja, continua
-                } else {
-                    // caso esteja, adiciona na lista final
-                    array_push($dadosFinal, $dados[$i]);
-                }
-            }
 
-            $response = APIHelper::APIResponse(true, 200, 'Sucesso', [
-                'transacoes' => $dadosFinal,
-            ]);
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso', $dados);
             return response()->json($response, 200);
         } catch (Exception  $ex) {
             $response = APIHelper::APIResponse(false, 500, null, null, $ex);
