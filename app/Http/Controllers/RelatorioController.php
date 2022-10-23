@@ -187,7 +187,6 @@ class RelatorioController extends Controller
         $from = date($request->query('startDate'));
         $to = date($request->query('endDate'));
         $intervaloDatas = $this->date_range($from, $to, '+1 day', 'd/m/Y');
-        array_shift($intervaloDatas);
 
         try {
             $contasBancarias = DB::select(DB::raw("SELECT id, nome, saldo FROM contas_bancarias"));
