@@ -188,8 +188,6 @@ class RelatorioController extends Controller
         try {
             $contasBancarias = DB::select(DB::raw("SELECT id, nome, saldo FROM contas_bancarias"));
 
-            dd($contasBancarias);
-
             $results = [];
             foreach ($contasBancarias as $contaBancaria) {
                 $result = $transacoes = DB::select(DB::raw("SELECT cb.nome as nomeBanco, DATE_FORMAT(t.data,'%d/%m/%Y') as dataFormatada, SUM(case when t.tipo = 'rendimento' then t.valor else t.valor * -1 end) as total FROM
