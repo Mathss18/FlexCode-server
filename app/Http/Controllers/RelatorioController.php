@@ -222,8 +222,13 @@ class RelatorioController extends Controller
 
             foreach ($intervaloDatas as $key => $value) {
                 foreach ($valoesPorContaBancaria as $key => $value) {
+                    $auxIntervaloDatas = $intervaloDatas;
                     foreach ($value as $key2 => $value2) {
+                        if(in_array($value2->dataFormatada, $auxIntervaloDatas)){
+                            unset($auxIntervaloDatas[$value2->dataFormatada]);
+                        }
                     }
+                    dd($auxIntervaloDatas);
                 }
             }
 
