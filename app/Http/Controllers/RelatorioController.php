@@ -235,6 +235,7 @@ class RelatorioController extends Controller
                         array_push($value, $obj);
                     }
                 }
+                dd($value);
             }
 
             dd($valoesPorContaBancaria, $intervaloDatas);
