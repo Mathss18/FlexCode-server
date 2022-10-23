@@ -191,7 +191,7 @@ class RelatorioController extends Controller
         try {
             $contasBancarias = DB::select(DB::raw("SELECT id, nome, saldo FROM contas_bancarias"));
 
-            $transacoes = DB::select(DB::raw("SELECT cb.id as idBanco, cb.nome as nomeBanco, DATE_FORMAT(t.data,'%d/%m/%Y') as dataFormatada, COALESCE(DATE_FORMAT(t.data,'%d/%m/%Y'),0) as dataFormatada2, SUM(case when t.tipo = 'rendimento' then t.valor else t.valor * -1 end) as total FROM
+            $transacoes = DB::select(DB::raw("SELECT cb.id as idBanco, cb.nome as nomeBanco, DATE_FORMAT(t.data,'%d/%m/%Y') as dataFormatada, SUM(case when t.tipo = 'rendimento' then t.valor else t.valor * -1 end) as total FROM
              transacoes t, contas_bancarias cb WHERE t.data BETWEEN '{$from}' AND '{$to}' AND cb.id = t.conta_bancaria_id GROUP BY DAY(t.data), MONTH(t.data), YEAR(t.data), cb.nome"));
 
 
@@ -223,12 +223,11 @@ class RelatorioController extends Controller
             foreach ($valoesPorContaBancaria as $key => $value) {
                 $index = 0;
                 $prev = null;
+                $arrayDatas = [];
                 foreach ($value as $key2 => $value2) {
-                    if (!in_array($value2->dataFormatada, $intervaloDatas)) {
-                        dd($value2, $intervaloDatas);
-                    }
-                    $prev = $value2;
+                    array_push($value2->dataFormatada, $arrayDatas);
                 }
+                dd(array_diff($intervaloDatas, $arrayDatas));
             }
 
             dd($valoesPorContaBancaria);
