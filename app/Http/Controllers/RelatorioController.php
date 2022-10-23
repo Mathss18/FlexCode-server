@@ -225,7 +225,7 @@ class RelatorioController extends Controller
                 $prev = null;
                 $arrayDatas = [];
                 foreach ($value as $key2 => $value2) {
-                    array_push($value2->dataFormatada, $arrayDatas);
+                    array_push($arrayDatas, $value2->dataFormatada);
                 }
                 dd(array_diff($intervaloDatas, $arrayDatas));
             }
