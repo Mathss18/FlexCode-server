@@ -162,8 +162,8 @@ class OrdemServicoController extends Controller
             if ($produtos) {
 
                 $oldProdutosBeforeDetach = $ordensServicos->produtos()->get()->pluck('pivot')->toArray();
+                dd($oldProdutosBeforeDetach, $produtos);
                 $ordensServicos->produtos()->detach();
-                // dd($oldProdutosBeforeDetach, $produtos);
                 foreach ($produtos as $produto) {
                     // DB::table('ordens_servicos_produtos')->where('produto_id', $produto['produto_id'])->delete();
                     $ordensServicos->produtos()->attach(
