@@ -102,13 +102,11 @@ class OrdemServicoController extends Controller
             if ($funcionarios) {
                 $stausOrdemServicoFuncionario = 0;
 
-                if($ordensServicos->situacao == 0){
+                if ($ordensServicos->situacao == 0) {
                     $stausOrdemServicoFuncionario = 0;
-                }
-                else if($ordensServicos->situacao == 1){
+                } else if ($ordensServicos->situacao == 1) {
                     $stausOrdemServicoFuncionario = 2;
-                }
-                else if($ordensServicos->situacao == 3){
+                } else if ($ordensServicos->situacao == 3) {
                     $stausOrdemServicoFuncionario = 2;
                 }
                 foreach ($funcionarios as $funcionario) {
@@ -162,7 +160,7 @@ class OrdemServicoController extends Controller
 
             // Cadastra os produtos da ordem de serviço
             if ($produtos) {
-                dd($ordensServicos->produtos()->get()->toArray());
+                dd($ordensServicos->produtos()->get()->toArray(), $produtos);
                 $ordensServicos->produtos()->detach();
                 foreach ($produtos as $produto) {
                     // DB::table('ordens_servicos_produtos')->where('produto_id', $produto['produto_id'])->delete();
@@ -178,8 +176,7 @@ class OrdemServicoController extends Controller
                         ]
                     );
                 }
-            }
-            else{
+            } else {
                 $ordensServicos->produtos()->detach();
             }
 
@@ -200,8 +197,7 @@ class OrdemServicoController extends Controller
                         ]
                     );
                 }
-            }
-            else{
+            } else {
                 $ordensServicos->servicos()->detach();
             }
 
@@ -209,13 +205,11 @@ class OrdemServicoController extends Controller
             if ($funcionarios) {
                 $stausOrdemServicoFuncionario = 0;
 
-                if($ordensServicos->situacao == 0){
+                if ($ordensServicos->situacao == 0) {
                     $stausOrdemServicoFuncionario = 0;
-                }
-                else if($ordensServicos->situacao == 1){
+                } else if ($ordensServicos->situacao == 1) {
                     $stausOrdemServicoFuncionario = 1;
-                }
-                else if($ordensServicos->situacao == 3){
+                } else if ($ordensServicos->situacao == 3) {
                     $stausOrdemServicoFuncionario = 2;
                 }
                 $ordensServicos->funcionarios()->detach();
@@ -232,14 +226,12 @@ class OrdemServicoController extends Controller
                         ]
                     );
                 }
-            }
-            else{
+            } else {
                 $ordensServicos->funcionarios()->detach();
             }
 
             $response = APIHelper::APIResponse(true, 200, 'Sucesso ao editar a ordem de serviço', $ordensServicos);
             return response()->json($response, 200);
-
         } catch (Exception  $ex) {
             $response = APIHelper::APIResponse(false, 500, null, null, $ex);
             return response()->json($response, 500);
