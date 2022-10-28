@@ -184,6 +184,7 @@ class OrdemServicoController extends Controller
 
             //Cadastra os serviços da ordem de serviço
             if ($servicos) {
+                $oldServicosBeforeDetach = $ordensServicos->servicos()->get()->pluck('pivot')->toArray();
                 $ordensServicos->servicos()->detach();
                 foreach ($servicos as $servico) {
                     // DB::table('ordens_servicos_servicos')->where('servico_id', $servico['servico_id'])->delete();
@@ -196,6 +197,7 @@ class OrdemServicoController extends Controller
                             'observacao' => $servico['observacao'],
                             'created_at' => Carbon::now('GMT-3'),
                             'updated_at' => Carbon::now('GMT-3'),
+                            'situacao' => $this->getSituacao($servico['servico_id'], $oldServicosBeforeDetach)
                         ]
                     );
                 }
@@ -261,22 +263,10 @@ class OrdemServicoController extends Controller
         }
     }
 
-    // private function getSituacao($prodId, $prodsArray){
-    //     dd($prodId, $prodsArray, array_search($prodId, $prodsArray));
-    //     $key = array_search($prodId, $prodsArray); // $key = index;
-    //     $situacao = null;
-    //     try {
-    //         $situacao = $prodsArray[$key]['situacao'];
-    //     } catch (\Throwable $th) {
-    //         $situacao = null;
-    //     }
-    //     // dd($key, $situacao);
-    //     return $situacao;
-    // }
-    private function getSituacao($prodId, $prodsArray){
-        foreach ($prodsArray as $key => $val) {
-            if ($val['produto_id'] === $prodId) {
-                $situacao = $prodsArray[$key]['situacao'];
+    private function getSituacao($id, $itemsArray){
+        foreach ($itemsArray as $key => $val) {
+            if ($val['produto_id'] === $id) {
+                $situacao = $itemsArray[$key]['situacao'];
                 return $situacao;
             }
         }
