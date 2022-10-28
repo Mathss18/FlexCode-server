@@ -276,8 +276,7 @@ class OrdemServicoController extends Controller
     private function getSituacao($prodId, $prodsArray){
         foreach ($prodsArray as $key => $val) {
             if ($val['produto_id'] === $prodId) {
-                $situacao = $prodsArray[$key];
-                dd($situacao);
+                $situacao = $prodsArray[$key]['situacao'];
                 return $situacao;
             }
         }
