@@ -162,7 +162,7 @@ class OrdemServicoController extends Controller
             if ($produtos) {
 
                 $oldProdutosBeforeDetach = $ordensServicos->produtos()->get()->pluck('pivot')->toArray();
-                $ordensServicos->produtos()->detach();
+                // $ordensServicos->produtos()->detach();
                 foreach ($produtos as $produto) {
                     // DB::table('ordens_servicos_produtos')->where('produto_id', $produto['produto_id'])->delete();
                     $ordensServicos->produtos()->attach(
@@ -262,7 +262,7 @@ class OrdemServicoController extends Controller
     }
 
     private function getSituacao($prodId, $prodsArray){
-        // dd($prodId);
+        dd($prodId, $prodsArray, array_search($prodId, $prodsArray));
         $key = array_search($prodId, $prodsArray); // $key = index;
         $situacao = null;
         try {
