@@ -269,6 +269,7 @@ class OrdemServicoController extends Controller
         } catch (\Throwable $th) {
             $situacao = null;
         }
+        dd($key, $situacao);
         return $situacao;
     }
 }
