@@ -162,7 +162,6 @@ class OrdemServicoController extends Controller
             if ($produtos) {
 
                 $oldProdutosBeforeDetach = $ordensServicos->produtos()->get()->pluck('pivot')->toArray();
-                dd($oldProdutosBeforeDetach, $produtos);
                 $ordensServicos->produtos()->detach();
                 foreach ($produtos as $produto) {
                     // DB::table('ordens_servicos_produtos')->where('produto_id', $produto['produto_id'])->delete();
@@ -175,6 +174,7 @@ class OrdemServicoController extends Controller
                             'observacao' => $produto['observacao'],
                             'created_at' => Carbon::now('GMT-3'),
                             'updated_at' => Carbon::now('GMT-3'),
+                            'situacao' => $this->getSituacao($produto['produto_id'], $oldProdutosBeforeDetach)
                         ]
                     );
                 }
@@ -259,5 +259,16 @@ class OrdemServicoController extends Controller
             $response = APIHelper::APIResponse(false, 500, null, null, $ex);
             return response()->json($response, 500);
         }
+    }
+
+    private function getSituacao($prodId, $prodsArray){
+        $key = array_search($prodId, $prodsArray); // $key = index;
+        $situacao = null;
+        try {
+            $situacao = $prodsArray[$key]['situacao'];
+        } catch (\Throwable $th) {
+            $situacao = null;
+        }
+        return $situacao;
     }
 }
