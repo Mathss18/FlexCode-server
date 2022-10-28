@@ -262,6 +262,7 @@ class OrdemServicoController extends Controller
     }
 
     private function getSituacao($prodId, $prodsArray){
+        // dd($prodId)
         $key = array_search($prodId, $prodsArray); // $key = index;
         $situacao = null;
         try {
@@ -269,7 +270,7 @@ class OrdemServicoController extends Controller
         } catch (\Throwable $th) {
             $situacao = null;
         }
-        dd($key, $situacao);
+        // dd($key, $situacao);
         return $situacao;
     }
 }
