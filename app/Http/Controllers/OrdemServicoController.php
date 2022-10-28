@@ -160,7 +160,8 @@ class OrdemServicoController extends Controller
 
             // Cadastra os produtos da ordem de serviço
             if ($produtos) {
-                dd($ordensServicos->produtos()->get()->toArray(), $produtos);
+                dd($ordensServicos->produtos()->pluck('pivot')->toArray(), $produtos);
+
                 $ordensServicos->produtos()->detach();
                 foreach ($produtos as $produto) {
                     // DB::table('ordens_servicos_produtos')->where('produto_id', $produto['produto_id'])->delete();
