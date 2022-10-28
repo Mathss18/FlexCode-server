@@ -277,6 +277,7 @@ class OrdemServicoController extends Controller
         foreach ($prodsArray as $key => $val) {
             if ($val['produto_id'] === $prodId) {
                 $situacao = $prodsArray[$key]['situacao'];
+                dd($situacao);
                 return $situacao;
             }
         }
