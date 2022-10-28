@@ -261,16 +261,28 @@ class OrdemServicoController extends Controller
         }
     }
 
+    // private function getSituacao($prodId, $prodsArray){
+    //     dd($prodId, $prodsArray, array_search($prodId, $prodsArray));
+    //     $key = array_search($prodId, $prodsArray); // $key = index;
+    //     $situacao = null;
+    //     try {
+    //         $situacao = $prodsArray[$key]['situacao'];
+    //     } catch (\Throwable $th) {
+    //         $situacao = null;
+    //     }
+    //     // dd($key, $situacao);
+    //     return $situacao;
+    // }
     private function getSituacao($prodId, $prodsArray){
-        dd($prodId, $prodsArray, array_search($prodId, $prodsArray));
-        $key = array_search($prodId, $prodsArray); // $key = index;
-        $situacao = null;
-        try {
-            $situacao = $prodsArray[$key]['situacao'];
-        } catch (\Throwable $th) {
-            $situacao = null;
+        foreach ($prodsArray as $key => $val) {
+            if ($val['produto_id'] === $prodId) {
+                $situacao = $prodsArray[$key]['situacao'];
+                return $situacao;
+            }
         }
-        // dd($key, $situacao);
-        return $situacao;
+
+        return null;
     }
+
+
 }
