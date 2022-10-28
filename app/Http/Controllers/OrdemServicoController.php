@@ -262,7 +262,7 @@ class OrdemServicoController extends Controller
     }
 
     private function getSituacao($prodId, $prodsArray){
-        // dd($prodId)
+        dd($prodId);
         $key = array_search($prodId, $prodsArray); // $key = index;
         $situacao = null;
         try {
