@@ -160,7 +160,7 @@ class OrdemServicoController extends Controller
 
             // Cadastra os produtos da ordem de serviço
             if ($produtos) {
-                dd($ordensServicos->produtos()->pluck('pivot')->toArray(), $produtos);
+                dd($ordensServicos->produtos()->get()->pluck('pivot')->toArray(), $produtos);
 
                 $ordensServicos->produtos()->detach();
                 foreach ($produtos as $produto) {
