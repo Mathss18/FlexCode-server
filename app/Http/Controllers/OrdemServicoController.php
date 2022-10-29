@@ -312,7 +312,7 @@ class OrdemServicoController extends Controller
                     }
                 }
             }
-            // dd($dados);
+            dd($dados);
             $payloadFinal = [];
             foreach ($dados as $dado1) {
                 $funcionarioDaVez = $dado1['nomeFuncionario'];
