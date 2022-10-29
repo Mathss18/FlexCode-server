@@ -313,11 +313,9 @@ class OrdemServicoController extends Controller
                     }
                 }
             }
-            // dd($dados);
+
             $payloadFinal = [];
-
             $blacklist = [];
-
             foreach ($dados as $dado1) {
                 $produtos = [];
                 foreach ($dados as $dado2) {
@@ -336,17 +334,15 @@ class OrdemServicoController extends Controller
                 }
                 array_push($blacklist, $dado1['nomeFuncionario']);
             }
-            dd($payloadFinal);
 
             $payload = [
                 'numero' => $ordensServicos['numero'],
                 'nomeCliente' => $ordensServicos['cliente']['nome'],
                 'nomesFuncionarios' => $nomesFuncionarios,
-                'funcionarios' => []
+                'funcionarios' => $payloadFinal
             ];
 
-            dd($ordensServicosProdutos);
-            $response = APIHelper::APIResponse(true, 200, 'Sucesso', $ordensServicos);
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso', $payload);
             return response()->json($response, 200);
         } catch (Exception  $ex) {
             $response = APIHelper::APIResponse(false, 500, null, null, $ex);
