@@ -283,7 +283,10 @@ class OrdemServicoController extends Controller
         //$ordensServicos = OrdemServico::paginate(15);
         try {
             $ordensServicos = OrdemServico::with(['produtos', 'servicos', 'funcionarios', 'cliente'])->findOrFail($id);
-            dd($ordensServicos);
+            $payload = [
+                'numero' => $ordensServicos->numero
+            ];
+            dd($payload);
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', $ordensServicos);
             return response()->json($response, 200);
         } catch (Exception  $ex) {
