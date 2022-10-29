@@ -361,7 +361,6 @@ class OrdemServicoController extends Controller
                 }
             }
 
-            dd($produtosPorFuncionarios);
             $payload = [
                 'numero' => $ordensServicos['numero'],
                 'nomeCliente' => $ordensServicos['cliente']['nome'],
