@@ -14,12 +14,12 @@ class OrdemServicoProduto extends Model
 
     public function produtos()
     {
-        return $this->hasOne(Produto::class);
+        return $this->belongsTo(Produto::class);
     }
 
     public function funcionarios()
     {
-        return $this->hasOne(Funcionario::class);
+        return $this->belongsTo(Funcionario::class);
     }
 
 }
