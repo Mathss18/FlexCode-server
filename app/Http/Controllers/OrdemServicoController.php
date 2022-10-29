@@ -292,6 +292,7 @@ class OrdemServicoController extends Controller
                 ]);
             }
             $ordensServicosProdutos = OrdemServicoProduto::with(['produto'])->where('ordem_servico_id', $ordensServicos['id'])->get()->toArray();
+            $dados = [];
             foreach ($ordensServicosProdutos as $ordemServicoProduto) {
                 $situacao = json_decode($ordemServicoProduto['situacao']);
                 foreach ($nomesFuncionariosAndIdsFuncionarios as $funcNomeAndId) {
@@ -304,12 +305,14 @@ class OrdemServicoController extends Controller
                                     'status'=> $situ->situacao
                                 ]
                             ];
-                            dd($dado);
-                            dd('achei', $situ->usuario_id, $funcNomeAndId['id'], $ordemServicoProduto);
+                            array_push($dados, $dado);
+                            // dd($dado);
+                            // dd('achei', $situ->usuario_id, $funcNomeAndId['id'], $ordemServicoProduto);
                         }
                     }
                 }
             }
+            dd($dados);
 
             $payload = [
                 'numero' => $ordensServicos['numero'],
