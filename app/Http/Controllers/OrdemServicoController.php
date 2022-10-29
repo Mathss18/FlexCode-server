@@ -293,7 +293,7 @@ class OrdemServicoController extends Controller
             }
             $ordensServicosProdutos = OrdemServicoProduto::with(['produto'])->where('ordem_servico_id', $ordensServicos['id'])->get()->toArray();
             $dados = [];
-            dd("cu");
+            dd($ordensServicosProdutos);
             foreach ($ordensServicosProdutos as $ordemServicoProduto) {
                 $situacao = json_decode($ordemServicoProduto['situacao']);
                 foreach ($nomesFuncionariosAndIdsFuncionarios as $funcNomeAndId) {
