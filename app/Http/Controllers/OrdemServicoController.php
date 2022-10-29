@@ -300,7 +300,7 @@ class OrdemServicoController extends Controller
                         if ($situ->usuario_id == $funcNomeAndId['id']) {
                             $dado = [
                                 'nomeFuncionario' => $funcNomeAndId['nome'],
-                                'produtos' => [
+                                'produto' => [
                                     'nome' => $ordemServicoProduto['produto']['nome'],
                                     'status' => $situ->situacao
                                 ]
@@ -321,7 +321,7 @@ class OrdemServicoController extends Controller
                 $produtos = [];
                 foreach ($dados as $dado2) {
                     if ($dado1['nomeFuncionario'] == $dado2['nomeFuncionario'] && !in_array($dado1['nomeFuncionario'], $blacklist)) {
-                        array_push($produtos, $dado2['produtos']);
+                        array_push($produtos, $dado2['produto']);
                     }
                 }
                 if (count($produtos) > 0) {
