@@ -16,7 +16,8 @@ class OrdemServicoController extends Controller
     {
         //$ordensServicos = OrdemServico::paginate(15);
         try {
-            $ordensServicos = OrdemServico::with(['produtos', 'servicos', 'funcionarios', 'cliente'])->orderBy('id', 'desc')->get();
+            // $ordensServicos = OrdemServico::with(['produtos', 'servicos', 'funcionarios', 'cliente'])->orderBy('id', 'desc')->get();
+            $ordensServicos = OrdemServico::with(['produtos', 'servicos', 'funcionarios', 'cliente'])->orderBy('id', 'desc')->first();
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', $ordensServicos);
             return response()->json($response, 200);
         } catch (Exception  $ex) {
