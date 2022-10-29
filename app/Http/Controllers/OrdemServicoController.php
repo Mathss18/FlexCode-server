@@ -283,10 +283,19 @@ class OrdemServicoController extends Controller
         try {
             $ordensServicos = OrdemServico::with(['produtos', 'servicos', 'funcionarios', 'cliente'])->findOrFail($id)->toArray();
             $nomesFuncionarios = [];
+            $nomesFuncionariosAndIdsFuncionarios = [];
             foreach ($ordensServicos['funcionarios'] as $funcionario) {
                 array_push($nomesFuncionarios, $funcionario['nome']);
+                array_push($nomesFuncionariosAndIdsFuncionarios, [
+                    'nome' => $funcionario['nome'],
+                    'id' => $funcionario['id']
+                ]);
             }
             $ordensServicosProdutos = OrdemServicoProduto::with(['produto'])->where('ordem_servico_id', $ordensServicos['id'])->get()->toArray();
+            foreach ($ordensServicosProdutos as $ordemServicoProduto) {
+                $situacao = $ordemServicoProduto['situacao'];
+                dd(json_decode($situacao));
+            }
 
             $payload = [
                 'numero' => $ordensServicos['numero'],
