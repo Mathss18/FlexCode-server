@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Helpers\APIHelper;
 use App\Http\Resources\Json;
 use App\Models\OrdemServico;
+use App\Models\OrdemServicoProduto;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
@@ -285,7 +286,7 @@ class OrdemServicoController extends Controller
             foreach ($ordensServicos['funcionarios'] as $funcionario) {
                 array_push($nomesFuncionarios, $funcionario['nome']);
             }
-            $ordensServicosProdutos = DB::table('ordens_servicos_produtos')->where('ordem_servico_id', $ordensServicos['id'])->get()->toArray();
+            $ordensServicosProdutos = OrdemServicoProduto::with(['produtos', 'funcionarios'])->where('ordem_servico_id', $ordensServicos['id'])->get()->toArray();
 
             $payload = [
                 'numero' => $ordensServicos['numero'],
@@ -293,7 +294,7 @@ class OrdemServicoController extends Controller
                 'nomesFuncionarios' => $nomesFuncionarios,
                 'funcionarios' => []
             ];
-            
+
             dd($ordensServicosProdutos);
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', $ordensServicos);
             return response()->json($response, 200);
