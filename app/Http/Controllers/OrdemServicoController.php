@@ -313,7 +313,8 @@ class OrdemServicoController extends Controller
                 }
             }
 
-            $payloadFinal = [];
+            // Foreach para mergear os produtos por cada funcionario
+            $produtosPorFuncionarios = [];
             $blacklist = [];
             foreach ($dados as $dado1) {
                 $produtos = [];
@@ -324,7 +325,7 @@ class OrdemServicoController extends Controller
                 }
                 if (count($produtos) > 0) {
                     array_push(
-                        $payloadFinal,
+                        $produtosPorFuncionarios,
                         [
                             'nomeFuncionario' => $dado1['nomeFuncionario'],
                             'produtos' => $produtos
@@ -334,11 +335,16 @@ class OrdemServicoController extends Controller
                 array_push($blacklist, $dado1['nomeFuncionario']);
             }
 
+            // Foreach para completar os produtos que um funcionario ainda não iniciou
+            foreach ($produtosPorFuncionarios as $produtoPorFuncionario) {
+                dd($produtoPorFuncionario);
+            }
+
             $payload = [
                 'numero' => $ordensServicos['numero'],
                 'nomeCliente' => $ordensServicos['cliente']['nome'],
                 'nomesFuncionarios' => $nomesFuncionarios,
-                'funcionarios' => $payloadFinal
+                'funcionarios' => $produtosPorFuncionarios
             ];
 
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', $payload);
