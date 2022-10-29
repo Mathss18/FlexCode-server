@@ -338,7 +338,16 @@ class OrdemServicoController extends Controller
             // Foreach para completar os produtos que um funcionario ainda não iniciou
             foreach ($produtosPorFuncionarios as $produtoPorFuncionario) {
                 foreach ($ordensServicosProdutos as $ordemServicoProduto) {
-                    dd($produtoPorFuncionario['produtos'], $ordemServicoProduto['produto']);
+                    // dd($produtoPorFuncionario['produtos'], $ordemServicoProduto['produto']);
+                    if(!$this->in_array_r($ordemServicoProduto['produto']['nome'], $produtoPorFuncionario['produtos'])){
+                        array_push($produtoPorFuncionario['produtos'],
+                        [
+                            'id' =>$ordemServicoProduto['produto']['id'],
+                            'nome' => $ordemServicoProduto['produto']['nome'],
+                            'quantidade' => $ordemServicoProduto['quantidade'],
+                            'status' => false,
+                        ]);
+                    }
                 }
             }
 
@@ -355,5 +364,15 @@ class OrdemServicoController extends Controller
             $response = APIHelper::APIResponse(false, 500, null, null, $ex);
             return response()->json($response, 500);
         }
+    }
+
+    function in_array_r($needle, $haystack, $strict = false) {
+        foreach ($haystack as $item) {
+            if (($strict ? $item === $needle : $item == $needle) || (is_array($item) && $this->in_array_r($needle, $item, $strict))) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
