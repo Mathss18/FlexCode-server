@@ -302,7 +302,8 @@ class OrdemServicoController extends Controller
                                 'nomeFuncionario' => $funcNomeAndId['nome'],
                                 'produto' => [
                                     'nome' => $ordemServicoProduto['produto']['nome'],
-                                    'status' => $situ->situacao
+                                    'quantidade' => $ordemServicoProduto['quantidade'],
+                                    'status' => $situ->situacao,
                                 ]
                             ];
                             array_push($dados, $dado);
