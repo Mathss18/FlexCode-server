@@ -70,7 +70,7 @@ class OrdemServicoController extends Controller
             $situacao = [];
             if($funcionarios){
                 foreach ($funcionarios as $funcionario) {
-                    array_push($situacao, ['situacao' => false, 'usuario_id' => $funcionario['value'].'']);
+                    array_push($situacao, ['situacao' => false, 'usuario_id' => $funcionario['value']]);
                 }
             }
             // Cadastra os produtos da ordem de serviço
@@ -82,7 +82,7 @@ class OrdemServicoController extends Controller
                             'quantidade' => number_format((float)$produto['quantidade'], session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
                             'preco' => number_format((float)$produto['preco'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
                             'total' => number_format((float)$produto['total'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
-                            'situacao' => $situacao,
+                            'situacao' => json_encode($situacao),
                             'observacao' => $produto['observacao'],
                             'created_at' => Carbon::now('GMT-3'),
                             'updated_at' => Carbon::now('GMT-3'),
