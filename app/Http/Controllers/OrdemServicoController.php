@@ -313,6 +313,22 @@ class OrdemServicoController extends Controller
                 }
             }
             dd($dados);
+            $payloadFinal = [];
+            foreach ($dados as $dado1) {
+                $funcionarioDaVez = $dado1['nomeFuncionario'];
+                $produtos = [];
+                foreach ($dados as $dado2) {
+                    if($funcionarioDaVez = $dado2['nomeFuncionario']){
+                        array_push($produtos, $dado2['produtos']);
+                        $paylod = [
+                            'nomeFuncionario' => $funcionarioDaVez,
+                            'produtos' => $produtos
+                        ];
+                        array_push($payloadFinal, $payload);
+                    }
+                }
+            }
+            dd($payloadFinal);
 
             $payload = [
                 'numero' => $ordensServicos['numero'],
