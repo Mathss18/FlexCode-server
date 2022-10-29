@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Models;
+
 use App\Models\Produto;
 use App\Models\Funcionario;
 
@@ -14,12 +15,11 @@ class OrdemServicoProduto extends Model
 
     public function produtos()
     {
-        return $this->belongsTo(Produto::class);
+        return $this->belongsTo(Produto::class, 'produto_id', 'id');
     }
 
     public function funcionarios()
     {
-        return $this->belongsTo(Funcionario::class);
+        return $this->belongsTo(Funcionario::class, 'produto_id', 'id');
     }
-
 }
