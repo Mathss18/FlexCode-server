@@ -282,12 +282,12 @@ class OrdemServicoController extends Controller
 
         //$ordensServicos = OrdemServico::paginate(15);
         try {
-            $ordensServicos = OrdemServico::with(['produtos', 'servicos', 'funcionarios', 'cliente'])->findOrFail($id);
+            $ordensServicos = OrdemServico::with(['produtos', 'servicos', 'funcionarios', 'cliente'])->findOrFail($id)->toArray();
             // $nomesFuncionarios = OrdemServicoFuncionario::where('ordem_servico_id')
             $payload = [
-                'numero' => $ordensServicos->numero,
-                'nomeCliente' => $ordensServicos->cliente->nome,
-                'nomesFuncionarios' => $ordensServicos->funcionarios
+                'numero' => $ordensServicos['numero'],
+                'nomeCliente' => $ordensServicos['cliente']['nome'],
+                'nomesFuncionarios' => $ordensServicos['funcionarios']
             ];
             dd($payload);
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', $ordensServicos);
