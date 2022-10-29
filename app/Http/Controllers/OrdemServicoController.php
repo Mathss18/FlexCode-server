@@ -294,6 +294,7 @@ class OrdemServicoController extends Controller
             $ordensServicosProdutos = OrdemServicoProduto::with(['produto'])->where('ordem_servico_id', $ordensServicos['id'])->get()->toArray();
             foreach ($ordensServicosProdutos as $ordemServicoProduto) {
                 $situacao = json_decode($ordemServicoProduto['situacao']);
+                dd($nomesFuncionariosAndIdsFuncionarios);
                 foreach ($nomesFuncionariosAndIdsFuncionarios as $funcNomeAndId) {
                     foreach ($situacao as $situ) {
                         if ($situ->usuario_id === $funcNomeAndId['id']) {
