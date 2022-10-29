@@ -13,13 +13,8 @@ class OrdemServicoProduto extends Model
     use HasFactory;
     protected $table = 'ordens_servicos_produtos';
 
-    public function produtos()
+    public function produto()
     {
         return $this->belongsTo(Produto::class, 'produto_id', 'id');
-    }
-
-    public function funcionarios()
-    {
-        return $this->belongsTo(Funcionario::class, 'produto_id', 'id');
     }
 }

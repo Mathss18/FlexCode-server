@@ -286,7 +286,7 @@ class OrdemServicoController extends Controller
             foreach ($ordensServicos['funcionarios'] as $funcionario) {
                 array_push($nomesFuncionarios, $funcionario['nome']);
             }
-            $ordensServicosProdutos = OrdemServicoProduto::with(['produtos', 'funcionarios'])->where('ordem_servico_id', $ordensServicos['id'])->get()->toArray();
+            $ordensServicosProdutos = OrdemServicoProduto::with(['produto'])->where('ordem_servico_id', $ordensServicos['id'])->get()->toArray();
 
             $payload = [
                 'numero' => $ordensServicos['numero'],
