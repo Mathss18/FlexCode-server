@@ -312,21 +312,22 @@ class OrdemServicoController extends Controller
                     }
                 }
             }
-            dd($dados);
+            // dd($dados);
             $payloadFinal = [];
+            $blacklist = [];
             foreach ($dados as $dado1) {
-                $funcionarioDaVez = $dado1['nomeFuncionario'];
                 $produtos = [];
                 foreach ($dados as $dado2) {
-                    if($funcionarioDaVez = $dado2['nomeFuncionario']){
+                    if($dado1['nomeFuncionario'] == $dado2['nomeFuncionario'] && !in_array($dado1['nomeFuncionario'], $blacklist)){
                         array_push($produtos, $dado2['produtos']);
-                        $payload = [
-                            'nomeFuncionario' => $funcionarioDaVez,
-                            'produtos' => $produtos
-                        ];
-                        array_push($payloadFinal, $payload);
                     }
                 }
+                $payload = [
+                    'nomeFuncionario' => $dado1['nomeFuncionario'],
+                    'produtos' => $produtos
+                ];
+                array_push($payloadFinal, $payload);
+                array_push($blacklist, $dado1['nomeFuncionario']);
             }
             dd($payloadFinal);
 
