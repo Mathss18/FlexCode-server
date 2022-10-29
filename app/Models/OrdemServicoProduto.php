@@ -14,12 +14,12 @@ class OrdemServicoProduto extends Model
 
     public function produtos()
     {
-        return $this->belongsToMany(Produto::class, 'ordens_servicos_produtos')->withPivot('id','produto_id','ordem_servico_id', 'quantidade', 'preco', 'situacao', 'total', 'observacao');
+        return $this->hasOne(Produto::class);
     }
 
     public function funcionarios()
     {
-        return $this->belongsToMany(Funcionario::class, 'ordens_servicos_funcionarios');
+        return $this->hasOne(Funcionario::class);
     }
 
 }
