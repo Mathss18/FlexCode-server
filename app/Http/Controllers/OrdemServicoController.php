@@ -304,7 +304,7 @@ class OrdemServicoController extends Controller
             foreach ($ordensServicosProdutos as $ordemServicoProduto) {
                 $situacao = json_decode($ordemServicoProduto['situacao']);
                 foreach ($nomesFuncionariosAndIdsFuncionarios as $funcNomeAndId) {
-                    dd($situacao);
+                    // dd($situacao);
                     foreach ($situacao as $situ) {
                         if ($situ->usuario_id == $funcNomeAndId['id']) {
                             $dado = [
