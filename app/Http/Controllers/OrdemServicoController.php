@@ -25,6 +25,8 @@ class OrdemServicoController extends Controller
         }
     }
 
+
+
     public function show($id)
     {
         try {
@@ -263,7 +265,8 @@ class OrdemServicoController extends Controller
         }
     }
 
-    private function getSituacao($id, $itemsArray){
+    private function getSituacao($id, $itemsArray)
+    {
         foreach ($itemsArray as $key => $val) {
             if ($val['produto_id'] === $id) {
                 $situacao = $itemsArray[$key]['situacao'];
@@ -274,5 +277,18 @@ class OrdemServicoController extends Controller
         return null;
     }
 
+    public function getProgresso($id)
+    {
 
+        //$ordensServicos = OrdemServico::paginate(15);
+        try {
+            $ordensServicos = OrdemServico::with(['produtos', 'servicos', 'funcionarios', 'cliente'])->findOrFail($id);
+            dd($ordensServicos);
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso', $ordensServicos);
+            return response()->json($response, 200);
+        } catch (Exception  $ex) {
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+            return response()->json($response, 500);
+        }
+    }
 }

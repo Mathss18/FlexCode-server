@@ -224,6 +224,8 @@ Route::middleware(['jwt', 'check.jwt.tenant'])->group(function () {
 
     Route::delete('ordens-servicos/{id}', [OrdemServicoController::class, 'destroy']);
 
+    Route::get('ordens-servicos-progresso/{id}', [OrdemServicoController::class, 'getProgresso']);
+
     //============================ ORDENS SERVICOS FUNCIONARIOS ==============================
     Route::get('minhas-tarefas', [OrdemServicoFuncionarioController::class, 'index']);
 
