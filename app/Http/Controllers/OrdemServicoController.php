@@ -313,6 +313,7 @@ class OrdemServicoController extends Controller
                 }
             }
 
+            dd("cu");
             // Foreach para mergear os produtos por cada funcionario
             $produtosPorFuncionarios = [];
             $blacklist = [];
@@ -340,7 +341,6 @@ class OrdemServicoController extends Controller
                 foreach ($ordensServicosProdutos as $ordemServicoProduto) {
                     // dd($produtoPorFuncionario['produtos'], $ordemServicoProduto['produto']);
                     if(!$this->in_array_r($ordemServicoProduto['produto']['nome'], $produtoPorFuncionario['produtos'])){
-                        // dd('cu');
                         array_push($produtoPorFuncionario['produtos'],
                         [
                             'id' =>$ordemServicoProduto['produto']['id'],
