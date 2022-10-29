@@ -301,14 +301,13 @@ class OrdemServicoController extends Controller
                             $dado = [
                                 'nomeFuncionario' => $funcNomeAndId['nome'],
                                 'produto' => [
+                                    'id' =>$ordemServicoProduto['produto']['id'],
                                     'nome' => $ordemServicoProduto['produto']['nome'],
                                     'quantidade' => $ordemServicoProduto['quantidade'],
                                     'status' => $situ->situacao,
                                 ]
                             ];
                             array_push($dados, $dado);
-                            // dd($dado);
-                            // dd('achei', $situ->usuario_id, $funcNomeAndId['id'], $ordemServicoProduto);
                         }
                     }
                 }
