@@ -337,7 +337,9 @@ class OrdemServicoController extends Controller
 
             // Foreach para completar os produtos que um funcionario ainda não iniciou
             foreach ($produtosPorFuncionarios as $produtoPorFuncionario) {
-                dd($produtoPorFuncionario['produtos'], $ordensServicosProdutos);
+                foreach ($ordensServicosProdutos as $ordemServicoProduto) {
+                    dd($produtoPorFuncionario['produtos'], $ordensServicosProdutos['produto']);
+                }
             }
 
             $payload = [
