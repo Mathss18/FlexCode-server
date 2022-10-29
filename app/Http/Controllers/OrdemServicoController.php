@@ -297,6 +297,14 @@ class OrdemServicoController extends Controller
                 foreach ($nomesFuncionariosAndIdsFuncionarios as $funcNomeAndId) {
                     foreach ($situacao as $situ) {
                         if ($situ->usuario_id == $funcNomeAndId['id']) {
+                            $dado = [
+                                'nomeFuncionario' => $funcNomeAndId['nome'],
+                                'produtos' => [
+                                    'nome'=>$ordemServicoProduto['produto']['nome'],
+                                    'status'=> $situ->situacao
+                                ]
+                            ];
+                            dd($dado);
                             dd('achei', $situ->usuario_id, $funcNomeAndId['id'], $ordemServicoProduto);
                         }
                     }
