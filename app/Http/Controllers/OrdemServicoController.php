@@ -279,20 +279,21 @@ class OrdemServicoController extends Controller
 
     public function getProgresso($id)
     {
-
-        //$ordensServicos = OrdemServico::paginate(15);
         try {
             $ordensServicos = OrdemServico::with(['produtos', 'servicos', 'funcionarios', 'cliente'])->findOrFail($id)->toArray();
             $nomesFuncionarios = [];
             foreach ($ordensServicos['funcionarios'] as $funcionario) {
                 array_push($nomesFuncionarios, $funcionario['nome']);
             }
+            $ordensServicosProdutos = DB::table('ordens_servicos_produtos')->where('ordem_servico_id', $ordensServicos['id'])->get()->toArray();
+
             $payload = [
                 'numero' => $ordensServicos['numero'],
                 'nomeCliente' => $ordensServicos['cliente']['nome'],
-                'nomesFuncionarios' => $nomesFuncionarios
+                'nomesFuncionarios' => $nomesFuncionarios,
+                'funcionarios' => []
             ];
-            dd($payload);
+            dd($ordensServicosProdutos);
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', $ordensServicos);
             return response()->json($response, 200);
         } catch (Exception  $ex) {
