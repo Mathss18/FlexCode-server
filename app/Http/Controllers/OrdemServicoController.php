@@ -70,7 +70,7 @@ class OrdemServicoController extends Controller
             $situacao = [];
             if($funcionarios){
                 foreach ($funcionarios as $funcionario) {
-                    array_push($situacao, ['situacao' => false, 'usuario_id' => $funcionario['value']]);
+                    array_push($situacao, ['situacao' => false, 'usuario_id' => strval($funcionario['value'])]);
                 }
             }
             // Cadastra os produtos da ordem de serviço
