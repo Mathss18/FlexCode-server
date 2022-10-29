@@ -324,13 +324,15 @@ class OrdemServicoController extends Controller
                         array_push($produtos, $dado2['produtos']);
                     }
                 }
-                array_push(
-                    $payloadFinal,
-                    [
-                        'nomeFuncionario' => $dado1['nomeFuncionario'],
-                        'produtos' => $produtos
-                    ]
-                );
+                if (count($produtos) > 0) {
+                    array_push(
+                        $payloadFinal,
+                        [
+                            'nomeFuncionario' => $dado1['nomeFuncionario'],
+                            'produtos' => $produtos
+                        ]
+                    );
+                }
                 array_push($blacklist, $dado1['nomeFuncionario']);
             }
             dd($payloadFinal);
