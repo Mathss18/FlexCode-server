@@ -320,7 +320,7 @@ class OrdemServicoController extends Controller
                 foreach ($dados as $dado2) {
                     if($funcionarioDaVez = $dado2['nomeFuncionario']){
                         array_push($produtos, $dado2['produtos']);
-                        $paylod = [
+                        $payload = [
                             'nomeFuncionario' => $funcionarioDaVez,
                             'produtos' => $produtos
                         ];
