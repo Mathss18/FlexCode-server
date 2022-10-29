@@ -293,6 +293,7 @@ class OrdemServicoController extends Controller
                 'nomesFuncionarios' => $nomesFuncionarios,
                 'funcionarios' => []
             ];
+            
             dd($ordensServicosProdutos);
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', $ordensServicos);
             return response()->json($response, 200);
