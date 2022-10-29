@@ -296,8 +296,7 @@ class OrdemServicoController extends Controller
                 $situacao = json_decode($ordemServicoProduto['situacao']);
                 foreach ($nomesFuncionariosAndIdsFuncionarios as $funcNomeAndId) {
                     foreach ($situacao as $situ) {
-                        dd($funcNomeAndId, $situ);
-                        if ($situ->usuario_id === $funcNomeAndId['id']) {
+                        if ($situ->usuario_id == $funcNomeAndId['id']) {
                             dd('achei', $situ->usuario_i, $funcNomeAndId['id'], $ordemServicoProduto);
                         }
                     }
