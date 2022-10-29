@@ -314,7 +314,9 @@ class OrdemServicoController extends Controller
             }
             // dd($dados);
             $payloadFinal = [];
+
             $blacklist = [];
+
             foreach ($dados as $dado1) {
                 $produtos = [];
                 foreach ($dados as $dado2) {
@@ -326,6 +328,7 @@ class OrdemServicoController extends Controller
                     'nomeFuncionario' => $dado1['nomeFuncionario'],
                     'produtos' => $produtos
                 ];
+                dd($payload);
                 array_push($payloadFinal, $payload);
                 array_push($blacklist, $dado1['nomeFuncionario']);
             }
