@@ -293,6 +293,7 @@ class OrdemServicoController extends Controller
             }
             $ordensServicosProdutos = OrdemServicoProduto::with(['produto'])->where('ordem_servico_id', $ordensServicos['id'])->get()->toArray();
             $dados = [];
+            dd("cu");
             foreach ($ordensServicosProdutos as $ordemServicoProduto) {
                 $situacao = json_decode($ordemServicoProduto['situacao']);
                 foreach ($nomesFuncionariosAndIdsFuncionarios as $funcNomeAndId) {
@@ -313,7 +314,7 @@ class OrdemServicoController extends Controller
                 }
             }
 
-            dd("cu");
+
             // Foreach para mergear os produtos por cada funcionario
             $produtosPorFuncionarios = [];
             $blacklist = [];
