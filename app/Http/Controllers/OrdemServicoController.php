@@ -340,6 +340,7 @@ class OrdemServicoController extends Controller
                         $produtosPorFuncionarios,
                         [
                             'nomeFuncionario' => $dado1['nomeFuncionario'],
+                            'foto' => $dado1['foto'],
                             'produtos' => $produtos
                         ]
                     );
