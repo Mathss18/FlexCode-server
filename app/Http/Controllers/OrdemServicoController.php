@@ -304,7 +304,6 @@ class OrdemServicoController extends Controller
             foreach ($ordensServicosProdutos as $ordemServicoProduto) {
                 $situacao = json_decode($ordemServicoProduto['situacao']);
                 foreach ($nomesFuncionariosAndIdsFuncionarios as $funcNomeAndId) {
-                    // dd($situacao);
                     foreach ($situacao as $situ) {
                         if ($situ->usuario_id == $funcNomeAndId['id']) {
                             $dado = [
@@ -312,6 +311,7 @@ class OrdemServicoController extends Controller
                                 'produto' => [
                                     'id' => $ordemServicoProduto['produto']['id'],
                                     'nome' => $ordemServicoProduto['produto']['nome'],
+                                    'codigoInterno' => $ordemServicoProduto['produto']['codigoInterno'],
                                     'quantidade' => $ordemServicoProduto['quantidade'],
                                     'status' => $situ->situacao,
                                 ]
@@ -345,11 +345,10 @@ class OrdemServicoController extends Controller
                 array_push($blacklist, $dado1['nomeFuncionario']);
             }
 
-            // Foreach para completar os produtos que um funcionario ainda não iniciou
+            // Foreach para completar os produtos que um funcionario ainda não iniciou (no caso de na tbl ordens_servicos_produtos a situacao não conter o id do funcionario, isso significa que ele nao iniciou)
             $index = 0;
             foreach ($produtosPorFuncionarios as $produtoPorFuncionario) {
                 foreach ($ordensServicosProdutos as $ordemServicoProduto) {
-                    // dd($produtosPorFuncionarios, $ordemServicoProduto['produto']['id']);
                     if (!in_array($ordemServicoProduto['produto']['id'], array_column($produtoPorFuncionario['produtos'], 'id'))) {
 
                         array_push(
@@ -357,6 +356,7 @@ class OrdemServicoController extends Controller
                             [
                                 'id' => $ordemServicoProduto['produto']['id'],
                                 'nome' => $ordemServicoProduto['produto']['nome'],
+                                'codigoInterno' => $ordemServicoProduto['produto']['codigoInterno'],
                                 'quantidade' => $ordemServicoProduto['quantidade'],
                                 'status' => false,
                             ]
