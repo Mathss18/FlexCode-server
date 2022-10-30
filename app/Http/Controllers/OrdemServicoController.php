@@ -353,7 +353,7 @@ class OrdemServicoController extends Controller
                     if (!in_array($ordemServicoProduto['produto']['id'], array_column($produtoPorFuncionario['produtos'], 'id'))) {
 
                         array_push(
-                            $ordensServicosProdutos[$index]['produtos'],
+                            $produtosPorFuncionarios[$index]['produtos'],
                             [
                                 'id' => $ordemServicoProduto['produto']['id'],
                                 'nome' => $ordemServicoProduto['produto']['nome'],
