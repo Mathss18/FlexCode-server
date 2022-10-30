@@ -293,7 +293,6 @@ class OrdemServicoController extends Controller
             $nomesFuncionariosAndIdsFuncionarios = [];
             foreach ($ordensServicos['funcionarios'] as $funcionario) {
                 array_push($nomesFuncionarios, $funcionario['nome']);
-                dd($funcionario);
                 array_push($nomesFuncionariosAndIdsFuncionarios, [
                     'nome' => $funcionario['nome'],
                     'foto' => $funcionario['foto'],
@@ -310,7 +309,7 @@ class OrdemServicoController extends Controller
                         if ($situ->usuario_id == $funcNomeAndId['id']) {
                             $dado = [
                                 'nomeFuncionario' => $funcNomeAndId['nome'],
-                                'fotoUrl' => $funcNomeAndId['foto'],
+                                'foto' => $funcNomeAndId['foto'],
                                 'produto' => [
                                     'id' => $ordemServicoProduto['produto']['id'],
                                     'nome' => $ordemServicoProduto['produto']['nome'],
