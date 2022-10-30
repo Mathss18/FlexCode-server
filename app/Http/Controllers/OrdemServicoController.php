@@ -361,7 +361,6 @@ class OrdemServicoController extends Controller
                                 'status' => false,
                             ]
                         );
-                        dd($produtoPorFuncionario['produtos'], $produtosPorFuncionarios);
                     }
                 }
                 $index++;
