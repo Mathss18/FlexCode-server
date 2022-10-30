@@ -309,6 +309,7 @@ class OrdemServicoController extends Controller
                         if ($situ->usuario_id == $funcNomeAndId['id']) {
                             $dado = [
                                 'nomeFuncionario' => $funcNomeAndId['nome'],
+                                'fotoUrl' => $funcNomeAndId['foto'],
                                 'produto' => [
                                     'id' => $ordemServicoProduto['produto']['id'],
                                     'nome' => $ordemServicoProduto['produto']['nome'],
