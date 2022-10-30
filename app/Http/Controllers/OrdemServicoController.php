@@ -295,6 +295,7 @@ class OrdemServicoController extends Controller
                 array_push($nomesFuncionarios, $funcionario['nome']);
                 array_push($nomesFuncionariosAndIdsFuncionarios, [
                     'nome' => $funcionario['nome'],
+                    'foto' => $funcionario['foto'],
                     'id' => $funcionario['id']
                 ]);
             }
