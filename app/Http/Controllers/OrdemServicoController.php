@@ -68,7 +68,7 @@ class OrdemServicoController extends Controller
             $ordensServicos->save();
 
             $situacao = [];
-            if($funcionarios){
+            if ($funcionarios) {
                 foreach ($funcionarios as $funcionario) {
                     array_push($situacao, ['situacao' => false, 'usuario_id' => strval($funcionario['value'])]);
                 }
@@ -310,7 +310,7 @@ class OrdemServicoController extends Controller
                             $dado = [
                                 'nomeFuncionario' => $funcNomeAndId['nome'],
                                 'produto' => [
-                                    'id' =>$ordemServicoProduto['produto']['id'],
+                                    'id' => $ordemServicoProduto['produto']['id'],
                                     'nome' => $ordemServicoProduto['produto']['nome'],
                                     'quantidade' => $ordemServicoProduto['quantidade'],
                                     'status' => $situ->situacao,
@@ -346,21 +346,25 @@ class OrdemServicoController extends Controller
             }
 
             // Foreach para completar os produtos que um funcionario ainda não iniciou
+            $index = 0;
             foreach ($produtosPorFuncionarios as $produtoPorFuncionario) {
                 foreach ($ordensServicosProdutos as $ordemServicoProduto) {
                     // dd($produtosPorFuncionarios, $ordemServicoProduto['produto']['id']);
-                    if(!in_array($ordemServicoProduto['produto']['id'], array_column($produtoPorFuncionario['produtos'], 'id'))){
+                    if (!in_array($ordemServicoProduto['produto']['id'], array_column($produtoPorFuncionario['produtos'], 'id'))) {
 
-                        array_push($produtoPorFuncionario['produtos'],
-                        [
-                            'id' =>$ordemServicoProduto['produto']['id'],
-                            'nome' => $ordemServicoProduto['produto']['nome'],
-                            'quantidade' => $ordemServicoProduto['quantidade'],
-                            'status' => false,
-                        ]);
+                        array_push(
+                            $ordensServicosProdutos[$index]['produtos'],
+                            [
+                                'id' => $ordemServicoProduto['produto']['id'],
+                                'nome' => $ordemServicoProduto['produto']['nome'],
+                                'quantidade' => $ordemServicoProduto['quantidade'],
+                                'status' => false,
+                            ]
+                        );
                         dd($produtoPorFuncionario['produtos'], $produtosPorFuncionarios);
                     }
                 }
+                $index++;
             }
 
             $payload = [
@@ -378,7 +382,8 @@ class OrdemServicoController extends Controller
         }
     }
 
-    function in_array_r($needle, $haystack, $strict = false) {
+    function in_array_r($needle, $haystack, $strict = false)
+    {
         foreach ($haystack as $item) {
             if (($strict ? $item === $needle : $item == $needle) || (is_array($item) && $this->in_array_r($needle, $item, $strict))) {
                 return true;
