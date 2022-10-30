@@ -293,6 +293,7 @@ class OrdemServicoController extends Controller
             $nomesFuncionariosAndIdsFuncionarios = [];
             foreach ($ordensServicos['funcionarios'] as $funcionario) {
                 array_push($nomesFuncionarios, $funcionario['nome']);
+                dd($funcionario);
                 array_push($nomesFuncionariosAndIdsFuncionarios, [
                     'nome' => $funcionario['nome'],
                     'foto' => $funcionario['foto'],
