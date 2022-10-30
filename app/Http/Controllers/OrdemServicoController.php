@@ -348,8 +348,8 @@ class OrdemServicoController extends Controller
             // Foreach para completar os produtos que um funcionario ainda não iniciou
             foreach ($produtosPorFuncionarios as $produtoPorFuncionario) {
                 foreach ($ordensServicosProdutos as $ordemServicoProduto) {
-                    dd($produtoPorFuncionario['produtos'], $ordemServicoProduto['produto']['nome']);
-                    if(!$this->in_array_r($ordemServicoProduto['produto']['nome'], $produtoPorFuncionario['produtos'])){
+                    dd($produtoPorFuncionario['produtos'], $ordemServicoProduto['produto']['id']);
+                    if(!$this->in_array_r($ordemServicoProduto['produto']['id'], $produtoPorFuncionario['produtos'])){
                         array_push($produtoPorFuncionario['produtos'],
                         [
                             'id' =>$ordemServicoProduto['produto']['id'],
