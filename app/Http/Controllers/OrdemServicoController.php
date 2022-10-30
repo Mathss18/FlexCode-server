@@ -358,7 +358,7 @@ class OrdemServicoController extends Controller
                             'quantidade' => $ordemServicoProduto['quantidade'],
                             'status' => false,
                         ]);
-                        dd($produtoPorFuncionario['produtos']);
+                        dd($produtoPorFuncionario['produtos'], $produtosPorFuncionarios);
                     }
                 }
             }
