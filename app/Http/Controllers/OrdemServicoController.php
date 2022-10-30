@@ -350,7 +350,7 @@ class OrdemServicoController extends Controller
                 foreach ($ordensServicosProdutos as $ordemServicoProduto) {
                     // dd($produtosPorFuncionarios, $ordemServicoProduto['produto']['id']);
                     if(!in_array($ordemServicoProduto['produto']['id'], array_column($produtoPorFuncionario['produtos'], 'id'))){
-                        dd('cu');
+                        dd($produtoPorFuncionario['produtos']);
                         array_push($produtoPorFuncionario['produtos'],
                         [
                             'id' =>$ordemServicoProduto['produto']['id'],
