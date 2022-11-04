@@ -96,11 +96,11 @@ class NfeService
         $nfe->tagide($ide);
 
         //====================TAG REF NFE===================
-        if (array_key_exists("refNFe", $dados)) {
+        // if (array_key_exists("refNFe", $dados)) {
             $nfeRef = new stdClass();
-            $nfeRef->refNFe = $dados['refNFe'];
+            $nfeRef->refNFe = '35221003350300000199550040003247841955376823';
             $nfe->tagrefNFe($nfeRef);
-        }
+        // }
 
 
         //====================TAG EMITENTE===================
