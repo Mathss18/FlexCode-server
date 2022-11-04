@@ -226,8 +226,7 @@ class NfeService
                 $dados['produtos'][$i]['cfop'] == '5101' ||
                 $dados['produtos'][$i]['cfop'] == '5102' ||
                 $dados['produtos'][$i]['cfop'] == '6101' ||
-                $dados['produtos'][$i]['cfop'] == '6102' ||
-                $dados['produtos'][$i]['cfop'] == '5949'
+                $dados['produtos'][$i]['cfop'] == '6102'
             ) {
                 $icms->CSOSN = '101';
                 $icms->pCredSN = $aliquota;
@@ -235,6 +234,7 @@ class NfeService
             } else if (
                 $dados['produtos'][$i]['cfop'] == '5902' ||
                 $dados['produtos'][$i]['cfop'] == '6912' ||
+                $dados['produtos'][$i]['cfop'] == '5949' ||
                 $dados['produtos'][$i]['cfop'] == '6910'
             ) {
                 $icms->CSOSN = '400';
@@ -260,11 +260,11 @@ class NfeService
             //$icms->vBCFCPSTRet = null; //incluso no layout 4.00
             //$icms->pFCPSTRet = null; //incluso no layout 4.00
             //$icms->vFCPSTRet = null; //incluso no layout 4.00
-            //$icms->modBC = null;
-            //$icms->vBC = null;
+            $icms->modBC = 3;
+            $icms->vBC = $dados['produtos'][$i]['preco'];
             //$icms->pRedBC = null;
-            //$icms->pICMS = null;
-            //$icms->vICMS = 480.21; // change COMENTAR A LINHA OU NULL
+            $icms->pICMS = 18.00;
+            $icms->vICMS = 2.60; // change COMENTAR A LINHA OU NULL
             //$icms->pRedBCEfet = null;
             //$icms->vBCEfet = null;
             //$icms->pICMSEfet = null;
@@ -318,8 +318,8 @@ class NfeService
 
         //====================TAG ICMSTOTAL===================
         $icmsTotal = new stdClass();
-        $icmsTotal->vBC = 0.00;
-        $icmsTotal->vICMS = 0.00; //change 480.21
+        $icmsTotal->vBC = 14.42;
+        $icmsTotal->vICMS = 2.60; //change 480.21
         $icmsTotal->vICMSDeson = 0.00;
         $icmsTotal->vFCP = 0.00; //incluso no layout 4.00
         $icmsTotal->vBCST = 0.00;
