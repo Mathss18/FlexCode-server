@@ -261,7 +261,7 @@ class NfeService
             //$icms->pFCPSTRet = null; //incluso no layout 4.00
             //$icms->vFCPSTRet = null; //incluso no layout 4.00
             $icms->modBC = 3;
-            $icms->vBC = $dados['produtos'][$i]['preco'];
+            $icms->vBC = $dados['produtos'][$i]['total'];
             //$icms->pRedBC = null;
             $icms->pICMS = 18.00;
             $icms->vICMS = 2.60; // change COMENTAR A LINHA OU NULL
