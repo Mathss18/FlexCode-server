@@ -198,6 +198,7 @@ class RelatorioController extends Controller
                 $valoesPorContaBancaria[$item->nomeBanco][$key] = $item;
             }
             ksort($valoesPorContaBancaria, SORT_NUMERIC);
+            dd($valoesPorContaBancaria);
 
             // Ordena por data ASC
             foreach ($valoesPorContaBancaria as $nomeBanco => $value) {
