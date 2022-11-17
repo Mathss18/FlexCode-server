@@ -198,7 +198,7 @@ class RelatorioController extends Controller
                 $valoesPorContaBancaria[$item->nomeBanco][$key] = $item;
             }
             ksort($valoesPorContaBancaria, SORT_NUMERIC);
-            dd($valoesPorContaBancaria);
+            // dd($valoesPorContaBancaria);
 
             // Ordena por data ASC
             foreach ($valoesPorContaBancaria as $nomeBanco => $value) {
@@ -217,7 +217,7 @@ class RelatorioController extends Controller
                 $prev = 0;
                 foreach ($value as $value2) {
                     if ($index === 0) {
-                        $value2->total += $saldo;
+                        $value2->total = $saldo;
                     } else {
                         $value2->total += $prev;
                     }
