@@ -98,7 +98,8 @@ class NfeService
         //====================TAG REF NFE===================
         if (array_key_exists("refNFe", $dados)) {
             $nfeRef = new stdClass();
-            $nfeRef->refNFe = $dados['refNFe'];
+            // $nfeRef->refNFe = $dados['refNFe'];
+            $nfeRef->refNFe = "35221109136351000107550010000028741885537470";
             $nfe->tagrefNFe($nfeRef);
         }
 
