@@ -96,12 +96,18 @@ class NfeService
         $nfe->tagide($ide);
 
         //====================TAG REF NFE===================
-        if (array_key_exists("refNFe", $dados)) {
-            $nfeRef = new stdClass();
-            // $nfeRef->refNFe = $dados['refNFe'];
-            $nfeRef->refNFe = "35221109136351000107550010000028741885537470";
-            $nfe->tagrefNFe($nfeRef);
-        }
+        // if (array_key_exists("refNFe", $dados)) {
+        //     $nfeRef = new stdClass();
+        //     // $nfeRef->refNFe = $dados['refNFe'];
+        //     $nfeRef->refNFe = "35221109136351000107550010000028741885537470";
+        //     $nfe->tagrefNFe($nfeRef);
+        // }
+
+        $nfeRef = new stdClass();
+        // $nfeRef->refNFe = $dados['refNFe'];
+        $nfeRef->refNFe = "35221109136351000107550010000028741885537470";
+        $nfe->tagrefNFe($nfeRef);
+
 
 
         //====================TAG EMITENTE===================
@@ -455,11 +461,10 @@ class NfeService
         $nfe->tagpag($pag);
 
         //====================TAG DETALHE PAGAMENTO===================
-        if(count($dados['parcelas']) >= 1){
+        if (count($dados['parcelas']) >= 1) {
             $tipoFormaPag = '01';
             $totalFinalFormaPag = $dados['totalFinal'];
-        }
-        else{
+        } else {
             $tipoFormaPag = '90';
             $totalFinalFormaPag = 0;
         }
@@ -741,7 +746,7 @@ class NfeService
                         return $url;
                     }
                 } else {
-                    throw new \Exception('Erro Ao Tirar Carta de Correção!  Erro numero: ' . $std->cStat . ' / '.$std->retEvento->infEvento->cStat);
+                    throw new \Exception('Erro Ao Tirar Carta de Correção!  Erro numero: ' . $std->cStat . ' / ' . $std->retEvento->infEvento->cStat);
                 }
             }
         } catch (\Exception $ex) {
@@ -828,7 +833,7 @@ class NfeService
         if (Storage::disk('local')->exists("public/" . session('tenant')->nome . "/configuracoes/logo/logo.png")) {
             $logoPath = Storage::disk('local')->path("public/" . session('tenant')->nome . "/configuracoes/logo/logo.png");
             $logo = 'data://text/plain;base64,' . base64_encode(file_get_contents($logoPath)) ?? '';
-        }else if (Storage::disk('local')->exists("public/" . session('tenant')->nome . "/configuracoes/logo/logo.jpg")) {
+        } else if (Storage::disk('local')->exists("public/" . session('tenant')->nome . "/configuracoes/logo/logo.jpg")) {
 
             $logoPath = Storage::disk('local')->path("public/" . session('tenant')->nome . "/configuracoes/logo/logo.jpg");
             $logo = 'data://text/plain;base64,' . base64_encode(file_get_contents($logoPath)) ?? '';
