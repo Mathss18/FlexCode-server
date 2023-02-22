@@ -348,7 +348,7 @@ class NfeService
         $icmsTotal->vSeg = 0.00;
         $icmsTotal->vDesc = 0.00;
         $icmsTotal->vII = 0.00;
-        $icmsTotal->vIPI = 51.39; //change 133.39
+        $icmsTotal->vIPI = 0.00; //change 133.39
         $icmsTotal->vIPIDevol = 51.39; //incluso no layout 4.00
         $icmsTotal->vPIS = 0.00;
         $icmsTotal->vCOFINS = 0.00;
