@@ -533,7 +533,7 @@ class NfeService
     {
         try {
             $xml = $nfe->monta();
-            file_put_contents("xml.xml", $xml);
+            Log::info('xml', [$xml]);
             return $xml;
         } catch (\Exception $ex) {
             $this->error = 'Erro ao montar: ' . $ex->getMessage();
