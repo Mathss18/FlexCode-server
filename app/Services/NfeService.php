@@ -308,21 +308,21 @@ class NfeService
             $nfe->tagCOFINS($cofis);
 
             //====================TAG IPI===================
-            // $ipi = new stdClass();
-            // $ipi->item =  $i + 1; //item da NFe
+            $ipi = new stdClass();
+            $ipi->item =  $i + 1; //item da NFe
             // $ipi->clEnq = null;
             // $ipi->CNPJProd = null;
             // $ipi->cSelo = null;
             // $ipi->qSelo = null;
             // $ipi->cEnq = '999';
-            // $ipi->CST = 99;
-            // $ipi->vIPI = 0.00;
-            // $ipi->vBC = 1000.00;
+            $ipi->CST = 99;
+            $ipi->vIPI = 51.39;
+            $ipi->vBC = 0.00;
             // $ipi->pIPI = 0.00;
             // $ipi->qUnid = null;
             // $ipi->vUnid = null;
 
-            // $nfe->tagIPI($ipi);
+            $nfe->tagIPI($ipi);
 
         }
 
