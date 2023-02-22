@@ -231,7 +231,6 @@ class NfeService
             $icms->CSOSN = '900';
             $icms->pCredSN = $aliquota;
             $icms->vCredICMSSN = $dados['totalProdutos'] * ($aliquota / 100);
-            $icms->vBC = $dados['totalProdutos'];
             //VERIFICA SE TEM IE OU NÃO
             // if (
             //     $dados['produtos'][$i]['cfop'] == '5101' ||
@@ -270,11 +269,11 @@ class NfeService
             //$icms->vBCFCPSTRet = null; //incluso no layout 4.00
             //$icms->pFCPSTRet = null; //incluso no layout 4.00
             //$icms->vFCPSTRet = null; //incluso no layout 4.00
-            //$icms->modBC = null;
-            //$icms->vBC = "658.80";
+            $icms->modBC = 1;
+            $icms->vBC = 658.80;
             //$icms->pRedBC = null;
             //$icms->pICMS = null;
-            //$icms->vICMS = 480.21; // change COMENTAR A LINHA OU NULL
+            $icms->vICMS = 118.58; // change COMENTAR A LINHA OU NULL
             //$icms->pRedBCEfet = null;
             //$icms->vBCEfet = null;
             //$icms->pICMSEfet = null;
