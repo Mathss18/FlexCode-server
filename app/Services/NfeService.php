@@ -308,21 +308,28 @@ class NfeService
             $nfe->tagCOFINS($cofis);
 
             //====================TAG IPI===================
-            $ipi = new stdClass();
-            $ipi->item =  $i + 1; //item da NFe
-            $ipi->clEnq = null;
-            $ipi->CNPJProd = null;
-            $ipi->cSelo = null;
-            $ipi->qSelo = null;
-            $ipi->cEnq = '999';
-            $ipi->CST = 99;
-            $ipi->vIPI = 51.39;
-            $ipi->vBC = 0.00;
-            $ipi->pIPI = 0.00;
-            $ipi->qUnid = null;
-            $ipi->vUnid = null;
+            // $ipi = new stdClass();
+            // $ipi->item =  $i + 1; //item da NFe
+            // $ipi->clEnq = null;
+            // $ipi->CNPJProd = null;
+            // $ipi->cSelo = null;
+            // $ipi->qSelo = null;
+            // $ipi->cEnq = '999';
+            // $ipi->CST = 99;
+            // $ipi->vIPI = 51.39;
+            // $ipi->vBC = 0.00;
+            // $ipi->pIPI = 0.00;
+            // $ipi->qUnid = null;
+            // $ipi->vUnid = null;
 
-            $nfe->tagIPI($ipi);
+            // $nfe->tagIPI($ipi);
+
+            $impostoDevol = new stdClass();
+            $impostoDevol->item = 1; //item da NFe
+            $impostoDevol->pDevol = 100.00;
+            $impostoDevol->vIPIDevol = 51.39;
+
+            $nfe->tagimpostoDevol($impostoDevol);
 
         }
 
@@ -341,7 +348,7 @@ class NfeService
         $icmsTotal->vSeg = 0.00;
         $icmsTotal->vDesc = 0.00;
         $icmsTotal->vII = 0.00;
-        $icmsTotal->vIPI = 0.00; //change 133.39
+        $icmsTotal->vIPI = 51.39; //change 133.39
         $icmsTotal->vIPIDevol = 51.39; //incluso no layout 4.00
         $icmsTotal->vPIS = 0.00;
         $icmsTotal->vCOFINS = 0.00;
