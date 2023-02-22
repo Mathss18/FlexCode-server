@@ -228,29 +228,32 @@ class NfeService
             $icms = new stdClass();
             $icms->item = $i + 1; //item da NFe
             $icms->orig = 0;
+            $icms->CSOSN = '900';
+            $icms->pCredSN = $aliquota;
+            $icms->vCredICMSSN = $dados['totalProdutos'] * ($aliquota / 100);
             //VERIFICA SE TEM IE OU NÃO
-            if (
-                $dados['produtos'][$i]['cfop'] == '5101' ||
-                $dados['produtos'][$i]['cfop'] == '5102' ||
-                $dados['produtos'][$i]['cfop'] == '6101' ||
-                $dados['produtos'][$i]['cfop'] == '6102'
-            ) {
-                $icms->CSOSN = '101';
-                $icms->pCredSN = $aliquota;
-                $icms->vCredICMSSN = $dados['totalProdutos'] * ($aliquota / 100);
-            } else if (
-                $dados['produtos'][$i]['cfop'] == '5902' ||
-                $dados['produtos'][$i]['cfop'] == '6912' ||
-                $dados['produtos'][$i]['cfop'] == '6910'
-            ) {
-                $icms->CSOSN = '400';
-                $icms->pCredSN = $aliquota;
-                $icms->vCredICMSSN = $dados['totalProdutos'] * ($aliquota / 100);
-            } else {
-                $icms->CSOSN = '900';
-                $icms->pCredSN = $aliquota;
-                $icms->vCredICMSSN = $dados['totalProdutos'] * ($aliquota / 100);
-            }
+            // if (
+            //     $dados['produtos'][$i]['cfop'] == '5101' ||
+            //     $dados['produtos'][$i]['cfop'] == '5102' ||
+            //     $dados['produtos'][$i]['cfop'] == '6101' ||
+            //     $dados['produtos'][$i]['cfop'] == '6102'
+            // ) {
+            //     $icms->CSOSN = '101';
+            //     $icms->pCredSN = $aliquota;
+            //     $icms->vCredICMSSN = $dados['totalProdutos'] * ($aliquota / 100);
+            // } else if (
+            //     $dados['produtos'][$i]['cfop'] == '5902' ||
+            //     $dados['produtos'][$i]['cfop'] == '6912' ||
+            //     $dados['produtos'][$i]['cfop'] == '6910'
+            // ) {
+            //     $icms->CSOSN = '400';
+            //     $icms->pCredSN = $aliquota;
+            //     $icms->vCredICMSSN = $dados['totalProdutos'] * ($aliquota / 100);
+            // } else {
+            //     $icms->CSOSN = '900';
+            //     $icms->pCredSN = $aliquota;
+            //     $icms->vCredICMSSN = $dados['totalProdutos'] * ($aliquota / 100);
+            // }
             //$icms->modBCST = null;
             //$icms->pMVAST = null;
             //$icms->pRedBCST = null;
@@ -324,8 +327,8 @@ class NfeService
 
         //====================TAG ICMSTOTAL===================
         $icmsTotal = new stdClass();
-        $icmsTotal->vBC = 0.00;
-        $icmsTotal->vICMS = 0.00; //change 480.21
+        $icmsTotal->vBC = 658.80;
+        $icmsTotal->vICMS = 118.58; //change 480.21
         $icmsTotal->vICMSDeson = 0.00;
         $icmsTotal->vFCP = 0.00; //incluso no layout 4.00
         $icmsTotal->vBCST = 0.00;
@@ -338,11 +341,11 @@ class NfeService
         $icmsTotal->vDesc = 0.00;
         $icmsTotal->vII = 0.00;
         $icmsTotal->vIPI = 0.00; //change 133.39
-        $icmsTotal->vIPIDevol = 0.00; //incluso no layout 4.00
+        $icmsTotal->vIPIDevol = 51.39; //incluso no layout 4.00
         $icmsTotal->vPIS = 0.00;
         $icmsTotal->vCOFINS = 0.00;
         $icmsTotal->vOutro = 0.00; // change to 0.00
-        $icmsTotal->vNF = $dados['totalFinal']; // total produtos + frete
+        $icmsTotal->vNF = 710.19; // total produtos + frete
         //$icmsTotal->vTotTrib = 0.00;
 
         $nfe->tagICMSTot($icmsTotal);
