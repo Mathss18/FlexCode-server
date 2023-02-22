@@ -270,7 +270,7 @@ class NfeService
             //$icms->vBCFCPSTRet = null; //incluso no layout 4.00
             //$icms->pFCPSTRet = null; //incluso no layout 4.00
             //$icms->vFCPSTRet = null; //incluso no layout 4.00
-            // $icms->modBC = 1;
+            $icms->modBC = 1;
             // $icms->vBC = 658.80;
             //$icms->pRedBC = null;
             //$icms->pICMS = null;
