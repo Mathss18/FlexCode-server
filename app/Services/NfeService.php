@@ -274,7 +274,7 @@ class NfeService
             // $icms->vBC = 658.80;
             //$icms->pRedBC = null;
             //$icms->pICMS = null;
-            $icms->vICMS = 118.58; // change COMENTAR A LINHA OU NULL
+            //$icms->vICMS = 118.58; // change COMENTAR A LINHA OU NULL
             //$icms->pRedBCEfet = null;
             //$icms->vBCEfet = null;
             //$icms->pICMSEfet = null;
