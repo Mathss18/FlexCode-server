@@ -15,6 +15,7 @@ use NFePHP\NFe\Common\Standardize;
 use NFePHP\NFe\Complements;
 use NFePHP\DA\NFe\Danfe;
 use NFePHP\DA\NFe\Daevento;
+use Illuminate\Support\Facades\Log;
 
 class NfeService
 {
