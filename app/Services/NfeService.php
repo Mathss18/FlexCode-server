@@ -558,7 +558,7 @@ class NfeService
 
             //Envia o lote
             $xmlTranmitido = $this->tools->sefazEnviaLote([$xmlAssinado], 1);
-            Logger::info(['xmlTransmitido' => $xmlTranmitido]);
+            Log::info(['xmlTransmitido' => $xmlTranmitido]);
             $std = $st->toStd($xmlTranmitido);
             if ($std->cStat != 103) {
                 //erro registrar e voltar
