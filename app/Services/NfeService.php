@@ -542,7 +542,7 @@ class NfeService
     {
         try {
             $xmlAssinado = $this->tools->signNFe($xml); // O conteúdo do XML assinado fica armazenado na variável $xmlAssinado
-
+            Log::info(['xmlAssinado' => $xmlAssinado]);
             return $xmlAssinado;
         } catch (\Exception $ex) {
             //aqui você trata possíveis exceptions da assinatura
@@ -580,7 +580,7 @@ class NfeService
     {
         try {
             $protocolo = $this->tools->sefazConsultaRecibo($recibo);
-
+            Log::info(['protocolo' => $protocolo]);
             //transforma o xml de retorno em um stdClass
             $st = new Standardize();
             $std = $st->toStd($protocolo);
