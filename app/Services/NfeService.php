@@ -15,6 +15,7 @@ use NFePHP\NFe\Common\Standardize;
 use NFePHP\NFe\Complements;
 use NFePHP\DA\NFe\Danfe;
 use NFePHP\DA\NFe\Daevento;
+use Illuminate\Support\Facades\Log;
 
 class NfeService
 {
@@ -557,6 +558,7 @@ class NfeService
 
             //Envia o lote
             $xmlTranmitido = $this->tools->sefazEnviaLote([$xmlAssinado], 1);
+            Logger::info(['xmlTransmitido' => $xmlTranmitido]);
             $std = $st->toStd($xmlTranmitido);
             if ($std->cStat != 103) {
                 //erro registrar e voltar
