@@ -303,19 +303,20 @@ class RelatorioController extends Controller
         $from = date($request->query('startDate'));
         $to = date($request->query('endDate'));
         $idFavorecido = $request->input('idFavorecido');
+        $tipoFavorecido = $request->input('tipoFavorecido');
 
         try {
             $rendimentosAbertos = DB::select(DB::raw("SELECT t.*, cb.nome as conta_bancaria_nome FROM
-                transacoes t, contas_bancarias cb WHERE t.favorecido_id = $idFavorecido AND t.conta_bancaria_id = cb.id AND t.situacao = 'aberta' AND t.data BETWEEN '{$from}' AND '{$to}' ORDER BY t.data DESC"));
+                transacoes t, contas_bancarias cb WHERE t.favorecido_id = $idFavorecido AND t.tipoFavorecido = $tipoFavorecido AND t.conta_bancaria_id = cb.id AND t.situacao = 'aberta' AND t.data BETWEEN '{$from}' AND '{$to}' ORDER BY t.data DESC"));
 
             $rendimentosAbertosTotal = DB::select(DB::raw("SELECT sum(t.valor) as valor FROM
-                transacoes t WHERE t.favorecido_id = $idFavorecido AND t.situacao = 'aberta' AND t.data BETWEEN '{$from}' AND '{$to}' ORDER BY t.data DESC"));
+                transacoes t WHERE t.favorecido_id = $idFavorecido AND t.tipoFavorecido = $tipoFavorecido AND t.situacao = 'aberta' AND t.data BETWEEN '{$from}' AND '{$to}' ORDER BY t.data DESC"));
 
             $rendimentosRegistrados = DB::select(DB::raw("SELECT t.*, cb.nome as conta_bancaria_nome FROM
-                transacoes t, contas_bancarias cb WHERE t.favorecido_id = $idFavorecido AND t.conta_bancaria_id = cb.id AND t.situacao = 'registrada' AND t.data BETWEEN '{$from}' AND '{$to}' ORDER BY t.data DESC"));
+                transacoes t, contas_bancarias cb WHERE t.favorecido_id = $idFavorecido AND t.tipoFavorecido = $tipoFavorecido AND t.conta_bancaria_id = cb.id AND t.situacao = 'registrada' AND t.data BETWEEN '{$from}' AND '{$to}' ORDER BY t.data DESC"));
 
             $rendimentosRegistradosTotal = DB::select(DB::raw("SELECT sum(t.valor) as valor FROM
-                transacoes t WHERE t.favorecido_id = $idFavorecido AND t.situacao = 'registrada' AND t.data BETWEEN '{$from}' AND '{$to}' ORDER BY t.data DESC"));
+                transacoes t WHERE t.favorecido_id = $idFavorecido AND t.tipoFavorecido = $tipoFavorecido AND t.situacao = 'registrada' AND t.data BETWEEN '{$from}' AND '{$to}' ORDER BY t.data DESC"));
 
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', [
                 'rendimentosAbertos' => $rendimentosAbertos,
