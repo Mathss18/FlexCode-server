@@ -298,6 +298,39 @@ class RelatorioController extends Controller
         }
     }
 
+    public function detalhesDePagamento(Request $request)
+    {
+        $from = date($request->query('startDate'));
+        $to = date($request->query('endDate'));
+        $idFavorecido = $request->input('idFavorecido');
+
+        try {
+            $rendimentosAbertos = DB::select(DB::raw("SELECT t.*, cb.nome as conta_bancaria_nome FROM
+                    transacoes t, contas_bancarias cb WHERE t.favorecido_id = $idFavorecido t.conta_bancaria_id = cb.id AND t.situacao = 'aberta' AND t.data BETWEEN '{$from}' AND '{$to}' ORDER BY t.data DESC"));
+
+            $rendimentosAbertosTotal = DB::select(DB::raw("SELECT sum(t.valor) as valor FROM
+                    transacoes t WHERE t.favorecido_id = $idFavorecido t.conta_bancaria_id = cb.id AND t.situacao = 'aberta' AND t.data BETWEEN '{$from}' AND '{$to}' ORDER BY t.data DESC"));
+
+            $rendimentosRegistrados = DB::select(DB::raw("SELECT t.*, cb.nome as conta_bancaria_nome FROM
+                    transacoes t, contas_bancarias cb WHERE t.favorecido_id = $idFavorecido t.conta_bancaria_id = cb.id AND t.situacao = 'registrada' AND t.data BETWEEN '{$from}' AND '{$to}' ORDER BY t.data DESC"));
+
+            $rendimentosRegistradosTotal = DB::select(DB::raw("SELECT sum(t.valor) as valor FROM
+                    transacoes t WHERE t.favorecido_id = $idFavorecido t.conta_bancaria_id = cb.id AND t.situacao = 'registrada' AND t.data BETWEEN '{$from}' AND '{$to}' ORDER BY t.data DESC"));
+
+
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso', [
+                'rendimentosAbertos' => $rendimentosAbertos,
+                'rendimentosAbertosTotal' => $rendimentosAbertosTotal,
+                'rendimentosRegistrados' => $rendimentosRegistrados,
+                'rendimentosRegistradosTotal' => $rendimentosRegistradosTotal,
+            ]);
+            return response()->json($response, 200);
+        } catch (Exception  $ex) {
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+            return response()->json($response, 500);
+        }
+    }
+
     private function date_range($first, $last, $step = '+1 day', $output_format = 'd/m/Y')
     {
 
