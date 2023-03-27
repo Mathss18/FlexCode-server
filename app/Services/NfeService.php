@@ -236,7 +236,7 @@ class NfeService
                 $dados['produtos'][$i]['cfop'] == '5101' ||
                 $dados['produtos'][$i]['cfop'] == '5102' ||
                 $dados['produtos'][$i]['cfop'] == '6101' ||
-                $dados['produtos'][$i]['cfop'] == '5949' ||
+                // $dados['produtos'][$i]['cfop'] == '5949' ||
                 $dados['produtos'][$i]['cfop'] == '6102'
             ) {
                 $icms->CSOSN = '101';
