@@ -249,15 +249,17 @@ class NfeService
                 $icms->vCredICMSSN = $dados['totalProdutos'] * ($aliquota / 100);
             } else {
                 $icms->CSOSN = '900';
-                $icms->pCredSN = $aliquota;
-                $icms->vCredICMSSN = $dados['totalProdutos'] * ($aliquota / 100);
+                // $icms->pCredSN = $aliquota;
+                // $icms->vCredICMSSN = $dados['totalProdutos'] * ($aliquota / 100);
+                $icms->vBCST = $dados['produtos'][$i]['total'];
+                $icms->vICMSST = ($dados['produtos'][$i]['total'] * 18.0)/100; // change COMENTAR A LINHA OU NULL
             }
             //$icms->modBCST = null;
             //$icms->pMVAST = null;
             //$icms->pRedBCST = null;
-            $icms->vBCST = $dados['produtos'][$i]['total'];
+            // $icms->vBCST = $dados['produtos'][$i]['total'];
             //$icms->pICMSST = null;
-            $icms->vICMSST = ($dados['produtos'][$i]['total'] * 18.0)/100; // change COMENTAR A LINHA OU NULL
+            // $icms->vICMSST = ($dados['produtos'][$i]['total'] * 18.0)/100; // change COMENTAR A LINHA OU NULL
             //$icms->vBCFCPST = null; //incluso no layout 4.00
             //$icms->pFCPST = null; //incluso no layout 4.00
             //$icms->vFCPST = null; //incluso no layout 4.00
