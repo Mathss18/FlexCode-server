@@ -106,8 +106,8 @@ class NfeService
 
         $nfeRef = new stdClass();
         // $nfeRef->refNFe = $dados['refNFe'];
-        // $nfeRef->refNFe = "35221109136351000107550010000028741885337470";
-        // $nfe->tagrefNFe($nfeRef);
+        $nfeRef->refNFe = "35230260199957000726550010000847991424906223";
+        $nfe->tagrefNFe($nfeRef);
 
 
 
