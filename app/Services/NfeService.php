@@ -251,8 +251,8 @@ class NfeService
                 $icms->CSOSN = '900';
                 // $icms->pCredSN = $aliquota;
                 // $icms->vCredICMSSN = $dados['totalProdutos'] * ($aliquota / 100);
-                $icms->vBCST = $dados['produtos'][$i]['total'];
-                $icms->vICMSST = ($dados['produtos'][$i]['total'] * 18.0)/100; // change COMENTAR A LINHA OU NULL
+                $icms->vBC = $dados['produtos'][$i]['total'];
+                $icms->vICMS = ($dados['produtos'][$i]['total'] * 18.0)/100; // change COMENTAR A LINHA OU NULL
             }
             //$icms->modBCST = null;
             //$icms->pMVAST = null;
