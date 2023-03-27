@@ -255,9 +255,9 @@ class NfeService
             //$icms->modBCST = null;
             //$icms->pMVAST = null;
             //$icms->pRedBCST = null;
-            //$icms->vBCST = null;
+            $icms->vBCST = $dados['produtos'][$i]['total'];
             //$icms->pICMSST = null;
-            //$icms->vICMSST = null;
+            $icms->vICMSST = ($dados['produtos'][$i]['total'] * 18.0)/100; // change COMENTAR A LINHA OU NULL
             //$icms->vBCFCPST = null; //incluso no layout 4.00
             //$icms->pFCPST = null; //incluso no layout 4.00
             //$icms->vFCPST = null; //incluso no layout 4.00
@@ -267,8 +267,8 @@ class NfeService
             //$icms->vBCFCPSTRet = null; //incluso no layout 4.00
             //$icms->pFCPSTRet = null; //incluso no layout 4.00
             //$icms->vFCPSTRet = null; //incluso no layout 4.00
-            $icms->modBC = 3;
-            $icms->vBC = $dados['produtos'][$i]['total'];
+            // $icms->modBC = null;
+            // $icms->vBC = $dados['produtos'][$i]['total'];
             //$icms->pRedBC = null;
             //$icms->pICMS = null;
             // $icms->vICMS = ($dados['produtos'][$i]['total'] * 18.0)/100; // change COMENTAR A LINHA OU NULL
