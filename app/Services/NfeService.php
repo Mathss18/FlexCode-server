@@ -236,6 +236,7 @@ class NfeService
                 $dados['produtos'][$i]['cfop'] == '5101' ||
                 $dados['produtos'][$i]['cfop'] == '5102' ||
                 $dados['produtos'][$i]['cfop'] == '6101' ||
+                $dados['produtos'][$i]['cfop'] == '5949' ||
                 $dados['produtos'][$i]['cfop'] == '6102'
             ) {
                 $icms->CSOSN = '101';
@@ -244,7 +245,6 @@ class NfeService
             } else if (
                 $dados['produtos'][$i]['cfop'] == '5902' ||
                 $dados['produtos'][$i]['cfop'] == '6912' ||
-                $dados['produtos'][$i]['cfop'] == '5949' ||
                 $dados['produtos'][$i]['cfop'] == '6910'
             ) {
                 $icms->CSOSN = '400';
