@@ -271,7 +271,7 @@ class NfeService
             // $icms->vBC = $dados['produtos'][$i]['total'];
             //$icms->pRedBC = null;
             //$icms->pICMS = null;
-            $icms->vICMS = ($dados['produtos'][$i]['total'] * 18.0)/100; // change COMENTAR A LINHA OU NULL
+            // $icms->vICMS = ($dados['produtos'][$i]['total'] * 18.0)/100; // change COMENTAR A LINHA OU NULL
             //$icms->pRedBCEfet = null;
             //$icms->vBCEfet = null;
             //$icms->pICMSEfet = null;
