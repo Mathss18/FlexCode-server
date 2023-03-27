@@ -106,8 +106,8 @@ class NfeService
 
         $nfeRef = new stdClass();
         // $nfeRef->refNFe = $dados['refNFe'];
-        $nfeRef->refNFe = "35230260199957000726550010000847991424906223";
-        $nfe->tagrefNFe($nfeRef);
+        // $nfeRef->refNFe = "35221109136351000107550010000028741885337470";
+        // $nfe->tagrefNFe($nfeRef);
 
 
 
@@ -174,8 +174,6 @@ class NfeService
 
         $nfe->tagenderDest($enderDest);
 
-        $vbc = 0;
-        $vicms = 0;
         //====================TAG PRODUTO===================
         for ($i = 0; $i < count($dados['produtos']); $i++) {
             $prod = new stdClass();
@@ -253,17 +251,13 @@ class NfeService
                 $icms->CSOSN = '900';
                 $icms->pCredSN = $aliquota;
                 $icms->vCredICMSSN = $dados['totalProdutos'] * ($aliquota / 100);
-                $icms->vBCSTRet = $dados['produtos'][$i]['total'];
-                $icms->vICMSSTRet = ($dados['produtos'][$i]['total'] * 18.0)/100; // change COMENTAR A LINHA OU NULL
-                $vbc += $dados['produtos'][$i]['total'];
-                $vicms += ($dados['produtos'][$i]['total'] * 18.0)/100;
             }
             //$icms->modBCST = null;
             //$icms->pMVAST = null;
             //$icms->pRedBCST = null;
-            // $icms->vBCST = $dados['produtos'][$i]['total'];
+            //$icms->vBCST = null;
             //$icms->pICMSST = null;
-            // $icms->vICMSST = ($dados['produtos'][$i]['total'] * 18.0)/100; // change COMENTAR A LINHA OU NULL
+            //$icms->vICMSST = null;
             //$icms->vBCFCPST = null; //incluso no layout 4.00
             //$icms->pFCPST = null; //incluso no layout 4.00
             //$icms->vFCPST = null; //incluso no layout 4.00
@@ -273,11 +267,11 @@ class NfeService
             //$icms->vBCFCPSTRet = null; //incluso no layout 4.00
             //$icms->pFCPSTRet = null; //incluso no layout 4.00
             //$icms->vFCPSTRet = null; //incluso no layout 4.00
-            // $icms->modBC = null;
-            // $icms->vBC = $dados['produtos'][$i]['total'];
+            //$icms->modBC = null;
+            //$icms->vBC = null;
             //$icms->pRedBC = null;
             //$icms->pICMS = null;
-            // $icms->vICMS = ($dados['produtos'][$i]['total'] * 18.0)/100; // change COMENTAR A LINHA OU NULL
+            //$icms->vICMS = 480.21; // change COMENTAR A LINHA OU NULL
             //$icms->pRedBCEfet = null;
             //$icms->vBCEfet = null;
             //$icms->pICMSEfet = null;
@@ -331,8 +325,8 @@ class NfeService
 
         //====================TAG ICMSTOTAL===================
         $icmsTotal = new stdClass();
-        $icmsTotal->vBC = $vbc;
-        $icmsTotal->vICMS = $vicms; //change 480.21
+        $icmsTotal->vBC = 0.00;
+        $icmsTotal->vICMS = 0.00; //change 480.21
         $icmsTotal->vICMSDeson = 0.00;
         $icmsTotal->vFCP = 0.00; //incluso no layout 4.00
         $icmsTotal->vBCST = 0.00;
