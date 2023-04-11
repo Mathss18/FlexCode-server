@@ -229,7 +229,7 @@ class NfeService
             $icms = new stdClass();
             $icms->item = $i + 1; //item da NFe
             $icms->orig = 0;
-            $icms->CSOSN = '400';
+            $icms->CSOSN = '900';
             // $icms->pCredSN = $aliquota;
             // $icms->vCredICMSSN = $dados['totalProdutos'] * ($aliquota / 100);
             //VERIFICA SE TEM IE OU NÃO
