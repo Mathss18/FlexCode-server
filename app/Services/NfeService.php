@@ -324,12 +324,12 @@ class NfeService
 
             // $nfe->tagIPI($ipi);
 
-            $impostoDevol = new stdClass();
-            $impostoDevol->item = 1; //item da NFe
-            $impostoDevol->pDevol = 0.00;
-            $impostoDevol->vIPIDevol = 0.00;
+            // $impostoDevol = new stdClass();
+            // $impostoDevol->item = 1; //item da NFe
+            // $impostoDevol->pDevol = 0.00;
+            // $impostoDevol->vIPIDevol = 0.00;
 
-            $nfe->tagimpostoDevol($impostoDevol);
+            // $nfe->tagimpostoDevol($impostoDevol);
 
         }
 
