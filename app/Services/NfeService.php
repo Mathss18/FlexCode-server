@@ -229,7 +229,7 @@ class NfeService
             $icms = new stdClass();
             $icms->item = $i + 1; //item da NFe
             $icms->orig = 0;
-            $icms->CSOSN = '900';
+            $icms->CSOSN = '400';
             // $icms->pCredSN = $aliquota;
             // $icms->vCredICMSSN = $dados['totalProdutos'] * ($aliquota / 100);
             //VERIFICA SE TEM IE OU NÃO
@@ -326,8 +326,8 @@ class NfeService
 
             $impostoDevol = new stdClass();
             $impostoDevol->item = 1; //item da NFe
-            $impostoDevol->pDevol = 100.00;
-            $impostoDevol->vIPIDevol = 51.39;
+            $impostoDevol->pDevol = 0.00;
+            $impostoDevol->vIPIDevol = 0.00;
 
             $nfe->tagimpostoDevol($impostoDevol);
 
