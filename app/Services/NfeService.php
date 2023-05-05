@@ -236,7 +236,7 @@ class NfeService
                 $dados['produtos'][$i]['cfop'] == '6101' ||
                 $dados['produtos'][$i]['cfop'] == '6102'
             ) {
-                $icms->CSOSN = '101';
+                $icms->CSOSN = '102';
                 $icms->pCredSN = $aliquota;
                 $icms->vCredICMSSN = $dados['totalProdutos'] * ($aliquota / 100);
             } else if (
