@@ -51,6 +51,9 @@ class NfeService
 
         $this->soap = new SoapCurl(Certificate::readPfx($certificadoDigital, session('config')->senhaCertificadoDigital));
         $this->soap->timeout(600); // 10 minutos de timeout // Aumentar tbm na pastar vendor arquivo -> SoapBase.php
+        $this->soap->httpVersion('1.1'); //seta a versão 1.1 do protocolo HTTP
+        // $this->tools->model(55); //estabelece que irá processar NFe
+        $this->tools->loadSoapClass($this->soap); //injeta a classe SoapCurl() no classe Tools
     }
 
     public function gerarNfe($dados, $favorecido, $produtos, $transportadora, $aliquota)
