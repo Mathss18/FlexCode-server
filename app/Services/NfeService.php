@@ -244,7 +244,7 @@ class NfeService
                     $icms->CSOSN = '101';
                 }
                 else{
-                    $icms->CSOSN = '102';
+                    $icms->CSOSN = '101';
                 }
                 $icms->pCredSN = $aliquota;
                 $icms->vCredICMSSN = $dados['totalProdutos'] * ($aliquota / 100);
@@ -278,7 +278,7 @@ class NfeService
             //$icms->pFCPSTRet = null; //incluso no layout 4.00
             //$icms->vFCPSTRet = null; //incluso no layout 4.00
             //$icms->modBC = null;
-            $icms->vBC = $dados['produtos'][$i]['total'];
+            $icms->vBC = 322.50;
             //$icms->pRedBC = null;
             //$icms->pICMS = null;
             $icms->vICMS = 38.70; // change COMENTAR A LINHA OU NULL
@@ -335,7 +335,7 @@ class NfeService
 
         //====================TAG ICMSTOTAL===================
         $icmsTotal = new stdClass();
-        $icmsTotal->vBC = $dados['totalFinal'];
+        $icmsTotal->vBC = 322.50;
         $icmsTotal->vICMS = 38.70; //change 480.21
         $icmsTotal->vICMSDeson = 0.00;
         $icmsTotal->vFCP = 0.00; //incluso no layout 4.00
