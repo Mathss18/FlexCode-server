@@ -100,18 +100,17 @@ class NfeService
         $nfe->tagide($ide);
 
         //====================TAG REF NFE===================
-        // se precisar no futuro, só colocar 
         if (array_key_exists("refNFe", $dados)) {
             $nfeRef = new stdClass();
             $nfeRef->refNFe = $dados['refNFe'];
-            $nfeRef->refNFe = "43230604405220000237550000000956571950615707";
+            // $nfeRef->refNFe = "35221109136351000107550010000028741885537470";
             $nfe->tagrefNFe($nfeRef);
         }
 
         $nfeRef = new stdClass();
         // $nfeRef->refNFe = $dados['refNFe'];
-        $nfeRef->refNFe = "43230604405220000237550000000956571950615707";
-        $nfe->tagrefNFe($nfeRef);
+        // $nfeRef->refNFe = "35221109136351000107550010000028741885337470";
+        // $nfe->tagrefNFe($nfeRef);
 
 
 
@@ -251,10 +250,9 @@ class NfeService
             } else if (
                 $dados['produtos'][$i]['cfop'] == '5902' ||
                 $dados['produtos'][$i]['cfop'] == '6912' ||
-                $dados['produtos'][$i]['cfop'] == '6201' ||
                 $dados['produtos'][$i]['cfop'] == '6910'
             ) {
-                $icms->CSOSN = '900';
+                $icms->CSOSN = '400';
                 $icms->pCredSN = $aliquota;
                 $icms->vCredICMSSN = $dados['totalProdutos'] * ($aliquota / 100);
             } else {
@@ -277,11 +275,11 @@ class NfeService
             //$icms->vBCFCPSTRet = null; //incluso no layout 4.00
             //$icms->pFCPSTRet = null; //incluso no layout 4.00
             //$icms->vFCPSTRet = null; //incluso no layout 4.00
-            $icms->modBC = 3;
-            $icms->vBC = 322.50;
-            $icms->pRedBC = 0.00;
-            $icms->pICMS = 0.00;
-            $icms->vICMS = 38.70; // change COMENTAR A LINHA OU NULL
+            //$icms->modBC = null;
+            //$icms->vBC = null;
+            //$icms->pRedBC = null;
+            //$icms->pICMS = null;
+            //$icms->vICMS = 480.21; // change COMENTAR A LINHA OU NULL
             //$icms->pRedBCEfet = null;
             //$icms->vBCEfet = null;
             //$icms->pICMSEfet = null;
@@ -335,8 +333,8 @@ class NfeService
 
         //====================TAG ICMSTOTAL===================
         $icmsTotal = new stdClass();
-        $icmsTotal->vBC = 322.50;
-        $icmsTotal->vICMS = 38.70; //change 480.21
+        $icmsTotal->vBC = 0.00;
+        $icmsTotal->vICMS = 0.00; //change 480.21
         $icmsTotal->vICMSDeson = 0.00;
         $icmsTotal->vFCP = 0.00; //incluso no layout 4.00
         $icmsTotal->vBCST = 0.00;
