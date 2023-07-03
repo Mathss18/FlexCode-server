@@ -100,7 +100,7 @@ class NfeService
         $nfe->tagide($ide);
 
         //====================TAG REF NFE===================
-        // se precisar no futuro, só colocar "refNFe"
+        // se precisar no futuro, só colocar 
         if (array_key_exists("refNFe", $dados)) {
             $nfeRef = new stdClass();
             $nfeRef->refNFe = $dados['refNFe'];
@@ -109,7 +109,7 @@ class NfeService
         }
 
         $nfeRef = new stdClass();
-        $nfeRef->refNFe = $dados['refNFe'];
+        // $nfeRef->refNFe = $dados['refNFe'];
         $nfeRef->refNFe = "43230604405220000237550000000956571950615707";
         $nfe->tagrefNFe($nfeRef);
 
