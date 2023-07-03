@@ -234,11 +234,34 @@ class NfeService
             $icms->item = $i + 1; //item da NFe
             $icms->orig = 0;
             //VERIFICA SE TEM IE OU NÃO
-
-                $icms->CSOSN = '400';
+            if (
+                $dados['produtos'][$i]['cfop'] == '5101' ||
+                $dados['produtos'][$i]['cfop'] == '5102' ||
+                $dados['produtos'][$i]['cfop'] == '6101' ||
+                $dados['produtos'][$i]['cfop'] == '6102'
+            ) {
+                if (strlen($favorecido['cpfCnpj']) == 14) {
+                    $icms->CSOSN = '101';
+                }
+                else{
+                    $icms->CSOSN = '102';
+                }
                 $icms->pCredSN = $aliquota;
                 $icms->vCredICMSSN = $dados['totalProdutos'] * ($aliquota / 100);
-
+            } else if (
+                $dados['produtos'][$i]['cfop'] == '5902' ||
+                $dados['produtos'][$i]['cfop'] == '6912' ||
+                $dados['produtos'][$i]['cfop'] == '6201' ||
+                $dados['produtos'][$i]['cfop'] == '6910'
+            ) {
+                $icms->CSOSN = '900';
+                $icms->pCredSN = $aliquota;
+                $icms->vCredICMSSN = $dados['totalProdutos'] * ($aliquota / 100);
+            } else {
+                $icms->CSOSN = '900';
+                $icms->pCredSN = $aliquota;
+                $icms->vCredICMSSN = $dados['totalProdutos'] * ($aliquota / 100);
+            }
             //$icms->modBCST = null;
             //$icms->pMVAST = null;
             //$icms->pRedBCST = null;
