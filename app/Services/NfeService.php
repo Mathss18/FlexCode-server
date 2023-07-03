@@ -251,7 +251,7 @@ class NfeService
             } else if (
                 $dados['produtos'][$i]['cfop'] == '5902' ||
                 $dados['produtos'][$i]['cfop'] == '6912' ||
-                // $dados['produtos'][$i]['cfop'] == '6201' ||
+                $dados['produtos'][$i]['cfop'] == '6201' ||
                 $dados['produtos'][$i]['cfop'] == '6910'
             ) {
                 $icms->CSOSN = '400';
@@ -278,7 +278,7 @@ class NfeService
             //$icms->pFCPSTRet = null; //incluso no layout 4.00
             //$icms->vFCPSTRet = null; //incluso no layout 4.00
             //$icms->modBC = null;
-            $icms->vBC = 322.5;
+            $icms->vBC = $dados['produtos'][$i]['total'];
             //$icms->pRedBC = null;
             //$icms->pICMS = null;
             $icms->vICMS = 38.70; // change COMENTAR A LINHA OU NULL
@@ -335,7 +335,7 @@ class NfeService
 
         //====================TAG ICMSTOTAL===================
         $icmsTotal = new stdClass();
-        $icmsTotal->vBC = 322.5;
+        $icmsTotal->vBC = $dados['totalFinal'];
         $icmsTotal->vICMS = 38.70; //change 480.21
         $icmsTotal->vICMSDeson = 0.00;
         $icmsTotal->vFCP = 0.00; //incluso no layout 4.00
