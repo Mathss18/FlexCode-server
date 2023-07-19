@@ -84,7 +84,7 @@ class DashboardController extends Controller
     {
         $currentYear = date('Y');
         
-        $highestMonthTotal = DB::select(DB::raw("
+        $vendasMelhorMesDoAnoAtual = DB::select(DB::raw("
             SELECT SUM(t.valor) as total, DATE_FORMAT(t.data, '%Y-%m') as month 
             FROM transacoes t 
             WHERE t.situacao = 'registrada' 
@@ -102,7 +102,7 @@ class DashboardController extends Controller
 
         $metasMensais = ([
             'y' => (float)number_format($vendasMesAtual[0]->total, 2, '.', ''),
-            'target' => (float)number_format($highestMonthTotal[0]->total, 2, '.', ''),
+            'target' => (float)number_format($vendasMelhorMesDoAnoAtual[0]->total, 2, '.', ''),
         ]);
         
         return $metasMensais;
