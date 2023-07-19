@@ -86,11 +86,11 @@ class DashboardController extends Controller
         $ultimoDiaMesPassado    = new DateTime("last day of last month");
         $primeiroDiaMesPassado  = $primeiroDiaMesPassado->format('Y-m-d');
         $ultimoDiaMesPassado    = $ultimoDiaMesPassado->format('Y-m-d');
-        $vendasMesPassado = DB::select(DB::raw("SELECT SUM(t.valor) as total FROM transacoes t WHERE t.situacao = 'registrada' AND t.data BETWEEN '{$primeiroDiaMesPassado}' AND '{$ultimoDiaMesPassado}' "));
+        $vendasMesPassado = DB::select(DB::raw("SELECT SUM(t.valor) as total FROM transacoes t WHERE t.situacao = 'registrada' AND t.tipo = 'rendimento' AND t.data BETWEEN '{$primeiroDiaMesPassado}' AND '{$ultimoDiaMesPassado}' "));
 
         $primeiroDiaMesAtual = date('Y-m-01'); // hard-coded '01' for first day
         $ultimoDiaMesAtual  = date('Y-m-t');
-        $vendasMesAtual = DB::select("SELECT SUM(t.valor) as total FROM transacoes t WHERE t.situacao = 'registrada' AND t.data BETWEEN '{$primeiroDiaMesAtual}' AND '{$ultimoDiaMesAtual}' ");
+        $vendasMesAtual = DB::select("SELECT SUM(t.valor) as total FROM transacoes t WHERE t.situacao = 'registrada' AND t.tipo = 'rendimento' AND t.data BETWEEN '{$primeiroDiaMesAtual}' AND '{$ultimoDiaMesAtual}' ");
 
         $metasMensais = ([
             'y' => (float)number_format($vendasMesAtual[0]->total, 2, '.', ''),
@@ -103,11 +103,15 @@ class DashboardController extends Controller
     {
         $primeiroDiaAnoPassado  = date("Y-m-d", strtotime("last year January 1st"));
         $ultimoDiaAnoPassado    = date("Y-m-d", strtotime("last year December 31st"));
-        $vendasAnoPassado = DB::select(DB::raw("SELECT SUM(v.total) as total FROM vendas v WHERE v.situacao= 1 AND v.dataEntrada BETWEEN '{$primeiroDiaAnoPassado}' AND '{$ultimoDiaAnoPassado}' "));
+        $primeiroDiaAnoPassado  = $primeiroDiaAnoPassado->format('Y-m-d');
+        $ultimoDiaAnoPassado    = $ultimoDiaAnoPassado->format('Y-m-d');
+        $vendasAnoPassado = DB::select(DB::raw("SELECT SUM(t.valor) as total FROM transacoes t WHERE t.situacao = 'registrada' AND t.tipo = 'rendimento' AND t.data BETWEEN '{$primeiroDiaAnoPassado}' AND '{$ultimoDiaAnoPassado}' "));
 
         $primeiroDiaAnoAtual  = date('Y-m-d', strtotime('first day of january this year'));
         $ultimoDiaAnoAtual    = date('Y-m-d', strtotime('last day of december this year'));
-        $vendasAnoAtual = DB::select(DB::raw("SELECT SUM(v.total) as total FROM vendas v WHERE v.situacao= 1 AND v.dataEntrada BETWEEN '{$primeiroDiaAnoAtual}' AND '{$ultimoDiaAnoAtual}' "));
+        $primeiroDiaAnoAtual  = $primeiroDiaAnoAtual->format('Y-m-d');
+        $ultimoDiaAnoAtual    = $ultimoDiaAnoAtual->format('Y-m-d');
+        $vendasAnoAtual = DB::select(DB::raw("SELECT SUM(t.valor) as total FROM transacoes t WHERE t.situacao = 'registrada' AND t.tipo = 'rendimento' AND t.data BETWEEN '{$primeiroDiaAnoAtual}' AND '{$ultimoDiaAnoAtual}' "));
 
         $metasAnuais = ([
             'y' => (float)number_format($vendasAnoAtual[0]->total, 2, '.', ''),
