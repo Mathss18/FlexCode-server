@@ -86,11 +86,11 @@ class DashboardController extends Controller
         $ultimoDiaMesPassado    = new DateTime("last day of last month");
         $primeiroDiaMesPassado  = $primeiroDiaMesPassado->format('Y-m-d');
         $ultimoDiaMesPassado    = $ultimoDiaMesPassado->format('Y-m-d');
-        $vendasMesPassado = DB::select(DB::raw("SELECT SUM(t.valor) as total FROM transacoes t WHERE t.situacao = 'registrada' AND v.data BETWEEN '{$primeiroDiaMesPassado}' AND '{$ultimoDiaMesPassado}' "));
+        $vendasMesPassado = DB::select(DB::raw("SELECT SUM(t.valor) as total FROM transacoes t WHERE t.situacao = 'registrada' AND t.data BETWEEN '{$primeiroDiaMesPassado}' AND '{$ultimoDiaMesPassado}' "));
 
         $primeiroDiaMesAtual = date('Y-m-01'); // hard-coded '01' for first day
         $ultimoDiaMesAtual  = date('Y-m-t');
-        $vendasMesAtual = DB::select("SELECT SUM(t.valor) as total FROM transacoes t WHERE t.situacao = 'registrada' AND v.data BETWEEN '{$primeiroDiaMesAtual}' AND '{$ultimoDiaMesAtual}' ");
+        $vendasMesAtual = DB::select("SELECT SUM(t.valor) as total FROM transacoes t WHERE t.situacao = 'registrada' AND t.data BETWEEN '{$primeiroDiaMesAtual}' AND '{$ultimoDiaMesAtual}' ");
 
         $metasMensais = ([
             'y' => (float)number_format($vendasMesAtual[0]->total, 2, '.', ''),
