@@ -103,14 +103,10 @@ class DashboardController extends Controller
     {
         $primeiroDiaAnoPassado  = date("Y-m-d", strtotime("last year January 1st"));
         $ultimoDiaAnoPassado    = date("Y-m-d", strtotime("last year December 31st"));
-        $primeiroDiaAnoPassado  = $primeiroDiaAnoPassado->format('Y-m-d');
-        $ultimoDiaAnoPassado    = $ultimoDiaAnoPassado->format('Y-m-d');
         $vendasAnoPassado = DB::select(DB::raw("SELECT SUM(t.valor) as total FROM transacoes t WHERE t.situacao = 'registrada' AND t.tipo = 'rendimento' AND t.data BETWEEN '{$primeiroDiaAnoPassado}' AND '{$ultimoDiaAnoPassado}' "));
 
         $primeiroDiaAnoAtual  = date('Y-m-d', strtotime('first day of january this year'));
         $ultimoDiaAnoAtual    = date('Y-m-d', strtotime('last day of december this year'));
-        $primeiroDiaAnoAtual  = $primeiroDiaAnoAtual->format('Y-m-d');
-        $ultimoDiaAnoAtual    = $ultimoDiaAnoAtual->format('Y-m-d');
         $vendasAnoAtual = DB::select(DB::raw("SELECT SUM(t.valor) as total FROM transacoes t WHERE t.situacao = 'registrada' AND t.tipo = 'rendimento' AND t.data BETWEEN '{$primeiroDiaAnoAtual}' AND '{$ultimoDiaAnoAtual}' "));
 
         $metasAnuais = ([
