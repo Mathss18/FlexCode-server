@@ -167,8 +167,6 @@ class RelatorioController extends Controller
 
             $totalVendasRealizadas = DB::select(DB::raw("SELECT sum(v.total) as total FROM vendas v WHERE v.situacao = 1 AND v.updated_at BETWEEN '{$fromFull}' AND '{$toFull}'"));
 
-
-
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', [
                 'vendasAbertas' => $vendasAbertas,
                 'totalVendasAbertas' => $totalVendasAbertas[0]->total,
