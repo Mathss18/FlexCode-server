@@ -85,19 +85,19 @@ class DashboardController extends Controller
         $currentYear = date('Y');
 
         $vendasMelhorMesDoAnoAtual = DB::select(DB::raw("
-        SELECT SUM(v.total) as total, DATE_FORMAT(v.data, '%Y-%m') as month 
-        FROM vendas v
-        WHERE v.situacao = 1 
-            AND YEAR(v.data) = {$currentYear}
-        GROUP BY month 
-        ORDER BY total DESC 
-        LIMIT 1
-    "));
+            SELECT SUM(v.total) as total, DATE_FORMAT(v.dataEntrada, '%Y-%m') as month 
+            FROM vendas v
+            WHERE v.situacao = 1 
+                AND YEAR(v.dataEntrada) = {$currentYear}
+            GROUP BY month 
+            ORDER BY total DESC 
+            LIMIT 1
+        "));
 
         $primeiroDiaMesAtual = date('Y-m-01'); // hard-coded '01' for first day
         $ultimoDiaMesAtual = date('Y-m-t');
 
-        $vendasMesAtual = DB::select(DB::raw("SELECT SUM(v.total) as total FROM vendas v WHERE v.situacao = 1 AND v.data BETWEEN '{$primeiroDiaMesAtual}' AND '{$ultimoDiaMesAtual}'"));
+        $vendasMesAtual = DB::select(DB::raw("SELECT SUM(v.total) as total FROM vendas v WHERE v.situacao = 1 AND v.dataEntrada BETWEEN '{$primeiroDiaMesAtual}' AND '{$ultimoDiaMesAtual}'"));
 
         $metasMensais = ([
             'y' => (float) number_format($vendasMesAtual[0]->total, 2, '.', ''),
@@ -106,6 +106,7 @@ class DashboardController extends Controller
 
         return $metasMensais;
     }
+
 
 
     public function metasAnuais()
