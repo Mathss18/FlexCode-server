@@ -82,17 +82,19 @@ class DashboardController extends Controller
 
     public function metasMensais()
     {
+        $currentMonth = date('m');
         $currentYear = date('Y');
 
-        $vendasMelhorMesDoAnoAtual = DB::select(DB::raw("
-            SELECT SUM(v.total) as total, DATE_FORMAT(v.dataEntrada, '%Y-%m') as month 
-            FROM vendas v
-            WHERE v.situacao = 1 
-                AND YEAR(v.dataEntrada) = {$currentYear}
-            GROUP BY month 
-            ORDER BY total DESC 
-            LIMIT 1
-        "));
+        // calculating the first and last day of the previous month
+        $firstDayOfLastMonth = date('Y-m-d', mktime(0, 0, 0, $currentMonth - 1, 1, $currentYear));
+        $lastDayOfLastMonth = date('Y-m-t', strtotime('-1 month'));
+
+        $vendasMesPassado = DB::select(DB::raw("
+        SELECT SUM(v.total) as total 
+        FROM vendas v
+        WHERE v.situacao = 1 
+            AND v.dataEntrada BETWEEN '{$firstDayOfLastMonth}' AND '{$lastDayOfLastMonth}'
+    "));
 
         $primeiroDiaMesAtual = date('Y-m-01'); // hard-coded '01' for first day
         $ultimoDiaMesAtual = date('Y-m-t');
@@ -101,11 +103,12 @@ class DashboardController extends Controller
 
         $metasMensais = ([
             'y' => (float) number_format($vendasMesAtual[0]->total, 2, '.', ''),
-            'target' => (float) number_format($vendasMelhorMesDoAnoAtual[0]->total, 2, '.', ''),
+            'target' => (float) number_format($vendasMesPassado[0]->total, 2, '.', ''),
         ]);
 
         return $metasMensais;
     }
+
 
 
 
