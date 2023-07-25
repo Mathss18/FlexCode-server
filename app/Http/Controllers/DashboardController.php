@@ -96,13 +96,10 @@ class DashboardController extends Controller
             AND v.dataEntrada BETWEEN '{$firstDayOfLastMonth}' AND '{$lastDayOfLastMonth}'
     "));
 
-        $primeiroDiaMesAtual = date('Y-m-01'); // hard-coded '01' for first day
-        $ultimoDiaMesAtual = date('Y-m-t');
+        $fromFull = date('Y-m-01 00:00:00'); // first day of current month: like 2023-01-01 00:00:00
+        $toFull = date('Y-m-t 23:59:59'); // last day of current month: like 2023-01-31 23:59:59
 
-        $fromFull = date($primeiroDiaMesAtual . ' 00:00:00');
-        $toFull = date($ultimoDiaMesAtual . ' 23:59:59');
-
-        $vendasMesAtual = DB::select(DB::raw("SELECT SUM(v.total) as total FROM vendas v WHERE v.situacao = 1 AND v.dataEntrada BETWEEN '{$fromFull}' AND '{$toFull}'"));
+        $vendasMesAtual = DB::select(DB::raw("SELECT sum(v.total) as total FROM vendas v WHERE v.situacao = 1 AND v.updated_at BETWEEN '{$fromFull}' AND '{$toFull}'"));
 
         $metasMensais = ([
             'y' => (float) number_format($vendasMesAtual[0]->total, 2, '.', ''),
