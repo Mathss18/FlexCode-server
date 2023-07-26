@@ -101,6 +101,9 @@ class DashboardController extends Controller
         if(!is_array($vendasMesAtual)){
             $vendasMesAtual[0] = 0;
         }
+        if(!is_array($vendasMelhorMes)){
+            $vendasMelhorMes[0] = 0;
+        }
 
         $metasMensais = ([
             'y' => (float) number_format($vendasMesAtual[0]->total, 2, '.', ''),
