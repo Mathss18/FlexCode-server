@@ -107,25 +107,35 @@ class DashboardController extends Controller
         return $metasMensais;
     }
 
-
-
-
     public function metasAnuais()
     {
-        $primeiroDiaAnoPassado = date("Y-m-d", strtotime("last year January 1st"));
-        $ultimoDiaAnoPassado = date("Y-m-d", strtotime("last year December 31st"));
-        $vendasAnoPassado = DB::select(DB::raw("SELECT SUM(t.valor) as total FROM transacoes t WHERE t.situacao = 'registrada' AND t.tipo = 'rendimento' AND t.data BETWEEN '{$primeiroDiaAnoPassado}' AND '{$ultimoDiaAnoPassado}' "));
+        $lastYear = date('Y', strtotime('-1 year')); // Get last year.
+        $currentYear = date('Y'); // Get current year.
 
-        $primeiroDiaAnoAtual = date('Y-m-d', strtotime('first day of january this year'));
-        $ultimoDiaAnoAtual = date('Y-m-d', strtotime('last day of december this year'));
-        $vendasAnoAtual = DB::select(DB::raw("SELECT SUM(t.valor) as total FROM transacoes t WHERE t.situacao = 'registrada' AND t.tipo = 'rendimento' AND t.data BETWEEN '{$primeiroDiaAnoAtual}' AND '{$ultimoDiaAnoAtual}' "));
+        // Select the total amount of sales from last year.
+        $vendasAnoPassado = DB::select(DB::raw("
+        SELECT SUM(v.total) as total 
+        FROM vendas v
+        WHERE v.situacao = 1 
+            AND YEAR(v.updated_at) = '{$lastYear}'
+    "));
+
+        // Select the total amount of sales from this year.
+        $vendasAnoAtual = DB::select(DB::raw("
+        SELECT SUM(v.total) as total 
+        FROM vendas v
+        WHERE v.situacao = 1 
+            AND YEAR(v.updated_at) = '{$currentYear}'
+    "));
 
         $metasAnuais = ([
             'y' => (float) number_format($vendasAnoAtual[0]->total, 2, '.', ''),
             'target' => (float) number_format($vendasAnoPassado[0]->total, 2, '.', ''),
         ]);
+
         return $metasAnuais;
     }
+
 
     public function melhoresClientes()
     {
