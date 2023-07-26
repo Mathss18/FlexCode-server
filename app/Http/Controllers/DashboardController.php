@@ -129,9 +129,9 @@ class DashboardController extends Controller
 
     public function melhoresClientes()
     {
-        $primeiroDiaMesAtual = date('Y-m-01'); // hard-coded '01' for first day
-        $ultimoDiaMesAtual = date('Y-m-t');
-        $melhoresClientes = DB::select(DB::raw("SELECT c.nome as name, SUM(v.total) as y FROM vendas v, clientes c WHERE c.id = v.cliente_id AND v.situacao= 1 AND v.dataEntrada BETWEEN '{$primeiroDiaMesAtual}' AND '{$ultimoDiaMesAtual}' GROUP BY c.nome ORDER BY total DESC LIMIT 10"));
+        $primeiroDiaMesAtual = date('Y-m-01 00:00:00'); // first day of current month: like 2023-01-01 00:00:00
+        $ultimoDiaMesAtual = date('Y-m-t 23:59:59'); // last day of current month: like 2023-01-31 23:59:59
+        $melhoresClientes = DB::select(DB::raw("SELECT c.nome as name, SUM(v.total) as y FROM vendas v, clientes c WHERE c.id = v.cliente_id AND v.situacao= 1 AND v.updated_at BETWEEN '{$primeiroDiaMesAtual}' AND '{$ultimoDiaMesAtual}' GROUP BY c.nome ORDER BY total DESC LIMIT 10"));
         return $melhoresClientes;
     }
 }
