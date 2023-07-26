@@ -98,16 +98,10 @@ class DashboardController extends Controller
         $toFull = date('Y-m-t 23:59:59'); // last day of current month: like 2023-01-31 23:59:59
 
         $vendasMesAtual = DB::select(DB::raw("SELECT sum(v.total) as total FROM vendas v WHERE v.situacao = 1 AND v.updated_at BETWEEN '{$fromFull}' AND '{$toFull}'"));
-        if(!is_array($vendasMesAtual)){
-            $vendasMesAtual[0] = 0;
-        }
-        if(!is_array($vendasMelhorMes)){
-            $vendasMelhorMes[0] = 0;
-        }
 
         $metasMensais = ([
-            'y' => (float) number_format($vendasMesAtual[0]->total, 2, '.', ''),
-            'target' => (float) number_format($vendasMelhorMes[0]->total, 2, '.', ''),
+            'y' => isset($vendasMesAtual[0]) ? (float) number_format($vendasMesAtual[0]->total, 2, '.', '') : 0,
+            'target' => isset($vendasMelhorMes[0]) ? (float) number_format($vendasMelhorMes[0]->total, 2, '.', '') : 0,
         ]);
 
         return $metasMensais;
