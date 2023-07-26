@@ -85,10 +85,10 @@ class DashboardController extends Controller
         $currentYear = date('Y');
 
         $vendasMelhorMes = DB::select(DB::raw("
-            SELECT YEAR(v.dataEntrada) as year, MONTH(v.dataEntrada) as month, SUM(v.total) as total 
+            SELECT YEAR(v.updated_at) as year, MONTH(v.updated_at) as month, SUM(v.total) as total 
             FROM vendas v
             WHERE v.situacao = 1 
-                AND YEAR(v.dataEntrada) = '{$currentYear}'
+                AND YEAR(v.updated_at) = '{$currentYear}'
             GROUP BY year, month
             ORDER BY total DESC
             LIMIT 1
