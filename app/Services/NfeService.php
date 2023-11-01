@@ -591,6 +591,7 @@ class NfeService
             //transforma o xml de retorno em um stdClass
             $st = new Standardize();
             $std = $st->toStd($protocolo);
+            Log::info(['$std' => $std]);
 
             $this->protocolo = $std->protNFe->infProt->nProt ?? '';
             $this->recibo = $recibo ?? '';
