@@ -296,7 +296,7 @@ class OrdemServicoController extends Controller
                 array_push($nomesFuncionariosAndIdsFuncionarios, [
                     'nome' => $funcionario['nome'],
                     'foto' => $funcionario['foto'],
-                    'id' => $funcionario['id']
+                    'id' => $funcionario['usuario_id']
                 ]);
             }
             $ordensServicosProdutos = OrdemServicoProduto::with(['produto'])->where('ordem_servico_id', $ordensServicos['id'])->get()->toArray();
