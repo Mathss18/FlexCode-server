@@ -147,8 +147,8 @@ class RelatorioController extends Controller
         $from = date($request->query('startDate'));
         $to = date($request->query('endDate'));
         try {
-            $transacoes = DB::select(DB::raw("SELECT MONTH(v.dataEntrada) as mes, YEAR(v.dataEntrada) as ano, SUM(v.total) as total FROM
-             vendas v GROUP BY YEAR(v.dataEntrada), MONTH(v.dataEntrada)"));
+            $transacoes = DB::select(DB::raw("SELECT MONTH(v.updated_at) as mes, YEAR(v.updated_at) as ano, SUM(v.total) as total FROM
+             vendas v GROUP BY YEAR(v.updated_at), MONTH(v.updated_at)"));
 
             $dados = [];
             for ($i = 0; $i < count($transacoes); $i++) {
