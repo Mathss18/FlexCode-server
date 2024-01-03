@@ -190,7 +190,7 @@ class RelatorioController extends Controller
             // Add the new item to your response
             array_push($dadosFinal, [
                 'periodo' => 'Balanço Diário',
-                'balancoFinal' => $averageDailyCurrentMonth
+                'balancoFinal' => number_format($averageDailyCurrentMonth, 2, '.', '')
             ]);
 
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', [
