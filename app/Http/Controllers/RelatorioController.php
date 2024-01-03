@@ -91,7 +91,7 @@ class RelatorioController extends Controller
                 'despesasRegistradasTotal' => $despesasRegistradasTotal,
             ]);
             return response()->json($response, 200);
-        } catch (Exception  $ex) {
+        } catch (Exception $ex) {
             $response = APIHelper::APIResponse(false, 500, null, null, $ex);
             return response()->json($response, 500);
         }
@@ -117,7 +117,7 @@ class RelatorioController extends Controller
                     'mes' => str_pad($transacoes[$i]->mes, 2, "0", STR_PAD_LEFT),
                     'ano' => $transacoes[$i]->ano,
                     'total' => $transacoes[$i]->total,
-                    'balancoFinal' => (float)number_format($acumulador, 2, '.', '')
+                    'balancoFinal' => (float) number_format($acumulador, 2, '.', '')
                 ]);
             }
             $dadosFinal = [];
@@ -136,7 +136,7 @@ class RelatorioController extends Controller
                 'transacoes' => $dadosFinal,
             ]);
             return response()->json($response, 200);
-        } catch (Exception  $ex) {
+        } catch (Exception $ex) {
             $response = APIHelper::APIResponse(false, 500, null, null, $ex);
             return response()->json($response, 500);
         }
@@ -147,19 +147,24 @@ class RelatorioController extends Controller
         $from = date($request->query('startDate'));
         $to = date($request->query('endDate'));
         try {
-            $transacoes = DB::select(DB::raw("SELECT MONTH(v.updated_at) as mes, YEAR(v.updated_at) as ano, SUM(v.total) as total FROM
-             vendas v WHERE v.situacao = 1 GROUP BY YEAR(v.updated_at), MONTH(v.updated_at)"));
+            $transacoes = DB::select(DB::raw("SELECT MONTH(v.updated_at) as mes, YEAR(v.updated_at) as ano, SUM(v.total) as total FROM vendas v WHERE v.situacao = 1 GROUP BY YEAR(v.updated_at), MONTH(v.updated_at)"));
 
             $dados = [];
+            $totalSum = 0; // For calculating total sum
+            $totalCount = 0; // For counting total months
+
             for ($i = 0; $i < count($transacoes); $i++) {
+                $totalSum += $transacoes[$i]->total;
+                $totalCount++;
                 array_push($dados, [
                     'periodo' => str_pad($transacoes[$i]->mes, 2, "0", STR_PAD_LEFT) . '/' . $transacoes[$i]->ano,
                     'mes' => str_pad($transacoes[$i]->mes, 2, "0", STR_PAD_LEFT),
                     'ano' => $transacoes[$i]->ano,
                     'total' => $transacoes[$i]->total,
-                    'balancoFinal' => (float)number_format($transacoes[$i]->total, 2, '.', '')
+                    'balancoFinal' => (float) number_format($transacoes[$i]->total, 2, '.', '')
                 ]);
             }
+
             $dadosFinal = [];
             for ($i = 0; $i < count($dados); $i++) {
                 // verifica se dados[i] está entre $to e $from, se não estiver, remove da lista
@@ -172,15 +177,27 @@ class RelatorioController extends Controller
                 }
             }
 
+            // Calculate the average daily balance for the current month
+            $currentDay = date('j'); // Current day of the month
+            $averageMonthly = $totalSum / max($totalCount, 1); // To avoid division by zero
+            $averageDailyCurrentMonth = ($averageMonthly / 30) * $currentDay;
+
+            // Add the new item to your response
+            array_push($dadosFinal, [
+                'periodo' => 'Average Daily Balance',
+                'balancoFinal' => $averageDailyCurrentMonth
+            ]);
+
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', [
                 'transacoes' => $dadosFinal,
             ]);
             return response()->json($response, 200);
-        } catch (Exception  $ex) {
+        } catch (Exception $ex) {
             $response = APIHelper::APIResponse(false, 500, null, null, $ex);
             return response()->json($response, 500);
         }
     }
+
 
     public function vendas(Request $request)
     {
@@ -214,7 +231,7 @@ class RelatorioController extends Controller
                 'totalVendasRealizadas' => $totalVendasRealizadas[0]->total,
             ]);
             return response()->json($response, 200);
-        } catch (Exception  $ex) {
+        } catch (Exception $ex) {
             $response = APIHelper::APIResponse(false, 500, null, null, $ex);
             return response()->json($response, 500);
         }
@@ -330,7 +347,7 @@ class RelatorioController extends Controller
 
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', $dados);
             return response()->json($response, 200);
-        } catch (Exception  $ex) {
+        } catch (Exception $ex) {
             $response = APIHelper::APIResponse(false, 500, null, null, $ex);
             return response()->json($response, 500);
         }
@@ -363,7 +380,7 @@ class RelatorioController extends Controller
                 'rendimentosRegistradosTotal' => $rendimentosRegistradosTotal,
             ]);
             return response()->json($response, 200);
-        } catch (Exception  $ex) {
+        } catch (Exception $ex) {
             $response = APIHelper::APIResponse(false, 500, null, null, $ex);
             return response()->json($response, 500);
         }
