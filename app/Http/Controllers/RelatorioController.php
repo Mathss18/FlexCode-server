@@ -144,10 +144,15 @@ class RelatorioController extends Controller
 
     public function vendasAoLongoDoTempo(Request $request)
     {
-        $from = date($request->query('startDate'));
-        $to = date($request->query('endDate'));
+        $from = $request->query('startDate') . ' 00:00:00'; // Ensuring full day is covered
+        $to = $request->query('endDate') . ' 23:59:59'; // Ensuring full day is covered
         try {
-            $transacoes = DB::select(DB::raw("SELECT MONTH(v.updated_at) as mes, YEAR(v.updated_at) as ano, SUM(v.total) as total FROM vendas v WHERE v.situacao = 1 GROUP BY YEAR(v.updated_at), MONTH(v.updated_at)"));
+            $query = "SELECT MONTH(v.updated_at) as mes, YEAR(v.updated_at) as ano, SUM(v.total) as total 
+                  FROM vendas v 
+                  WHERE v.situacao = 1 
+                  AND v.updated_at BETWEEN :from AND :to 
+                  GROUP BY YEAR(v.updated_at), MONTH(v.updated_at)";
+            $transacoes = DB::select(DB::raw($query), ['from' => $from, 'to' => $to]);
 
             $dados = [];
             $totalSum = 0; // For calculating total sum
@@ -184,7 +189,7 @@ class RelatorioController extends Controller
 
             // Add the new item to your response
             array_push($dadosFinal, [
-                'periodo' => 'Average Daily Balance',
+                'periodo' => 'Balanço Diário',
                 'balancoFinal' => $averageDailyCurrentMonth
             ]);
 
