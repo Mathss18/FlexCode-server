@@ -25,7 +25,7 @@ class VendaController extends Controller
     {
         //$vendas = Venda::paginate(15);
         try {
-            $vendas = Venda::with(['produtos:id,nome,codigoInterno,cliente_id,custoFinal', 'cliente', 'transportadora', 'forma_pagamento', 'parcelas', 'parcelas.forma_pagamento', 'anexos'])->orderBy('id', 'desc')->take(500)->get();
+            $vendas = Venda::with(['produtos', 'servicos', 'cliente', 'transportadora', 'forma_pagamento', 'parcelas', 'parcelas.forma_pagamento', 'anexos'])->orderBy('id', 'desc')->take(500)->get();
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', $vendas);
             return response()->json($response, 200);
         } catch (Exception $ex) {
