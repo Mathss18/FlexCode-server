@@ -18,14 +18,22 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use Illuminate\Support\Facades\Cache;
 
 class VendaController extends Controller
 {
     public function index()
     {
-        //$vendas = Venda::paginate(15);
         try {
-            $vendas = Venda::with(['produtos:id,nome,codigoInterno,cliente_id,custoFinal', 'cliente', 'transportadora', 'forma_pagamento', 'parcelas', 'parcelas.forma_pagamento', 'anexos'])->orderBy('id', 'desc')->get();
+            $cacheKey = 'vendas_index'; // Unique key for cache
+            $cacheTime = 5; // Cache time in minutes
+
+            $vendas = Cache::remember($cacheKey, $cacheTime, function () {
+                return Venda::with(['produtos:id,nome,codigoInterno,cliente_id,custoFinal', 'cliente', 'transportadora', 'forma_pagamento', 'parcelas', 'parcelas.forma_pagamento', 'anexos'])
+                    ->orderBy('id', 'desc')
+                    ->get();
+            });
+
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', $vendas);
             return response()->json($response, 200);
         } catch (Exception $ex) {
@@ -33,6 +41,7 @@ class VendaController extends Controller
             return response()->json($response, 500);
         }
     }
+
 
     public function show($id)
     {
@@ -208,6 +217,7 @@ class VendaController extends Controller
 
             $response = APIHelper::APIResponse(true, 200, 'Sucesso ao criar o pedido de venda', $vendas);
             DB::commit();
+            Cache::forget('vendas_index');
             return response()->json($response, 200);
         } catch (Exception $ex) {
             DB::rollBack();
@@ -458,6 +468,7 @@ class VendaController extends Controller
 
             $response = APIHelper::APIResponse(true, 200, 'Sucesso ao editar a venda', $vendas);
             DB::commit();
+            Cache::forget('vendas_index');
             return response()->json($response, 200);
         } catch (Exception $ex) {
             DB::rollBack();
@@ -470,6 +481,7 @@ class VendaController extends Controller
     {
         $vendas = Venda::findOrFail($id);
         if ($vendas->delete()) {
+            Cache::forget('vendas_index');
             return new Json($vendas);
         }
     }
