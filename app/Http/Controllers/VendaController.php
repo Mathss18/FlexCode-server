@@ -25,10 +25,10 @@ class VendaController extends Controller
     {
         //$vendas = Venda::paginate(15);
         try {
-            $vendas = Venda::with(['produtos', 'servicos', 'cliente', 'transportadora', 'forma_pagamento', 'parcelas', 'parcelas.forma_pagamento', 'anexos'])->orderBy('id', 'desc')->get();
+            $vendas = Venda::with(['produtos:id,nome,codigoInterno,cliente_id,custoFinal', 'cliente', 'transportadora', 'forma_pagamento', 'parcelas', 'parcelas.forma_pagamento', 'anexos'])->orderBy('id', 'desc')->get();
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', $vendas);
             return response()->json($response, 200);
-        } catch (Exception  $ex) {
+        } catch (Exception $ex) {
             $response = APIHelper::APIResponse(false, 500, null, null, $ex);
             return response()->json($response, 500);
         }
@@ -40,7 +40,7 @@ class VendaController extends Controller
             $vendas = Venda::with(['produtos', 'servicos', 'cliente', 'transportadora', 'forma_pagamento', 'parcelas', 'parcelas.forma_pagamento', 'anexos'])->findOrFail($id);
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', $vendas);
             return response()->json($response, 200);
-        } catch (Exception  $ex) {
+        } catch (Exception $ex) {
             $response = APIHelper::APIResponse(false, 500, null, null, $ex);
             return response()->json($response, 500);
         }
@@ -62,10 +62,10 @@ class VendaController extends Controller
         $vendas->somarFreteAoTotal = $request->input('somarFreteAoTotal');
         $vendas->dataPrimeiraParcela = $request->input('dataPrimeiraParcela');
         $vendas->tipoFormaPagamento = $request->input('tipoFormaPagamento');
-        $vendas->frete = number_format((float)$request->input('frete'), session('config')->quantidadeCasasDecimaisValor, '.', '');
-        $vendas->impostos = number_format((float)$request->input('impostos'), session('config')->quantidadeCasasDecimaisValor, '.', '');
-        $vendas->desconto = number_format((float)$request->input('desconto'), session('config')->quantidadeCasasDecimaisValor, '.', '');
-        $vendas->total = number_format((float)$request->input('total'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $vendas->frete = number_format((float) $request->input('frete'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $vendas->impostos = number_format((float) $request->input('impostos'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $vendas->desconto = number_format((float) $request->input('desconto'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $vendas->total = number_format((float) $request->input('total'), session('config')->quantidadeCasasDecimaisValor, '.', '');
         $vendas->observacao = $request->input('observacao');
         $vendas->observacaoInterna = $request->input('observacaoInterna');
 
@@ -85,9 +85,9 @@ class VendaController extends Controller
                     $vendas->produtos()->attach(
                         $produto['produto_id'],
                         [
-                            'quantidade' => number_format((float)$produto['quantidade'], session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
-                            'preco' => number_format((float)$produto['preco'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
-                            'total' => number_format((float)$produto['total'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
+                            'quantidade' => number_format((float) $produto['quantidade'], session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
+                            'preco' => number_format((float) $produto['preco'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
+                            'total' => number_format((float) $produto['total'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
                             'observacao' => $produto['observacao'],
                             'created_at' => Carbon::now('GMT-3'),
                             'updated_at' => Carbon::now('GMT-3'),
@@ -103,9 +103,9 @@ class VendaController extends Controller
                     $vendas->servicos()->attach(
                         $servico['servico_id'],
                         [
-                            'quantidade' => number_format((float)$servico['quantidade'], session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
-                            'preco' => number_format((float)$servico['preco'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
-                            'total' => number_format((float)$servico['total'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
+                            'quantidade' => number_format((float) $servico['quantidade'], session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
+                            'preco' => number_format((float) $servico['preco'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
+                            'total' => number_format((float) $servico['total'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
                             'observacao' => $servico['observacao'],
                             'created_at' => Carbon::now('GMT-3'),
                             'updated_at' => Carbon::now('GMT-3'),
@@ -123,7 +123,7 @@ class VendaController extends Controller
 
                     $parcela = new VendaParcela;
                     $parcela->dataVencimento = $value['dataVencimento'];
-                    $parcela->valorParcela = number_format((float)$value['valorParcela'], session('config')->quantidadeCasasDecimaisValor, '.', '');
+                    $parcela->valorParcela = number_format((float) $value['valorParcela'], session('config')->quantidadeCasasDecimaisValor, '.', '');
                     $parcela->forma_pagamento_id = $value['forma_pagamento_id'];
                     $parcela->observacao = $value['observacao'];
                     $parcela->venda_id = $vendas->id;
@@ -136,9 +136,9 @@ class VendaController extends Controller
 
                         $transacao = new Transacao;
                         $transacao->title = $request->input('cliente_id')['label'];
-                        $transacao->data  = DateTime::createFromFormat('d/m/Y', $value['dataVencimento'])->format("Y-m-d");
+                        $transacao->data = DateTime::createFromFormat('d/m/Y', $value['dataVencimento'])->format("Y-m-d");
                         $transacao->observacao = 'Venda nº ' . $vendas->numero . ' - Parcela ' . ($key + 1);
-                        $transacao->valor = number_format((float)$value['valorParcela'], 2, '.', '');
+                        $transacao->valor = number_format((float) $value['valorParcela'], 2, '.', '');
                         $transacao->tipo = 'rendimento';
                         $transacao->situacao = 'aberta';
                         $transacao->dataTransacaoRegistrada = null;
@@ -173,7 +173,7 @@ class VendaController extends Controller
                             $vendaAnexo->venda_id = $vendas->id;
                             try {
                                 $vendaAnexo->save();
-                            } catch (Exception  $ex) {
+                            } catch (Exception $ex) {
                                 DB::rollBack();
                                 $response = APIHelper::APIResponse(false, 500, null, null, $ex);
                                 return response()->json($response, 500);
@@ -191,15 +191,15 @@ class VendaController extends Controller
                     if ($prodBanco->movimentaEstoque) {
                         DB::table('saidas_produtos')->insert(
                             [
-                                'produto_id'        => $produto['produto_id'],
-                                'quantidade'        => number_format((float)$produto['quantidade'], session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
-                                'quantidadeMomento' => number_format((float)$prodBanco->quantidadeAtual, session('config')->quantidadeCasasDecimaisQuantidade, '.', '') - number_format((float)$produto['quantidade'], session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
-                                'preco'             => number_format((float)$produto['preco'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
-                                'nome_usuario'      => $user->nome,
-                                'cliente_id'        => $vendas->cliente_id,
-                                'observacao'        => '[Venda Realizada] Saída de produto da venda nº ' . $vendas->numero,
-                                'created_at'        => Carbon::now('GMT-3'),
-                                'updated_at'        => Carbon::now('GMT-3')
+                                'produto_id' => $produto['produto_id'],
+                                'quantidade' => number_format((float) $produto['quantidade'], session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
+                                'quantidadeMomento' => number_format((float) $prodBanco->quantidadeAtual, session('config')->quantidadeCasasDecimaisQuantidade, '.', '') - number_format((float) $produto['quantidade'], session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
+                                'preco' => number_format((float) $produto['preco'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
+                                'nome_usuario' => $user->nome,
+                                'cliente_id' => $vendas->cliente_id,
+                                'observacao' => '[Venda Realizada] Saída de produto da venda nº ' . $vendas->numero,
+                                'created_at' => Carbon::now('GMT-3'),
+                                'updated_at' => Carbon::now('GMT-3')
                             ]
                         );
                     }
@@ -209,7 +209,7 @@ class VendaController extends Controller
             $response = APIHelper::APIResponse(true, 200, 'Sucesso ao criar o pedido de venda', $vendas);
             DB::commit();
             return response()->json($response, 200);
-        } catch (Exception  $ex) {
+        } catch (Exception $ex) {
             DB::rollBack();
             $response = APIHelper::APIResponse(false, 500, null, null, $ex);
             return response()->json($response, 500);
@@ -234,10 +234,10 @@ class VendaController extends Controller
         $vendas->somarFreteAoTotal = $request->input('somarFreteAoTotal');
         $vendas->dataPrimeiraParcela = $request->input('dataPrimeiraParcela');
         $vendas->tipoFormaPagamento = $request->input('tipoFormaPagamento');
-        $vendas->frete = number_format((float)$request->input('frete'), session('config')->quantidadeCasasDecimaisValor, '.', '');
-        $vendas->impostos = number_format((float)$request->input('impostos'), session('config')->quantidadeCasasDecimaisValor, '.', '');
-        $vendas->desconto = number_format((float)$request->input('desconto'), session('config')->quantidadeCasasDecimaisValor, '.', '');
-        $vendas->total = number_format((float)$request->input('total'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $vendas->frete = number_format((float) $request->input('frete'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $vendas->impostos = number_format((float) $request->input('impostos'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $vendas->desconto = number_format((float) $request->input('desconto'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $vendas->total = number_format((float) $request->input('total'), session('config')->quantidadeCasasDecimaisValor, '.', '');
         $vendas->observacao = $request->input('observacao');
         $vendas->observacaoInterna = $request->input('observacaoInterna');
 
@@ -262,9 +262,9 @@ class VendaController extends Controller
                     $vendas->produtos()->attach(
                         $produto['produto_id'],
                         [
-                            'quantidade' => number_format((float)$produto['quantidade'], session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
-                            'preco' => number_format((float)$produto['preco'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
-                            'total' => number_format((float)$produto['total'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
+                            'quantidade' => number_format((float) $produto['quantidade'], session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
+                            'preco' => number_format((float) $produto['preco'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
+                            'total' => number_format((float) $produto['total'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
                             'observacao' => $produto['observacao'],
                             'created_at' => Carbon::now('GMT-3'),
                             'updated_at' => Carbon::now('GMT-3'),
@@ -282,9 +282,9 @@ class VendaController extends Controller
                     $vendas->servicos()->attach(
                         $servico['servico_id'],
                         [
-                            'quantidade' => number_format((float)$servico['quantidade'], session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
-                            'preco' => number_format((float)$servico['preco'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
-                            'total' => number_format((float)$servico['total'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
+                            'quantidade' => number_format((float) $servico['quantidade'], session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
+                            'preco' => number_format((float) $servico['preco'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
+                            'total' => number_format((float) $servico['total'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
                             'observacao' => $servico['observacao'],
                             'created_at' => Carbon::now('GMT-3'),
                             'updated_at' => Carbon::now('GMT-3'),
@@ -317,7 +317,7 @@ class VendaController extends Controller
                             new VendaParcela(
                                 [
                                     'dataVencimento' => $parcela['dataVencimento'],
-                                    'valorParcela' => number_format((float)$parcela['valorParcela'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
+                                    'valorParcela' => number_format((float) $parcela['valorParcela'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
                                     'forma_pagamento_id' => $parcela['forma_pagamento_id'],
                                     'observacao' => $parcela['observacao'],
                                     'created_at' => Carbon::now('GMT-3'),
@@ -334,9 +334,9 @@ class VendaController extends Controller
 
                         $transacao = new Transacao;
                         $transacao->title = $request->input('cliente_id')['label'];
-                        $transacao->data  = DateTime::createFromFormat('d/m/Y', $parcela['dataVencimento'])->format("Y-m-d");
+                        $transacao->data = DateTime::createFromFormat('d/m/Y', $parcela['dataVencimento'])->format("Y-m-d");
                         $transacao->observacao = 'Venda nº ' . $vendas->numero . ' - Parcela ' . ($index + 1);
-                        $transacao->valor = number_format((float)$parcela['valorParcela'], 2, '.', '');
+                        $transacao->valor = number_format((float) $parcela['valorParcela'], 2, '.', '');
                         $transacao->tipo = 'rendimento';
                         $transacao->situacao = 'aberta';
                         $transacao->dataTransacaoRegistrada = null;
@@ -395,15 +395,15 @@ class VendaController extends Controller
                     if ($prodBanco->movimentaEstoque) {
                         DB::table('saidas_produtos')->insert(
                             [
-                                'produto_id'        => $produto['produto_id'],
-                                'quantidade'        => number_format((float)$produto['quantidade'], session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
-                                'quantidadeMomento' => number_format((float)$prodBanco->quantidadeAtual, session('config')->quantidadeCasasDecimaisQuantidade, '.', '') - number_format((float)$produto['quantidade'], session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
-                                'preco'             => number_format((float)$produto['preco'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
-                                'nome_usuario'      => $user->nome,
-                                'cliente_id'        => $vendas->cliente_id,
-                                'observacao'        => '[Venda Realizada] Saída de produto da venda nº ' . $vendas->numero,
-                                'created_at'        => Carbon::now('GMT-3'),
-                                'updated_at'        => Carbon::now('GMT-3')
+                                'produto_id' => $produto['produto_id'],
+                                'quantidade' => number_format((float) $produto['quantidade'], session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
+                                'quantidadeMomento' => number_format((float) $prodBanco->quantidadeAtual, session('config')->quantidadeCasasDecimaisQuantidade, '.', '') - number_format((float) $produto['quantidade'], session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
+                                'preco' => number_format((float) $produto['preco'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
+                                'nome_usuario' => $user->nome,
+                                'cliente_id' => $vendas->cliente_id,
+                                'observacao' => '[Venda Realizada] Saída de produto da venda nº ' . $vendas->numero,
+                                'created_at' => Carbon::now('GMT-3'),
+                                'updated_at' => Carbon::now('GMT-3')
                             ]
                         );
                     }
@@ -418,15 +418,15 @@ class VendaController extends Controller
                     if ($prodBanco->movimentaEstoque) {
                         DB::table('entradas_produtos')->insert(
                             [
-                                'produto_id'        => $produto['produto_id'],
-                                'quantidade'        => number_format((float)$produto['quantidade'], session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
-                                'quantidadeMomento' => number_format((float)$prodBanco->quantidadeAtual, session('config')->quantidadeCasasDecimaisQuantidade, '.', '') + number_format((float)$produto['quantidade'], session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
-                                'preco'             => number_format((float)$produto['preco'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
-                                'nome_usuario'      => $user->nome,
-                                'cliente_id'        => $vendas->cliente_id,
-                                'observacao'        => '[Venda Devolvida] Devolução de produto da venda nº ' . $vendas->numero,
-                                'created_at'        => Carbon::now('GMT-3'),
-                                'updated_at'        => Carbon::now('GMT-3')
+                                'produto_id' => $produto['produto_id'],
+                                'quantidade' => number_format((float) $produto['quantidade'], session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
+                                'quantidadeMomento' => number_format((float) $prodBanco->quantidadeAtual, session('config')->quantidadeCasasDecimaisQuantidade, '.', '') + number_format((float) $produto['quantidade'], session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
+                                'preco' => number_format((float) $produto['preco'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
+                                'nome_usuario' => $user->nome,
+                                'cliente_id' => $vendas->cliente_id,
+                                'observacao' => '[Venda Devolvida] Devolução de produto da venda nº ' . $vendas->numero,
+                                'created_at' => Carbon::now('GMT-3'),
+                                'updated_at' => Carbon::now('GMT-3')
                             ]
                         );
                     }
@@ -441,15 +441,15 @@ class VendaController extends Controller
                     if ($prodBanco->movimentaEstoque) {
                         DB::table('entradas_produtos')->insert(
                             [
-                                'produto_id'    => $produto['produto_id'],
-                                'quantidade'        => number_format((float)$produto['quantidade'], session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
-                                'quantidadeMomento' => number_format((float)$prodBanco->quantidadeAtual, session('config')->quantidadeCasasDecimaisQuantidade, '.', '') + number_format((float)$produto['quantidade'], session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
-                                'preco'             => number_format((float)$produto['preco'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
-                                'nome_usuario'  => $user->nome,
-                                'cliente_id'    => $vendas->cliente_id,
-                                'observacao'    => '[Venda Cancelada] Devolução de produto da venda nº ' . $vendas->numero,
-                                'created_at'    => Carbon::now('GMT-3'),
-                                'updated_at'    => Carbon::now('GMT-3')
+                                'produto_id' => $produto['produto_id'],
+                                'quantidade' => number_format((float) $produto['quantidade'], session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
+                                'quantidadeMomento' => number_format((float) $prodBanco->quantidadeAtual, session('config')->quantidadeCasasDecimaisQuantidade, '.', '') + number_format((float) $produto['quantidade'], session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
+                                'preco' => number_format((float) $produto['preco'], session('config')->quantidadeCasasDecimaisValor, '.', ''),
+                                'nome_usuario' => $user->nome,
+                                'cliente_id' => $vendas->cliente_id,
+                                'observacao' => '[Venda Cancelada] Devolução de produto da venda nº ' . $vendas->numero,
+                                'created_at' => Carbon::now('GMT-3'),
+                                'updated_at' => Carbon::now('GMT-3')
                             ]
                         );
                     }
@@ -459,7 +459,7 @@ class VendaController extends Controller
             $response = APIHelper::APIResponse(true, 200, 'Sucesso ao editar a venda', $vendas);
             DB::commit();
             return response()->json($response, 200);
-        } catch (Exception  $ex) {
+        } catch (Exception $ex) {
             DB::rollBack();
             $response = APIHelper::APIResponse(false, 500, null, null, $ex);
             return response()->json($response, 500);
@@ -481,7 +481,7 @@ class VendaController extends Controller
             $nextId = $statement[0]->Auto_increment;
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', $nextId);
             return response()->json($response, 200);
-        } catch (Exception  $ex) {
+        } catch (Exception $ex) {
             $response = APIHelper::APIResponse(false, 500, null, null, $ex);
             return response()->json($response, 500);
         }
