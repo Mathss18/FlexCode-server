@@ -21,35 +21,77 @@ class ProdutoController extends Controller
     {
         //$produtos = Produto::paginate(15);
         try {
-            $produtos = Produto::with(['foto_produto','fornecedores','cliente','unidade_produto','grupo_produto','grupo_produto.porcentagem_lucro'])->orderBy('id', 'desc')->get();
+            $produtos = Produto::with(['foto_produto', 'fornecedores', 'cliente', 'unidade_produto', 'grupo_produto', 'grupo_produto.porcentagem_lucro'])->orderBy('id', 'desc')->get();
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', $produtos);
             return response()->json($response, 200);
-        } catch (Exception  $ex) {
+        } catch (Exception $ex) {
             $response = APIHelper::APIResponse(false, 500, null, null, $ex);
             return response()->json($response, 500);
         }
     }
 
-    public function indexMini()
+    public function indexMini(Request $request)
     {
-        //$produtos = Produto::paginate(15);
+        $itemsPerPage = $request->get('itemsPerPage');
+        $currentPage = $request->get('currentPage');
+
         try {
-            $produtos = ProdutoCollection::collection(Produto::with(['fornecedores','cliente','grupo_produto'])->orderBy('id', 'desc')->get());
+            $produtos = ProdutoCollection::collection(Produto::with(['fornecedores', 'cliente', 'grupo_produto'])->orderBy('id', 'desc')->get());
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', $produtos);
             return response()->json($response, 200);
-        } catch (Exception  $ex) {
+        } catch (Exception $ex) {
             $response = APIHelper::APIResponse(false, 500, null, null, $ex);
             return response()->json($response, 500);
         }
     }
+
+    public function indexMini2(Request $request)
+    {
+        $itemsPerPage = $request->get('itemsPerPage', 10); // Default to 10 items per page if not specified
+        $currentPage = $request->get('currentPage', 1); // Default to page 1 if not specified
+
+        try {
+            // Set the current page for the paginator
+            Paginator::currentPageResolver(function () use ($currentPage) {
+                return $currentPage;
+            });
+
+            // Fetch the paginated products
+            $produtos = Produto::with(['fornecedores', 'cliente', 'grupo_produto'])
+                ->orderBy('id', 'desc')
+                ->paginate($itemsPerPage);
+
+            // Prepare the response data with total item count
+            $responseData = [
+                'data' => $produtos->items(), // Get current page items
+                'totalItems' => $produtos->total(), // Get total items count
+                'currentPage' => $produtos->currentPage(),
+                'itemsPerPage' => $produtos->perPage(),
+            ];
+
+            // Assuming APIHelper::APIResponse can handle custom response data structure
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso', $responseData);
+            return response()->json($response, 200);
+        } catch (\Exception $ex) {
+            $errorDetails = [
+                'error' => $ex->getMessage(),
+                'file' => $ex->getFile(),
+                'line' => $ex->getLine()
+            ];
+            $response = APIHelper::APIResponse(false, 500, 'Internal Server Error', null, $errorDetails);
+            return response()->json($response, 500);
+        }
+    }
+
+
 
     public function show($id)
     {
         try {
-            $produto = Produto::with(['foto_produto','fornecedores','cliente','unidade_produto','grupo_produto','grupo_produto.porcentagem_lucro'])->findOrFail($id);
+            $produto = Produto::with(['foto_produto', 'fornecedores', 'cliente', 'unidade_produto', 'grupo_produto', 'grupo_produto.porcentagem_lucro'])->findOrFail($id);
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', $produto);
             return response()->json($response, 200);
-        } catch (Exception  $ex) {
+        } catch (Exception $ex) {
             $response = APIHelper::APIResponse(false, 500, null, null, $ex);
             return response()->json($response, 500);
         }
@@ -68,24 +110,24 @@ class ProdutoController extends Controller
         $produto->movimentaEstoque = $request->input('movimentaEstoque');
         $produto->habilitaNotaFiscal = $request->input('habilitaNotaFiscal');
         $produto->codigoBarras = $request->input('codigoBarras');
-        $produto->peso = number_format((float)$request->input('peso'), session('config')->quantidadeCasasDecimaisQuantidade, '.', '');
-        $produto->largura = number_format((float)$request->input('largura'), session('config')->quantidadeCasasDecimaisQuantidade, '.', '');
-        $produto->altura = number_format((float)$request->input('altura'), session('config')->quantidadeCasasDecimaisQuantidade, '.', '');
-        $produto->comprimento = number_format((float)$request->input('comprimento'), session('config')->quantidadeCasasDecimaisQuantidade, '.', '');
-        $produto->comissao = number_format((float)$request->input('comissao'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $produto->peso = number_format((float) $request->input('peso'), session('config')->quantidadeCasasDecimaisQuantidade, '.', '');
+        $produto->largura = number_format((float) $request->input('largura'), session('config')->quantidadeCasasDecimaisQuantidade, '.', '');
+        $produto->altura = number_format((float) $request->input('altura'), session('config')->quantidadeCasasDecimaisQuantidade, '.', '');
+        $produto->comprimento = number_format((float) $request->input('comprimento'), session('config')->quantidadeCasasDecimaisQuantidade, '.', '');
+        $produto->comissao = number_format((float) $request->input('comissao'), session('config')->quantidadeCasasDecimaisValor, '.', '');
         $produto->descricao = $request->input('descricao');
-        $produto->valorCusto = number_format((float)$request->input('valorCusto'), session('config')->quantidadeCasasDecimaisValor, '.', '');
-        $produto->despesasAdicionais = number_format((float)$request->input('despesasAdicionais'), session('config')->quantidadeCasasDecimaisValor, '.', '');
-        $produto->outrasDespesas = number_format((float)$request->input('outrasDespesas'), session('config')->quantidadeCasasDecimaisValor, '.', '');
-        $produto->custoFinal = number_format((float)$request->input('custoFinal'), session('config')->quantidadeCasasDecimaisValor, '.', '');
-        $produto->estoqueMinimo = number_format((float)$request->input('estoqueMinimo'), session('config')->quantidadeCasasDecimaisQuantidade, '.', '');
-        $produto->estoqueMaximo = number_format((float)$request->input('estoqueMaximo'), session('config')->quantidadeCasasDecimaisQuantidade, '.', '');
-        $produto->quantidadeAtual = number_format((float)$request->input('quantidadeAtual'), session('config')->quantidadeCasasDecimaisQuantidade, '.', '');
+        $produto->valorCusto = number_format((float) $request->input('valorCusto'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $produto->despesasAdicionais = number_format((float) $request->input('despesasAdicionais'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $produto->outrasDespesas = number_format((float) $request->input('outrasDespesas'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $produto->custoFinal = number_format((float) $request->input('custoFinal'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $produto->estoqueMinimo = number_format((float) $request->input('estoqueMinimo'), session('config')->quantidadeCasasDecimaisQuantidade, '.', '');
+        $produto->estoqueMaximo = number_format((float) $request->input('estoqueMaximo'), session('config')->quantidadeCasasDecimaisQuantidade, '.', '');
+        $produto->quantidadeAtual = number_format((float) $request->input('quantidadeAtual'), session('config')->quantidadeCasasDecimaisQuantidade, '.', '');
         $produto->ncm = $request->input('ncm');
         $produto->cest = $request->input('cest');
         $produto->cfop = $request->input('cfop')['value'];
-        $produto->pesoLiquido = number_format((float)$request->input('pesoLiquido'), session('config')->quantidadeCasasDecimaisQuantidade, '.', '');
-        $produto->pesoBruto = number_format((float)$request->input('pesoBruto'), session('config')->quantidadeCasasDecimaisQuantidade, '.', '');
+        $produto->pesoLiquido = number_format((float) $request->input('pesoLiquido'), session('config')->quantidadeCasasDecimaisQuantidade, '.', '');
+        $produto->pesoBruto = number_format((float) $request->input('pesoBruto'), session('config')->quantidadeCasasDecimaisQuantidade, '.', '');
         $produto->numeroFci = $request->input('numeroFci');
         $produto->valorAproxTribut = $request->input('valorAproxTribut');
         $produto->valorPixoPis = $request->input('valorPixoPis');
@@ -99,14 +141,14 @@ class ProdutoController extends Controller
 
         try {
             $produto->save();
-        } catch (Exception  $ex) {
+        } catch (Exception $ex) {
             DB::rollBack();
             $response = APIHelper::APIResponse(false, 500, null, null, $ex);
             return response()->json($response, 500);
         }
 
         // Cadastra a foto principal do produto
-        if($request->input('fotoPrincipal')){
+        if ($request->input('fotoPrincipal')) {
             if ($this->is_base64($request->input('fotoPrincipal')['url'])) {
                 $image = $request->input('fotoPrincipal')['url'];
                 $imageName = $request->input('fotoPrincipal')['nome'];
@@ -134,7 +176,7 @@ class ProdutoController extends Controller
                     $fotoProduto->url = $return;
                     try {
                         $fotoProduto->save();
-                    } catch (Exception  $ex) {
+                    } catch (Exception $ex) {
                         DB::rollBack();
                         $response = APIHelper::APIResponse(false, 500, null, null, $ex);
                         return response()->json($response, 500);
@@ -144,7 +186,7 @@ class ProdutoController extends Controller
         }
 
         // Cadastra os fornecedores do produto
-        if(count($request->input('fornecedores_id')) > 0 && $request->input('fornecedores_id')[0]['value'] != null){
+        if (count($request->input('fornecedores_id')) > 0 && $request->input('fornecedores_id')[0]['value'] != null) {
             foreach ($request->input('fornecedores_id') as $key => $value) {
                 try {
                     DB::table('produtos_fornecedores')->insert(
@@ -155,7 +197,7 @@ class ProdutoController extends Controller
                             'updated_at' => Carbon::now('GMT-3')
                         ]
                     );
-                } catch (Exception  $ex) {
+                } catch (Exception $ex) {
                     DB::rollBack();
                     $response = APIHelper::APIResponse(false, 500, null, null, $ex);
                     return response()->json($response, 500);
@@ -164,24 +206,24 @@ class ProdutoController extends Controller
         }
 
         // Se o produto movimenta estoque, lança uma entrada
-        if($produto->movimentaEstoque == true){
+        if ($produto->movimentaEstoque == true) {
             $user = JWTAuth::user();
             try {
                 DB::table('entradas_produtos')->insert(
                     [
-                        'produto_id'        => $produto->id,
-                        'quantidade'        => number_format((float)$produto->quantidadeAtual, session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
-                        'quantidadeMomento' => number_format((float)$produto->quantidadeAtual, session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
-                        'preco'             => number_format((float)$produto->custoFinal, session('config')->quantidadeCasasDecimaisValor, '.', ''),
-                        'usuario_id'        => $user->id,
-                        'nome_usuario'      => $user->nome,
-                        'observacao'        => '[Produtos] Produto cadastrado',
-                        'created_at'        => Carbon::now('GMT-3'),
-                        'updated_at'        => Carbon::now('GMT-3')
+                        'produto_id' => $produto->id,
+                        'quantidade' => number_format((float) $produto->quantidadeAtual, session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
+                        'quantidadeMomento' => number_format((float) $produto->quantidadeAtual, session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
+                        'preco' => number_format((float) $produto->custoFinal, session('config')->quantidadeCasasDecimaisValor, '.', ''),
+                        'usuario_id' => $user->id,
+                        'nome_usuario' => $user->nome,
+                        'observacao' => '[Produtos] Produto cadastrado',
+                        'created_at' => Carbon::now('GMT-3'),
+                        'updated_at' => Carbon::now('GMT-3')
                     ]
                 );
 
-            } catch (Exception  $ex) {
+            } catch (Exception $ex) {
                 DB::rollBack();
                 $response = APIHelper::APIResponse(false, 500, null, null, $ex);
                 return response()->json($response, 500);
@@ -209,30 +251,30 @@ class ProdutoController extends Controller
         $produto->movimentaEstoque = $request->input('movimentaEstoque');
         $produto->habilitaNotaFiscal = $request->input('habilitaNotaFiscal');
         $produto->codigoBarras = $request->input('codigoBarras');
-        $produto->peso = number_format((float)$request->input('peso'), session('config')->quantidadeCasasDecimaisQuantidade, '.', '');
-        $produto->largura = number_format((float)$request->input('largura'), session('config')->quantidadeCasasDecimaisQuantidade, '.', '');
-        $produto->altura = number_format((float)$request->input('altura'), session('config')->quantidadeCasasDecimaisQuantidade, '.', '');
-        $produto->comprimento = number_format((float)$request->input('comprimento'), session('config')->quantidadeCasasDecimaisQuantidade, '.', '');
-        $produto->comissao = number_format((float)$request->input('comissao'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $produto->peso = number_format((float) $request->input('peso'), session('config')->quantidadeCasasDecimaisQuantidade, '.', '');
+        $produto->largura = number_format((float) $request->input('largura'), session('config')->quantidadeCasasDecimaisQuantidade, '.', '');
+        $produto->altura = number_format((float) $request->input('altura'), session('config')->quantidadeCasasDecimaisQuantidade, '.', '');
+        $produto->comprimento = number_format((float) $request->input('comprimento'), session('config')->quantidadeCasasDecimaisQuantidade, '.', '');
+        $produto->comissao = number_format((float) $request->input('comissao'), session('config')->quantidadeCasasDecimaisValor, '.', '');
         $produto->descricao = $request->input('descricao');
-        $produto->valorCusto = number_format((float)$request->input('valorCusto'), session('config')->quantidadeCasasDecimaisValor, '.', '');
-        $produto->despesasAdicionais = number_format((float)$request->input('despesasAdicionais'), session('config')->quantidadeCasasDecimaisValor, '.', '');
-        $produto->outrasDespesas = number_format((float)$request->input('outrasDespesas'), session('config')->quantidadeCasasDecimaisValor, '.', '');
-        $produto->custoFinal = number_format((float)$request->input('custoFinal'), session('config')->quantidadeCasasDecimaisValor, '.', '');
-        $produto->estoqueMinimo = number_format((float)$request->input('estoqueMinimo'), session('config')->quantidadeCasasDecimaisQuantidade, '.', '');
-        $produto->estoqueMaximo = number_format((float)$request->input('estoqueMaximo'), session('config')->quantidadeCasasDecimaisQuantidade, '.', '');
+        $produto->valorCusto = number_format((float) $request->input('valorCusto'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $produto->despesasAdicionais = number_format((float) $request->input('despesasAdicionais'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $produto->outrasDespesas = number_format((float) $request->input('outrasDespesas'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $produto->custoFinal = number_format((float) $request->input('custoFinal'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $produto->estoqueMinimo = number_format((float) $request->input('estoqueMinimo'), session('config')->quantidadeCasasDecimaisQuantidade, '.', '');
+        $produto->estoqueMaximo = number_format((float) $request->input('estoqueMaximo'), session('config')->quantidadeCasasDecimaisQuantidade, '.', '');
 
         //Só altera a quantidadeAtual se o produto não está na tabela estoque
         $existeNaTabelaEstoque = DB::table('estoques')->where('produto_id', $produto->id)->first();
-        if(!$existeNaTabelaEstoque){
-            $produto->quantidadeAtual = number_format((float)$request->input('quantidadeAtual'), session('config')->quantidadeCasasDecimaisQuantidade, '.', '');
+        if (!$existeNaTabelaEstoque) {
+            $produto->quantidadeAtual = number_format((float) $request->input('quantidadeAtual'), session('config')->quantidadeCasasDecimaisQuantidade, '.', '');
         }
 
         $produto->ncm = $request->input('ncm');
         $produto->cest = $request->input('cest');
         $produto->cfop = $request->input('cfop')['value'];
-        $produto->pesoLiquido = number_format((float)$request->input('pesoLiquido'), session('config')->quantidadeCasasDecimaisQuantidade, '.', '');
-        $produto->pesoBruto = number_format((float)$request->input('pesoBruto'), session('config')->quantidadeCasasDecimaisQuantidade, '.', '');
+        $produto->pesoLiquido = number_format((float) $request->input('pesoLiquido'), session('config')->quantidadeCasasDecimaisQuantidade, '.', '');
+        $produto->pesoBruto = number_format((float) $request->input('pesoBruto'), session('config')->quantidadeCasasDecimaisQuantidade, '.', '');
         $produto->numeroFci = $request->input('numeroFci');
         $produto->valorAproxTribut = $request->input('valorAproxTribut');
         $produto->valorPixoPis = $request->input('valorPixoPis');
@@ -276,7 +318,7 @@ class ProdutoController extends Controller
                     $fotoProduto->url = $return;
                     try {
                         $fotoProduto->save();
-                    } catch (Exception  $ex) {
+                    } catch (Exception $ex) {
                         DB::rollBack();
                         $response = APIHelper::APIResponse(false, 500, null, null, $ex);
                         return response()->json($response, 500);
@@ -291,7 +333,7 @@ class ProdutoController extends Controller
                 $fotoProduto->url = $value['url'];
                 try {
                     $fotoProduto->save();
-                } catch (Exception  $ex) {
+                } catch (Exception $ex) {
                     DB::rollBack();
                     $response = APIHelper::APIResponse(false, 500, null, null, $ex);
                     return response()->json($response, 500);
@@ -311,7 +353,7 @@ class ProdutoController extends Controller
                         'updated_at' => Carbon::now('GMT-3')
                     ]
                 );
-            } catch (Exception  $ex) {
+            } catch (Exception $ex) {
                 DB::rollBack();
                 $response = APIHelper::APIResponse(false, 500, null, null, $ex);
                 return response()->json($response, 500);
@@ -319,23 +361,23 @@ class ProdutoController extends Controller
         }
 
         // Se o produto não movimentava estoque mas agora movimenta, lança uma entrada
-        if($oldProduto->movimentaEstoque == false && $produto->movimentaEstoque == true && !$existeNaTabelaEstoque){
+        if ($oldProduto->movimentaEstoque == false && $produto->movimentaEstoque == true && !$existeNaTabelaEstoque) {
             $user = JWTAuth::user();
             try {
                 DB::table('entradas_produtos')->insert(
                     [
-                        'produto_id'        => $produto->id,
-                        'quantidade'        => number_format((float)$produto->quantidadeAtual, session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
-                        'quantidadeMomento' => number_format((float)$produto->quantidadeAtual, session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
-                        'preco'             => number_format((float)$produto->custoFinal, session('config')->quantidadeCasasDecimaisValor, '.', ''),
-                        'nome_usuario'      => $user->nome,
-                        'usuario_id'        => $user->id,
-                        'observacao'        => '[Produtos] Produto não movimentava estoque, agora movimenta',
-                        'created_at'        => Carbon::now('GMT-3'),
-                        'updated_at'        => Carbon::now('GMT-3')
+                        'produto_id' => $produto->id,
+                        'quantidade' => number_format((float) $produto->quantidadeAtual, session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
+                        'quantidadeMomento' => number_format((float) $produto->quantidadeAtual, session('config')->quantidadeCasasDecimaisQuantidade, '.', ''),
+                        'preco' => number_format((float) $produto->custoFinal, session('config')->quantidadeCasasDecimaisValor, '.', ''),
+                        'nome_usuario' => $user->nome,
+                        'usuario_id' => $user->id,
+                        'observacao' => '[Produtos] Produto não movimentava estoque, agora movimenta',
+                        'created_at' => Carbon::now('GMT-3'),
+                        'updated_at' => Carbon::now('GMT-3')
                     ]
                 );
-            } catch (Exception  $ex) {
+            } catch (Exception $ex) {
                 DB::rollBack();
                 $response = APIHelper::APIResponse(false, 500, null, null, $ex);
                 return response()->json($response, 500);
@@ -348,7 +390,7 @@ class ProdutoController extends Controller
             $response = APIHelper::APIResponse(true, 200, 'Sucesso ao editar o produto', $produto);
             DB::commit();
             return response()->json($response, 200);
-        } catch (Exception  $ex) {
+        } catch (Exception $ex) {
             DB::rollBack();
             $response = APIHelper::APIResponse(false, 500, null, null, $ex);
             return response()->json($response, 500);

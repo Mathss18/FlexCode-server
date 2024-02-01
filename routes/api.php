@@ -178,6 +178,7 @@ Route::middleware(['jwt', 'check.jwt.tenant'])->group(function () {
     Route::get('produtos', [ProdutoController::class, 'index']);
 
     Route::get('produtos-mini', [ProdutoController::class, 'indexMini']);
+    Route::get('produtos-mini2', [ProdutoController::class, 'indexMini2']);
 
     Route::get('produtos/{id}', [ProdutoController::class, 'show']);
 
