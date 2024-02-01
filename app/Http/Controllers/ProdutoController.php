@@ -14,7 +14,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Tymon\JWTAuth\Facades\JWTAuth;
-Illuminate\Pagination\Paginator;
+use Illuminate\Pagination\Paginator;
 
 class ProdutoController extends Controller
 {
