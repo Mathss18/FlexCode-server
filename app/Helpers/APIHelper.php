@@ -50,7 +50,8 @@ class APIHelper
                         $errorMessage = $exeption;
                     }
                     else if(is_array($exeption)){
-                        $errorMessage = $exeption->getMessage();
+                        var_dump($exeption);
+                        $errorMessage = "$exeption[0]";
                     }
                     else {
                         $errorMessage = $exeption->getMessage();
