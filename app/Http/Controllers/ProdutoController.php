@@ -50,6 +50,7 @@ class ProdutoController extends Controller
     {
         $itemsPerPage = $request->get('itemsPerPage', 10); // Default to 10 items per page if not specified
         $currentPage = $request->get('currentPage', 1); // Default to page 1 if not specified
+        $searchText = $request->get('searchText', ""); // Default to empty string if not specified
 
         try {
             // Set the current page for the paginator
@@ -57,10 +58,19 @@ class ProdutoController extends Controller
                 return $currentPage;
             });
 
-            // Fetch the paginated products
-            $produtos = Produto::with(['fornecedores', 'cliente', 'grupo_produto'])
-                ->orderBy('id', 'desc')
-                ->paginate($itemsPerPage);
+            // Fetch the paginated products with search functionality
+            $query = Produto::with(['fornecedores', 'cliente', 'grupo_produto'])->orderBy('id', 'desc');
+
+            // Add search condition if searchText is provided
+            if (!empty($searchText)) {
+                $query->where(function ($q) use ($searchText) {
+                    $q->where('name', 'like', '%' . $searchText . '%') // Search in the name field
+                        ->orWhere('codigoInterno', 'like', '%' . $searchText . '%'); // Example: Search in another field
+                    // You can add more orWhere clauses to search in other fields or related models
+                });
+            }
+
+            $produtos = $query->paginate($itemsPerPage);
 
             // Prepare the response data with total item count
             $responseData = [
@@ -83,6 +93,7 @@ class ProdutoController extends Controller
             return response()->json($response, 500);
         }
     }
+
 
 
 
