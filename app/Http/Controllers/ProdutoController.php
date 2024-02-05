@@ -64,8 +64,12 @@ class ProdutoController extends Controller
             // Add search condition if searchText is provided
             if (!empty($searchText)) {
                 $query->where(function ($q) use ($searchText) {
-                    $q->where('produtos.nome', 'like', '%' . $searchText . '%') // Search in the name field
-                        ->orWhere('produtos.codigoInterno', 'like', '%' . $searchText . '%'); // Example: Search in another field
+                    $q->where('produtos.nome', 'like', '%' . $searchText . '%') // Search in the product name field
+                      ->orWhere('produtos.codigoInterno', 'like', '%' . $searchText . '%') // Search in another product field
+                      // Assuming 'cliente' is the relationship name in your Produto model to the Cliente model
+                      ->orWhereHas('cliente', function ($q) use ($searchText) {
+                          $q->where('nome', 'like', '%' . $searchText . '%'); // Search in the cliente nome field
+                      });
                     // You can add more orWhere clauses to search in other fields or related models
                 });
             }
