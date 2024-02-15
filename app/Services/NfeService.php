@@ -177,6 +177,8 @@ class NfeService
         $nfe->tagenderDest($enderDest);
 
         //====================TAG PRODUTO===================
+        // Armazena o total dos produtos para calculo correto do ICMS
+        $valorProdutosReal = 0.0;
         for ($i = 0; $i < count($dados['produtos']); $i++) {
             $prod = new stdClass();
             $prod->item = $i + 1; //item da NFe
@@ -197,6 +199,12 @@ class NfeService
             $prod->qTrib = $dados['produtos'][$i]['quantidade'];
             $prod->vUnTrib = $dados['produtos'][$i]['preco'];
             $prod->vProd = $dados['produtos'][$i]['total'];
+
+            // Não conta o cfop 5902 para calculo de ICSM
+            if($dados['produtos'][$i]['cfop'] != '5902'){
+                $valorProdutosReal += $dados['produtos'][$i]['total'];
+            }
+
             if ($dados['frete'] > 0.00) {
                 if ($i == count($dados['produtos']) - 1) {
                     $prod->vFrete = number_format($dados['frete'], 2, '.', '');
@@ -245,7 +253,7 @@ class NfeService
                     $icms->CSOSN = '102';
                 }
                 $icms->pCredSN = $aliquota;
-                $icms->vCredICMSSN = $dados['totalProdutos'] * ($aliquota / 100);
+                $icms->vCredICMSSN = $valorProdutosReal * ($aliquota / 100);
             } else if (
                 $dados['produtos'][$i]['cfop'] == '5902' ||
                 $dados['produtos'][$i]['cfop'] == '6912' ||
@@ -253,11 +261,11 @@ class NfeService
             ) {
                 $icms->CSOSN = '400';
                 $icms->pCredSN = $aliquota;
-                $icms->vCredICMSSN = $dados['totalProdutos'] * ($aliquota / 100);
+                $icms->vCredICMSSN = $valorProdutosReal * ($aliquota / 100);
             } else {
                 $icms->CSOSN = '900';
                 $icms->pCredSN = $aliquota;
-                $icms->vCredICMSSN = $dados['totalProdutos'] * ($aliquota / 100);
+                $icms->vCredICMSSN = $valorProdutosReal * ($aliquota / 100);
             }
             //$icms->modBCST = null;
             //$icms->pMVAST = null;
