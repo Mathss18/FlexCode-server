@@ -78,16 +78,16 @@ class DashboardController extends Controller
             }
         }
 
-        var_dump($dadosFinal);
-
+        
         // Calculate the average daily balance for the current month
         $currentDay = date('j'); // Current day of the month
         $averageMonthly = $totalSum / max($totalCount, 1); // To avoid division by zero
         $averageDailyCurrentMonth = ($averageMonthly / 30) * $currentDay;
-
+        
         $total = $media / $cnt;
         $curMonth = (float) number_format($averageDailyCurrentMonth, 2, '.', '');
         $diferencaPercentual = ($curMonth * 100) / $total;
+        var_dump($total, $curMonth);
 
         return $diferencaPercentual;
     }
