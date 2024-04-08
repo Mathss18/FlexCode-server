@@ -39,60 +39,52 @@ class DashboardController extends Controller
 
         $from = $anoAtual . '-01-01' . ' 00:00:00';
         $to = $anoAtual . '-12-31' . ' 23:59:59';
-        try {
-            $query = "SELECT MONTH(v.updated_at) as mes, YEAR(v.updated_at) as ano, SUM(v.total) as total 
+
+        $query = "SELECT MONTH(v.updated_at) as mes, YEAR(v.updated_at) as ano, SUM(v.total) as total 
                   FROM vendas v 
                   WHERE v.situacao = 1 
                   AND v.updated_at BETWEEN :from AND :to 
                   GROUP BY YEAR(v.updated_at), MONTH(v.updated_at)";
-            $transacoes = DB::select(DB::raw($query), ['from' => $from, 'to' => $to]);
+        $transacoes = DB::select(DB::raw($query), ['from' => $from, 'to' => $to]);
 
-            $dados = [];
-            $totalSum = 0; // For calculating total sum
-            $totalCount = 0; // For counting total months
+        $dados = [];
+        $totalSum = 0; // For calculating total sum
+        $totalCount = 0; // For counting total months
 
-            for ($i = 0; $i < count($transacoes); $i++) {
-                $totalSum += $transacoes[$i]->total;
-                $totalCount++;
-                array_push($dados, [
-                    'periodo' => str_pad($transacoes[$i]->mes, 2, "0", STR_PAD_LEFT) . '/' . $transacoes[$i]->ano,
-                    'mes' => str_pad($transacoes[$i]->mes, 2, "0", STR_PAD_LEFT),
-                    'ano' => $transacoes[$i]->ano,
-                    'total' => $transacoes[$i]->total,
-                    'balancoFinal' => (float) number_format($transacoes[$i]->total, 2, '.', '')
-                ]);
-            }
-
-            $dadosFinal = [];
-            for ($i = 0; $i < count($dados); $i++) {
-                // verifica se dados[i] está entre $to e $from, se não estiver, remove da lista
-                if ($dados[$i]['ano'] . '-' . $dados[$i]['mes'] < $from || $dados[$i]['ano'] . '-' . $dados[$i]['mes'] > $to) {
-                    // unset($dados[$i]);
-                    // caso não esteja, continua
-                } else {
-                    // caso esteja, adiciona na lista final
-                    array_push($dadosFinal, $dados[$i]);
-                }
-            }
-
-            // Calculate the average daily balance for the current month
-            $currentDay = date('j'); // Current day of the month
-            $averageMonthly = $totalSum / max($totalCount, 1); // To avoid division by zero
-            $averageDailyCurrentMonth = ($averageMonthly / 30) * $currentDay;
-
-            $balancoFinalLastMonth = end($dadosFinal)['balancoFinal'];
-            $balancoCurrentLastMonth = (float) number_format($averageDailyCurrentMonth, 2, '.', '');
-            $diferencaPercentual = (($balancoFinalLastMonth - $balancoCurrentLastMonth) / $balancoCurrentLastMonth) * 100;
-
-
-            $response = APIHelper::APIResponse(true, 200, 'Sucesso', [
-                'diferencaPercentual' => $diferencaPercentual,
+        for ($i = 0; $i < count($transacoes); $i++) {
+            $totalSum += $transacoes[$i]->total;
+            $totalCount++;
+            array_push($dados, [
+                'periodo' => str_pad($transacoes[$i]->mes, 2, "0", STR_PAD_LEFT) . '/' . $transacoes[$i]->ano,
+                'mes' => str_pad($transacoes[$i]->mes, 2, "0", STR_PAD_LEFT),
+                'ano' => $transacoes[$i]->ano,
+                'total' => $transacoes[$i]->total,
+                'balancoFinal' => (float) number_format($transacoes[$i]->total, 2, '.', '')
             ]);
-            return response()->json($response, 200);
-        } catch (Exception $ex) {
-            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
-            return response()->json($response, 500);
         }
+
+        $dadosFinal = [];
+        for ($i = 0; $i < count($dados); $i++) {
+            // verifica se dados[i] está entre $to e $from, se não estiver, remove da lista
+            if ($dados[$i]['ano'] . '-' . $dados[$i]['mes'] < $from || $dados[$i]['ano'] . '-' . $dados[$i]['mes'] > $to) {
+                // unset($dados[$i]);
+                // caso não esteja, continua
+            } else {
+                // caso esteja, adiciona na lista final
+                array_push($dadosFinal, $dados[$i]);
+            }
+        }
+
+        // Calculate the average daily balance for the current month
+        $currentDay = date('j'); // Current day of the month
+        $averageMonthly = $totalSum / max($totalCount, 1); // To avoid division by zero
+        $averageDailyCurrentMonth = ($averageMonthly / 30) * $currentDay;
+
+        $balancoFinalLastMonth = end($dadosFinal)['balancoFinal'];
+        $balancoCurrentLastMonth = (float) number_format($averageDailyCurrentMonth, 2, '.', '');
+        $diferencaPercentual = (($balancoFinalLastMonth - $balancoCurrentLastMonth) / $balancoCurrentLastMonth) * 100;
+
+        return $diferencaPercentual;
     }
 
     public function despesasAbertasHoje()
