@@ -87,7 +87,7 @@ class DashboardController extends Controller
         $total = $media / $cnt;
         $curMonth = (float) number_format($averageDailyCurrentMonth, 2, '.', '');
         $diferencaPercentual = ($curMonth * 100) / $total;
-        var_dump($total, $cnt, $curMonth);
+        var_dump($total, $media, $cnt, $curMonth);
 
         return $diferencaPercentual;
     }
