@@ -83,6 +83,8 @@ class DashboardController extends Controller
         $averageMonthly = $totalSum / max($totalCount, 1); // To avoid division by zero
         $averageDailyCurrentMonth = ($averageMonthly / 30) * $currentDay;
 
+        var_dump($dados);
+
         $total = $media / $cnt;
         $curMonth = (float) number_format($averageDailyCurrentMonth, 2, '.', '');
         $diferencaPercentual = ($curMonth * 100) / $total;
