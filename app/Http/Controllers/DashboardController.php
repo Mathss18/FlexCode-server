@@ -35,11 +35,9 @@ class DashboardController extends Controller
 
     public function diferencaPercentual()
     {
-        // Data e hora atuais
-        $to = date('Y-m-d H:i:s');
+        $from = date('Y-m-d H:i:s', strtotime('-14 months'));
+        $to = date('Y-m-d H:i:s', strtotime('-1 months'));
 
-        // Data e hora de 12 meses atrás
-        $from = date('Y-m-d H:i:s', strtotime('-12 months'));
 
         $query = "SELECT MONTH(v.updated_at) as mes, YEAR(v.updated_at) as ano, SUM(v.total) as total 
                   FROM vendas v 
@@ -65,27 +63,31 @@ class DashboardController extends Controller
         }
 
         $dadosFinal = [];
+        $media = 0;
+        $cnt = 0;
         for ($i = 0; $i < count($dados); $i++) {
             // verifica se dados[i] está entre $to e $from, se não estiver, remove da lista
             if ($dados[$i]['ano'] . '-' . $dados[$i]['mes'] < $from || $dados[$i]['ano'] . '-' . $dados[$i]['mes'] > $to) {
                 // unset($dados[$i]);
                 // caso não esteja, continua
             } else {
+                $media += $dados['balancoFinal'];
+                $cnt++;
                 // caso esteja, adiciona na lista final
                 array_push($dadosFinal, $dados[$i]);
             }
         }
 
-        var_dump($dadosFinal);
+        // var_dump($dadosFinal);
 
         // Calculate the average daily balance for the current month
         $currentDay = date('j'); // Current day of the month
         $averageMonthly = $totalSum / max($totalCount, 1); // To avoid division by zero
         $averageDailyCurrentMonth = ($averageMonthly / 30) * $currentDay;
 
-        $balancoFinalLastMonth = end($dadosFinal)['balancoFinal'];
-        $balancoCurrentLastMonth = (float) number_format($averageDailyCurrentMonth, 2, '.', '');
-        $diferencaPercentual = (($balancoFinalLastMonth - $balancoCurrentLastMonth) / $balancoCurrentLastMonth) * 100;
+        $total = $media / $cnt;
+        $curMonth = (float) number_format($averageDailyCurrentMonth, 2, '.', '');
+        $diferencaPercentual = ($curMonth * 100) / $total;
 
         return $diferencaPercentual;
     }
