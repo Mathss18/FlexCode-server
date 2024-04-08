@@ -71,7 +71,7 @@ class DashboardController extends Controller
                 // unset($dados[$i]);
                 // caso não esteja, continua
             } else {
-                $media += $dados['balancoFinal'];
+                $media += $dados[$i]['balancoFinal'];
                 $cnt++;
                 // caso esteja, adiciona na lista final
                 array_push($dadosFinal, $dados[$i]);
