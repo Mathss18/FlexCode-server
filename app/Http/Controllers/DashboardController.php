@@ -78,7 +78,7 @@ class DashboardController extends Controller
             }
         }
 
-        // var_dump($dadosFinal);
+        var_dump($dadosFinal);
 
         // Calculate the average daily balance for the current month
         $currentDay = date('j'); // Current day of the month
