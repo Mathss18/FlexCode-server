@@ -35,7 +35,7 @@ class DashboardController extends Controller
 
     public function diferencaPercentual()
     {
-        $from = date('Y-m-d H:i:s', strtotime('-14 months'));
+        $from = date('Y-m-d H:i:s', strtotime('-13 months'));
         $to = date('Y-m-d H:i:s', strtotime('-1 months'));
 
 
@@ -83,7 +83,7 @@ class DashboardController extends Controller
         $averageMonthly = $totalSum / max($totalCount, 1); // To avoid division by zero
         $averageDailyCurrentMonth = ($averageMonthly / 30) * $currentDay;
 
-        var_dump($dados);
+        // var_dump($dados);
 
         $total = $media / $cnt;
         $curMonth = (float) number_format($averageDailyCurrentMonth, 2, '.', '');
