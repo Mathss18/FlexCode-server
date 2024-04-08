@@ -41,7 +41,7 @@ class DashboardController extends Controller
         // Data e hora de 12 meses atrás
         $from = date('Y-m-d H:i:s', strtotime('-12 months'));
 
-        dd($to, $from);
+        var_dump($to, $from);
 
         $query = "SELECT MONTH(v.updated_at) as mes, YEAR(v.updated_at) as ano, SUM(v.total) as total 
                   FROM vendas v 
