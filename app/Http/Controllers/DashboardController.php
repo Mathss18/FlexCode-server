@@ -35,11 +35,9 @@ class DashboardController extends Controller
 
     public function diferencaPercentual()
     {
-        // Data e hora atuais
-        $to = date('Y-m-d H:i:s');
+        $to = date('Y-m-d H:i:s', strtotime('last day of previous month 23:59:59'));
+        $from = date('Y-m-d H:i:s', strtotime('-12 months', strtotime('first day of previous month')));
 
-        // Data e hora de 12 meses atrás
-        $from = date('Y-m-d H:i:s', strtotime('-12 months'));
 
         $query = "SELECT MONTH(v.updated_at) as mes, YEAR(v.updated_at) as ano, SUM(v.total) as total 
                   FROM vendas v 
