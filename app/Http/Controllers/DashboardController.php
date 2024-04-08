@@ -41,8 +41,6 @@ class DashboardController extends Controller
         // Data e hora de 12 meses atrás
         $from = date('Y-m-d H:i:s', strtotime('-12 months'));
 
-        var_dump($to, $from);
-
         $query = "SELECT MONTH(v.updated_at) as mes, YEAR(v.updated_at) as ano, SUM(v.total) as total 
                   FROM vendas v 
                   WHERE v.situacao = 1 
@@ -77,6 +75,8 @@ class DashboardController extends Controller
                 array_push($dadosFinal, $dados[$i]);
             }
         }
+
+        var_dump($dadosFinal);
 
         // Calculate the average daily balance for the current month
         $currentDay = date('j'); // Current day of the month
