@@ -72,7 +72,7 @@ class DashboardController extends Controller
         $averageMonthly = $totalSum / max(count($dados), 1); // To avoid division by zero
         $averageDailyCurrentMonth = ($averageMonthly / 30) * $currentDay;
 
-        return 100 - ($currentMonth['balancoFinal'] * 100) / $averageDailyCurrentMonth;
+        return 100 - abs(($currentMonth['balancoFinal'] * 100) / $averageDailyCurrentMonth);
     }
 
     public function despesasAbertasHoje()
