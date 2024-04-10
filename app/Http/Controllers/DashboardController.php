@@ -37,7 +37,7 @@ class DashboardController extends Controller
     {
         $today = date('Y-m-d');
         $from = date('Y-m-d', strtotime("-12 months", strtotime($today))) . ' 00:00:00';
-        $to = date('Y-m-t', strtotime("+12 months", strtotime($from))) . ' 23:59:59';
+        $to = date('Y-m-t') . ' 23:59:59';
 
         $query = "SELECT MONTH(v.updated_at) as mes, YEAR(v.updated_at) as ano, SUM(v.total) as total 
                   FROM vendas v 
