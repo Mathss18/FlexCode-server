@@ -36,7 +36,7 @@ class DashboardController extends Controller
     public function diferencaPercentual()
     {
         $from = date('Y-m-01', strtotime("-12 months")) . ' 00:00:00';
-        $to = date('Y-m-t', strtotime("-1 months")) . ' 23:59:59';
+        $to = date('Y-m-t') . ' 23:59:59';
 
         $query = "SELECT MONTH(v.updated_at) as mes, YEAR(v.updated_at) as ano, SUM(v.total) as total 
                   FROM vendas v 
@@ -62,24 +62,17 @@ class DashboardController extends Controller
             ]);
         }
 
-        
+        $currentMonth = end($dados);
+        array_pop($dados) ;
+
+
 
         // Calculate the average daily balance for the current month
         $currentDay = date('j'); // Current day of the month
         $averageMonthly = $totalSum / max(count($dados), 1); // To avoid division by zero
-
-        var_dump($averageMonthly);
-
         $averageDailyCurrentMonth = ($averageMonthly / 30) * $currentDay;
 
-        // Add the new item to your response
-        array_push($dados, [
-            'periodo' => 'Balanço Diário',
-            'balancoFinal' => (float) number_format($averageDailyCurrentMonth, 2, '.', '')
-        ]);
-
-        $diferencaPercentual = 0;
-        return $diferencaPercentual;
+        return 100 - ($currentMonth['balancoFinal'] * 100) / $averageDailyCurrentMonth;
     }
 
     public function despesasAbertasHoje()
