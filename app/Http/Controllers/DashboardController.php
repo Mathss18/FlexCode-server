@@ -45,11 +45,6 @@ class DashboardController extends Controller
                   AND v.updated_at BETWEEN :from AND :to 
                   GROUP BY YEAR(v.updated_at), MONTH(v.updated_at)";
 
-        $query2 = "SELECT MONTH(v.updated_at) as mes, YEAR(v.updated_at) as ano, SUM(v.total) as total 
-                FROM vendas v 
-                WHERE v.situacao = 1 
-                AND v.updated_at BETWEEN 2023 AND :to 
-                GROUP BY YEAR(v.updated_at), MONTH(v.updated_at)";
         $transacoes = DB::select(DB::raw($query), ['from' => $from, 'to' => $to]);
 
         var_dump($transacoes);
@@ -70,33 +65,20 @@ class DashboardController extends Controller
             ]);
         }
 
-        $dadosFinal = [];
-        $media = 0;
-        $cnt = 0;
-        for ($i = 0; $i < count($dados); $i++) {
-            // verifica se dados[i] está entre $to e $from, se não estiver, remove da lista
-            if ($dados[$i]['ano'] . '-' . $dados[$i]['mes'] < $from || $dados[$i]['ano'] . '-' . $dados[$i]['mes'] > $to) {
-                // unset($dados[$i]);
-                // caso não esteja, continua
-            } else {
-                $media += $dados[$i]['balancoFinal'];
-                $cnt++;
-                // caso esteja, adiciona na lista final
-                array_push($dadosFinal, $dados[$i]);
-            }
-        }
+
 
         // Calculate the average daily balance for the current month
         $currentDay = date('j'); // Current day of the month
-        $averageMonthly = $totalSum / max($totalCount, 1); // To avoid division by zero
+        $averageMonthly = $totalSum / max(count($dados), 1); // To avoid division by zero
         $averageDailyCurrentMonth = ($averageMonthly / 30) * $currentDay;
 
-        // var_dump($dados);
+        // Add the new item to your response
+        array_push($dados, [
+            'periodo' => 'Balanço Diário',
+            'balancoFinal' => (float) number_format($averageDailyCurrentMonth, 2, '.', '')
+        ]);
 
-        $total = $media / $cnt;
-        $curMonth = (float) number_format($averageDailyCurrentMonth, 2, '.', '');
-        $diferencaPercentual = ($curMonth * 100) / $total;
-
+        $diferencaPercentual = 0;
         return $diferencaPercentual;
     }
 
