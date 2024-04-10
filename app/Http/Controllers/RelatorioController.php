@@ -154,8 +154,6 @@ class RelatorioController extends Controller
                   GROUP BY YEAR(v.updated_at), MONTH(v.updated_at)";
             $transacoes = DB::select(DB::raw($query), ['from' => $from, 'to' => $to]);
 
-            return $transacoes;
-
             $dados = [];
             $totalSum = 0; // For calculating total sum
             $totalCount = 0; // For counting total months
@@ -171,6 +169,8 @@ class RelatorioController extends Controller
                     'balancoFinal' => (float) number_format($transacoes[$i]->total, 2, '.', '')
                 ]);
             }
+
+            return $dados;
 
             $dadosFinal = [];
             for ($i = 0; $i < count($dados); $i++) {
