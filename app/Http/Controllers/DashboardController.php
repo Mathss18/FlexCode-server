@@ -35,7 +35,7 @@ class DashboardController extends Controller
 
     public function diferencaPercentual()
     {
-        $from = date('Y-m-d H:i:s', strtotime('-13 months'));
+        $from = date('Y-m-d H:i:s', strtotime('-12 months'));
         $to = date('Y-m-d H:i:s', strtotime('-1 months'));
 
 
@@ -46,7 +46,7 @@ class DashboardController extends Controller
                   GROUP BY YEAR(v.updated_at), MONTH(v.updated_at)";
         $transacoes = DB::select(DB::raw($query), ['from' => $from, 'to' => $to]);
 
-        var_dump($transacoes);
+        var_dump($transacoes->toArray());
 
         $dados = [];
         $totalSum = 0; // For calculating total sum
