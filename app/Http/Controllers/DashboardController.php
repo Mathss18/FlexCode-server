@@ -82,8 +82,11 @@ class DashboardController extends Controller
 
         // Calculate the average daily balance for the current month
         $currentDay = date('j'); // Current day of the month
-        $averageMonthly = $totalSum / (count($dados)); // To avoid division by zero
+        $averageMonthly = $totalSum / count($dados); // To avoid division by zero
         $averageDailyCurrentMonth = ($averageMonthly / 30) * $currentDay;
+
+        // mes abril - M.M
+        var_dump($dadosCurrentMonth[0]['balancoFinal'], $averageDailyCurrentMonth, count($dados));
 
         return 100 - ($dadosCurrentMonth[0]['balancoFinal'] * 100) / $averageDailyCurrentMonth;
     }
