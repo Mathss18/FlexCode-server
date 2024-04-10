@@ -170,8 +170,6 @@ class RelatorioController extends Controller
                 ]);
             }
 
-            return $dados;
-
             $dadosFinal = [];
             for ($i = 0; $i < count($dados); $i++) {
                 // verifica se dados[i] está entre $to e $from, se não estiver, remove da lista
