@@ -153,6 +153,7 @@ class RelatorioController extends Controller
                   AND v.updated_at BETWEEN :from AND :to 
                   GROUP BY YEAR(v.updated_at), MONTH(v.updated_at)";
             $transacoes = DB::select(DB::raw($query), ['from' => $from, 'to' => $to]);
+            $transacoesLastTweeveMonths = DB::select(DB::raw($query), ['from' => date('Y-m-01', strtotime("-12 months")) . ' 00:00:00', 'to' => date('Y-m-t', strtotime("-1 months")) . ' 23:59:59']);
 
             $dados = [];
             $totalSum = 0; // For calculating total sum
@@ -170,9 +171,26 @@ class RelatorioController extends Controller
                 ]);
             }
 
+            $dadosLastTweeve = [];
+            $totalSumLastTweeve = 0; // For calculating total sum
+            $totalCountLastTweeve = 0; // For counting total months
+
+            for ($i = 0; $i < count($transacoesLastTweeveMonths); $i++) {
+                $totalSumLastTweeve += $transacoesLastTweeveMonths[$i]->total;
+                $totalCountLastTweeve++;
+                array_push($dadosLastTweeve, [
+                    'periodo' => str_pad($transacoesLastTweeveMonths[$i]->mes, 2, "0", STR_PAD_LEFT) . '/' . $transacoesLastTweeveMonths[$i]->ano,
+                    'mes' => str_pad($transacoesLastTweeveMonths[$i]->mes, 2, "0", STR_PAD_LEFT),
+                    'ano' => $transacoesLastTweeveMonths[$i]->ano,
+                    'total' => $transacoesLastTweeveMonths[$i]->total,
+                    'balancoFinal' => (float) number_format($transacoesLastTweeveMonths[$i]->total, 2, '.', '')
+                ]);
+            }
+
+
             // Calculate the average daily balance for the current month
             $currentDay = date('j'); // Current day of the month
-            $averageMonthly = $totalSum / max(count($dados), 1); // To avoid division by zero
+            $averageMonthly = $totalSumLastTweeve / max(count($dadosLastTweeve), 1); // To avoid division by zero
             $averageDailyCurrentMonth = ($averageMonthly / 30) * $currentDay;
 
             // Add the new item to your response
