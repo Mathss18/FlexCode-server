@@ -68,7 +68,7 @@ class DashboardController extends Controller
         $currentDay = date('j'); // Current day of the month
         $averageMonthly = $totalSum / max(count($dados), 1); // To avoid division by zero
 
-        var_dump($averageMonthly);
+        var_dump($dados);
 
         $averageDailyCurrentMonth = ($averageMonthly / 30) * $currentDay;
 
