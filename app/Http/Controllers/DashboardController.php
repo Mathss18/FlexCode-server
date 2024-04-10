@@ -44,6 +44,12 @@ class DashboardController extends Controller
                   WHERE v.situacao = 1 
                   AND v.updated_at BETWEEN :from AND :to 
                   GROUP BY YEAR(v.updated_at), MONTH(v.updated_at)";
+
+        $query2 = "SELECT MONTH(v.updated_at) as mes, YEAR(v.updated_at) as ano, SUM(v.total) as total 
+                FROM vendas v 
+                WHERE v.situacao = 1 
+                AND v.updated_at BETWEEN 2023 AND :to 
+                GROUP BY YEAR(v.updated_at), MONTH(v.updated_at)";
         $transacoes = DB::select(DB::raw($query), ['from' => $from, 'to' => $to]);
 
         var_dump($transacoes);
