@@ -175,13 +175,7 @@ class RelatorioController extends Controller
             $dadosFinal = [];
             for ($i = 0; $i < count($dados); $i++) {
                 // verifica se dados[i] está entre $to e $from, se não estiver, remove da lista
-                if ($dados[$i]['ano'] . '-' . $dados[$i]['mes'] < $from || $dados[$i]['ano'] . '-' . $dados[$i]['mes'] > $to) {
-                    // unset($dados[$i]);
-                    // caso não esteja, continua
-                } else {
-                    // caso esteja, adiciona na lista final
-                    array_push($dadosFinal, $dados[$i]);
-                }
+                array_push($dadosFinal, $dados[$i]);
             }
 
             // Calculate the average daily balance for the current month
