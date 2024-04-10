@@ -36,7 +36,7 @@ class DashboardController extends Controller
     public function diferencaPercentual()
     {
         $from = date('Y-m-01', strtotime("-12 months")) . ' 00:00:00';
-        $to = date('Y-m-t') . ' 23:59:59';
+        $to = date('Y-m-t', strtotime("-1 months")) . ' 23:59:59';
 
         $query = "SELECT MONTH(v.updated_at) as mes, YEAR(v.updated_at) as ano, SUM(v.total) as total 
                   FROM vendas v 
@@ -45,6 +45,7 @@ class DashboardController extends Controller
                   GROUP BY YEAR(v.updated_at), MONTH(v.updated_at)";
 
         $transacoes = DB::select(DB::raw($query), ['from' => $from, 'to' => $to]);
+        $transacoesCurrentMonth = DB::select(DB::raw($query), ['from' => date('Y-m-01') . ' 00:00:00', 'to' => date('Y-m-t') . ' 23:59:59']);
 
         $dados = [];
         $totalSum = 0; // For calculating total sum
@@ -62,9 +63,21 @@ class DashboardController extends Controller
             ]);
         }
 
-        $currentMonth = end($dados);
-        array_pop($dados) ;
+        $dadosCurrentMonth = [];
+        $totalSumCurrentMonth = 0; // For calculating total sum
+        $totalCountCurrentMonth = 0; // For counting total months
 
+        for ($i = 0; $i < count($transacoesCurrentMonth); $i++) {
+            $totalSumCurrentMonth += $transacoesCurrentMonth[$i]->total;
+            $totalCountCurrentMonth++;
+            array_push($dadosCurrentMonth, [
+                'periodo' => str_pad($transacoesCurrentMonth[$i]->mes, 2, "0", STR_PAD_LEFT) . '/' . $transacoesCurrentMonth[$i]->ano,
+                'mes' => str_pad($transacoesCurrentMonth[$i]->mes, 2, "0", STR_PAD_LEFT),
+                'ano' => $transacoesCurrentMonth[$i]->ano,
+                'total' => $transacoesCurrentMonth[$i]->total,
+                'balancoFinal' => (float) number_format($transacoesCurrentMonth[$i]->total, 2, '.', '')
+            ]);
+        }
 
 
         // Calculate the average daily balance for the current month
@@ -72,9 +85,9 @@ class DashboardController extends Controller
         $averageMonthly = $totalSum / (count($dados) - 1); // To avoid division by zero
         $averageDailyCurrentMonth = ($averageMonthly / 30) * $currentDay;
 
-        var_dump($totalSum, $totalCount, $averageMonthly, $currentDay, $averageDailyCurrentMonth);
+        var_dump($totalSum, $totalCount, $averageMonthly, $currentDay, $averageDailyCurrentMonth, $dadosCurrentMonth);
 
-        return 100 - abs(($currentMonth['balancoFinal'] * 100) / $averageDailyCurrentMonth);
+        return 100 - abs(($dadosCurrentMonth['balancoFinal'] * 100) / $averageDailyCurrentMonth);
     }
 
     public function despesasAbertasHoje()
