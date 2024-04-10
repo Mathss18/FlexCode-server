@@ -36,9 +36,7 @@ class DashboardController extends Controller
     public function diferencaPercentual()
     {
         $from = date('Y-m-01', strtotime("-12 months")) . ' 00:00:00';
-        $to = date('Y-m-t') . ' 23:59:59';
-
-        var_dump($from, $to);
+        $to = date('Y-m-t', strtotime("-1 months")) . ' 23:59:59';
 
         $query = "SELECT MONTH(v.updated_at) as mes, YEAR(v.updated_at) as ano, SUM(v.total) as total 
                   FROM vendas v 
@@ -47,8 +45,6 @@ class DashboardController extends Controller
                   GROUP BY YEAR(v.updated_at), MONTH(v.updated_at)";
 
         $transacoes = DB::select(DB::raw($query), ['from' => $from, 'to' => $to]);
-
-        var_dump($transacoes);
 
         $dados = [];
         $totalSum = 0; // For calculating total sum
@@ -66,7 +62,7 @@ class DashboardController extends Controller
             ]);
         }
 
-
+        var_dump($dados);
 
         // Calculate the average daily balance for the current month
         $currentDay = date('j'); // Current day of the month
