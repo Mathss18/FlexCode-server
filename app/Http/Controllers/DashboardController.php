@@ -35,8 +35,7 @@ class DashboardController extends Controller
 
     public function diferencaPercentual()
     {
-        $today = date('Y-m-d');
-        $from = date('Y-m-d', strtotime("-12 months", strtotime($today))) . ' 00:00:00';
+        $from = date('Y-m-01', strtotime("-12 months")) . ' 00:00:00';
         $to = date('Y-m-t') . ' 23:59:59';
 
         var_dump($from, $to);
