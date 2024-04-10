@@ -170,25 +170,19 @@ class RelatorioController extends Controller
                 ]);
             }
 
-            $dadosFinal = [];
-            for ($i = 0; $i < count($dados); $i++) {
-                // verifica se dados[i] está entre $to e $from, se não estiver, remove da lista
-                array_push($dadosFinal, $dados[$i]);
-            }
-
             // Calculate the average daily balance for the current month
             $currentDay = date('j'); // Current day of the month
-            $averageMonthly = $totalSum / max($totalCount, 1); // To avoid division by zero
+            $averageMonthly = $totalSum / max(count($dados), 1); // To avoid division by zero
             $averageDailyCurrentMonth = ($averageMonthly / 30) * $currentDay;
 
             // Add the new item to your response
-            array_push($dadosFinal, [
+            array_push($dados, [
                 'periodo' => 'Balanço Diário',
                 'balancoFinal' => (float) number_format($averageDailyCurrentMonth, 2, '.', '')
             ]);
 
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', [
-                'transacoes' => $dadosFinal,
+                'transacoes' => $dados,
             ]);
             return response()->json($response, 200);
         } catch (Exception $ex) {
