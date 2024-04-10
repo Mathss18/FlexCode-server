@@ -46,6 +46,8 @@ class DashboardController extends Controller
                   GROUP BY YEAR(v.updated_at), MONTH(v.updated_at)";
         $transacoes = DB::select(DB::raw($query), ['from' => $from, 'to' => $to]);
 
+        var_dump($transacoes);
+
         $dados = [];
         $totalSum = 0; // For calculating total sum
         $totalCount = 0; // For counting total months
