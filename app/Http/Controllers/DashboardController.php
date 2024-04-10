@@ -85,9 +85,6 @@ class DashboardController extends Controller
         $averageMonthly = $totalSum / count($dados); // To avoid division by zero
         $averageDailyCurrentMonth = ($averageMonthly / 30) * $currentDay;
 
-        // mes abril - M.M
-        // var_dump($dadosCurrentMonth[0]['balancoFinal'], $averageDailyCurrentMonth, count($dados));
-
         return 100 - ($averageDailyCurrentMonth/$dadosCurrentMonth[0]['balancoFinal']) * 100;
     }
 
