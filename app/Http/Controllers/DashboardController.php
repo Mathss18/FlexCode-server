@@ -86,9 +86,9 @@ class DashboardController extends Controller
         $averageDailyCurrentMonth = ($averageMonthly / 30) * $currentDay;
 
         // mes abril - M.M
-        var_dump($dadosCurrentMonth[0]['balancoFinal'], $averageDailyCurrentMonth, count($dados));
+        // var_dump($dadosCurrentMonth[0]['balancoFinal'], $averageDailyCurrentMonth, count($dados));
 
-        return 100 - ($dadosCurrentMonth[0]['balancoFinal'] * 100) / $averageDailyCurrentMonth;
+        return ($averageDailyCurrentMonth/$dadosCurrentMonth[0]['balancoFinal']) * 100;
     }
 
     public function despesasAbertasHoje()
