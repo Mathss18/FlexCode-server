@@ -247,7 +247,12 @@ class NfeService
                 $dados['produtos'][$i]['cfop'] == '6102'
             ) {
                 if (strlen($favorecido['cpfCnpj']) == 14) {
-                    $icms->CSOSN = '101';
+                    if($favorecido['inscricaoEstadual']){
+                        $icms->CSOSN = '101';
+                    }
+                    else{
+                        $icms->CSOSN = '400';
+                    }
                 }
                 else{
                     $icms->CSOSN = '102';
