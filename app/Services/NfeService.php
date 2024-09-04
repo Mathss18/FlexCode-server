@@ -288,7 +288,7 @@ class NfeService
             //$icms->pFCPSTRet = null; //incluso no layout 4.00
             //$icms->vFCPSTRet = null; //incluso no layout 4.00
             $icms->modBC = 3;
-            // $icms->vBC = 0.00;
+            $icms->vBC = 14490.90;
             //$icms->pRedBC = null;
             //$icms->pICMS = null;
             $icms->vICMS = 2608.36; // change COMENTAR A LINHA OU NULL
