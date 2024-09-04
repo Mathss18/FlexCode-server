@@ -345,7 +345,7 @@ class NfeService
 
         //====================TAG ICMSTOTAL===================
         $icmsTotal = new stdClass();
-        $icmsTotal->vBC = 14490.90;
+        // $icmsTotal->vBC = 14490.90;
         $icmsTotal->vICMS = 2608.36; //change 480.21
         $icmsTotal->vICMSDeson = 0.00;
         $icmsTotal->vFCP = 0.00; //incluso no layout 4.00
@@ -363,7 +363,7 @@ class NfeService
         $icmsTotal->vPIS = 0.00;
         $icmsTotal->vCOFINS = 0.00;
         $icmsTotal->vOutro = 0.00; // change to 0.00
-        $icmsTotal->vNF = $dados['totalFinal'] + 470.95; // total produtos + frete
+        $icmsTotal->vNF = $dados['totalProdutos'] + $dados['frete'] + 470.95; // total produtos + frete
         //$icmsTotal->vTotTrib = 0.00;
 
         $nfe->tagICMSTot($icmsTotal);
