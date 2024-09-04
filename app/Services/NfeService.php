@@ -345,7 +345,7 @@ class NfeService
 
         //====================TAG ICMSTOTAL===================
         $icmsTotal = new stdClass();
-        $icmsTotal->vBC = $dados['produtos'][$i]['total'];
+        $icmsTotal->vBC = 14490.90;
         $icmsTotal->vICMS = 2608.36; //change 480.21
         $icmsTotal->vICMSDeson = 0.00;
         $icmsTotal->vFCP = 0.00; //incluso no layout 4.00
