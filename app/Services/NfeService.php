@@ -287,11 +287,11 @@ class NfeService
             //$icms->vBCFCPSTRet = null; //incluso no layout 4.00
             //$icms->pFCPSTRet = null; //incluso no layout 4.00
             //$icms->vFCPSTRet = null; //incluso no layout 4.00
-            $icms->modBC = 3;
-            $icms->vBC = $dados['produtos'][$i]['total'];
+            //$icms->modBC = null;
+            //$icms->vBC = null;
             //$icms->pRedBC = null;
-            $icms->pICMS = 18.00;
-            $icms->vICMS = 2608.36; // change COMENTAR A LINHA OU NULL
+            //$icms->pICMS = null;
+            //$icms->vICMS = 480.21; // change COMENTAR A LINHA OU NULL
             //$icms->pRedBCEfet = null;
             //$icms->vBCEfet = null;
             //$icms->pICMSEfet = null;
@@ -325,28 +325,28 @@ class NfeService
             $nfe->tagCOFINS($cofis);
 
             //====================TAG IPI===================
-            $ipi = new stdClass();
-            $ipi->item =  $i + 1; //item da NFe
-            $ipi->clEnq = null;
-            $ipi->CNPJProd = null;
-            $ipi->cSelo = null;
-            $ipi->qSelo = null;
-            $ipi->cEnq = '999';
-            $ipi->CST = 99;
-            $ipi->vIPI = 470.95;
-            $ipi->vBC = 0.00;
-            $ipi->pIPI = 0.00;
-            $ipi->qUnid = null;
-            $ipi->vUnid = null;
+            // $ipi = new stdClass();
+            // $ipi->item =  $i + 1; //item da NFe
+            // $ipi->clEnq = null;
+            // $ipi->CNPJProd = null;
+            // $ipi->cSelo = null;
+            // $ipi->qSelo = null;
+            // $ipi->cEnq = '999';
+            // $ipi->CST = 99;
+            // $ipi->vIPI = 0.00;
+            // $ipi->vBC = 1000.00;
+            // $ipi->pIPI = 0.00;
+            // $ipi->qUnid = null;
+            // $ipi->vUnid = null;
 
-            $nfe->tagIPI($ipi);
+            // $nfe->tagIPI($ipi);
 
         }
 
         //====================TAG ICMSTOTAL===================
         $icmsTotal = new stdClass();
-        // $icmsTotal->vBC = 14490.90;
-        $icmsTotal->vICMS = 2608.36; //change 480.21
+        $icmsTotal->vBC = 0.00;
+        $icmsTotal->vICMS = 0.00; //change 480.21
         $icmsTotal->vICMSDeson = 0.00;
         $icmsTotal->vFCP = 0.00; //incluso no layout 4.00
         $icmsTotal->vBCST = 0.00;
@@ -358,12 +358,12 @@ class NfeService
         $icmsTotal->vSeg = 0.00;
         $icmsTotal->vDesc = 0.00;
         $icmsTotal->vII = 0.00;
-        $icmsTotal->vIPI = 470.95; //change 133.39
+        $icmsTotal->vIPI = 0.00; //change 133.39
         $icmsTotal->vIPIDevol = 0.00; //incluso no layout 4.00
         $icmsTotal->vPIS = 0.00;
         $icmsTotal->vCOFINS = 0.00;
         $icmsTotal->vOutro = 0.00; // change to 0.00
-        $icmsTotal->vNF = $dados['totalProdutos'] + $dados['frete'] + 470.95; // total produtos + frete
+        $icmsTotal->vNF = $dados['totalFinal']; // total produtos + frete
         //$icmsTotal->vTotTrib = 0.00;
 
         $nfe->tagICMSTot($icmsTotal);
