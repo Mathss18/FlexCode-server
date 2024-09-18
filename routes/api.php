@@ -26,6 +26,7 @@ use App\Http\Controllers\CompraController;
 use App\Http\Controllers\ConfiguracaoController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EstoqueController;
+use App\Http\Controllers\MedidaController;
 use App\Http\Controllers\NotaFiscalController;
 use App\Http\Controllers\OutrosFavorecidosController;
 use App\Http\Controllers\RelatorioController;
@@ -384,6 +385,18 @@ Route::middleware(['jwt', 'check.jwt.tenant'])->group(function () {
 
     Route::delete('configuracoes/{id}', [ConfiguracaoController::class, 'destroy']);
 
+    //============================ MEDIDAS ==============================
+    Route::get('medidas', [MedidaController::class, 'index']);
+
+    Route::get('medidas/{id}', [MedidaController::class, 'show']);
+
+    Route::post('medidas', [MedidaController::class, 'store']);
+
+    Route::put('medidas/{id}', [MedidaController::class, 'update']);
+
+    Route::delete('medidas/{id}', [MedidaController::class, 'destroy']);
+
+
     //============================ DASHBOARDS ==============================
     Route::get('dashboards', [DashboardController::class, 'index']);
 
@@ -394,6 +407,4 @@ Route::middleware(['jwt', 'check.jwt.tenant'])->group(function () {
     Route::get('relatorios/vendas', [RelatorioController::class, 'vendas']);
     Route::get('relatorios/previsao-de-saldo', [RelatorioController::class, 'previsaoDeSaldo']);
     Route::post('relatorios/detalhes-de-pagamento', [RelatorioController::class, 'detalhesDePagamento']);
-
-
 });

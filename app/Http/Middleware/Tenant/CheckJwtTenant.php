@@ -17,6 +17,10 @@ class CheckJwtTenant
      */
     public function handle(Request $request, Closure $next)
     {
+        if (env('APP_ENV') == 'local') {
+            return $next($request);
+        }
+
         $payload = JWTAuth::parseToken()->getPayload();
 
         if ($payload->get('tenant') == session('tenant')->nome) {

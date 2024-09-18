@@ -19,8 +19,10 @@ class TenantMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        // dd(response()->json($request->getHost(),500));
-        // dd(config('tenant.adm_domain'));
+        if (env('APP_ENV') == 'local') {
+            return $next($request);
+        }
+
         $manager = app(ManagerTenant::class);
 
         if ($manager->isAdmDomain()) {
@@ -32,7 +34,7 @@ class TenantMiddleware
         if (!$tenant) {
             return response()->json(['error' => '[Middleware] Cliente não encontrado'], 404);
         } else {
-            if($tenant->situacao == false){
+            if ($tenant->situacao == false) {
                 return response()->json(['error' => '[Middleware] Cliente Inativo'], 403);
             }
             $manager->setConnection($tenant);
