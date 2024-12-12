@@ -276,6 +276,7 @@ class NotaFiscalController extends Controller
             $response = APIHelper::APIResponse(true, 200, 'Sucesso ao cancelar NFe', $notasFiscais);
             return response()->json($response, 200);
         } catch (\Exception $ex) {
+            logger("ERRO AO CANCELAR NFE", [$ex]);
             $response = APIHelper::APIResponse(false, 500, null, null, $ex);
             return response()->json($response, 500);
         }
