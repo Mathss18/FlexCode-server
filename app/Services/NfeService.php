@@ -272,6 +272,9 @@ class NfeService
                 $icms->pCredSN = $aliquota;
                 $icms->vCredICMSSN = $valorProdutosReal * ($aliquota / 100);
             }
+            if(session('config')->crt != 1){
+                $icms->CSOSN = null;
+            }
             //$icms->modBCST = null;
             //$icms->pMVAST = null;
             //$icms->pRedBCST = null;
