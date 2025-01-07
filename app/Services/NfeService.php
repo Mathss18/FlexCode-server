@@ -235,73 +235,89 @@ class NfeService
 
             $nfe->tagimposto($imposto);
 
-            //====================TAG ICMS SIMPLES NACIONAL ===================
-            $icms = new stdClass();
-            $icms->item = $i + 1; //item da NFe
-            $icms->orig = 0;
-            //VERIFICA SE TEM IE OU NÃO
-            if (
-                $dados['produtos'][$i]['cfop'] == '5101' ||
-                $dados['produtos'][$i]['cfop'] == '5102' ||
-                $dados['produtos'][$i]['cfop'] == '6101' ||
-                $dados['produtos'][$i]['cfop'] == '6102'
-            ) {
-                if (strlen($favorecido['cpfCnpj']) == 14) {
-                    if($favorecido['inscricaoEstadual']){
-                        $icms->CSOSN = '101';
+            if(session('config')->crt != 1){
+                //====================TAG ICMS REGIME NORMAL===================
+                $icms = new stdClass();
+                $icms->item = $i + 1; //item da NFe
+                $icms->orig = 0; // Origem da mercadoria (0 = Nacional, 1 = Estrangeira, etc.)
+                $icms->CST = '00'; // Código da Situação Tributária do ICMS (00 = Tributado integralmente)
+                $icms->modBC = 3; // Modalidade de determinação da BC (0 = Valor da Operação)
+                $icms->vBC = $valorProdutosReal; // Base de Cálculo do ICMS
+                $icms->pICMS = $aliquota; // Alíquota do ICMS (%)
+                $icms->vICMS = $icms->vBC * ($icms->pICMS / 100); // Valor do ICMS
+    
+                // Adiciona ao XML
+                $nfe->tagICMS($icms);
+            }
+            else {
+                //====================TAG ICMS SIMPLES NACIONAL ===================
+                $icms = new stdClass();
+                $icms->item = $i + 1; //item da NFe
+                $icms->orig = 0;
+                //VERIFICA SE TEM IE OU NÃO
+                if (
+                    $dados['produtos'][$i]['cfop'] == '5101' ||
+                    $dados['produtos'][$i]['cfop'] == '5102' ||
+                    $dados['produtos'][$i]['cfop'] == '6101' ||
+                    $dados['produtos'][$i]['cfop'] == '6102'
+                ) {
+                    if (strlen($favorecido['cpfCnpj']) == 14) {
+                        if($favorecido['inscricaoEstadual']){
+                            $icms->CSOSN = '101';
+                        }
+                        else{
+                            $icms->CSOSN = '400';
+                        }
                     }
                     else{
-                        $icms->CSOSN = '400';
+                        $icms->CSOSN = '102';
                     }
+                    $icms->pCredSN = $aliquota;
+                    $icms->vCredICMSSN = $valorProdutosReal * ($aliquota / 100);
+                } else if (
+                    $dados['produtos'][$i]['cfop'] == '5902' ||
+                    $dados['produtos'][$i]['cfop'] == '6912' ||
+                    $dados['produtos'][$i]['cfop'] == '6910'
+                ) {
+                    $icms->CSOSN = '400';
+                    $icms->pCredSN = $aliquota;
+                    $icms->vCredICMSSN = $valorProdutosReal * ($aliquota / 100);
+                } else {
+                    $icms->CSOSN = '900';
+                    $icms->pCredSN = $aliquota;
+                    $icms->vCredICMSSN = $valorProdutosReal * ($aliquota / 100);
                 }
-                else{
-                    $icms->CSOSN = '102';
+                if(session('config')->crt != 1){
+                    $icms->CSOSN = null;
                 }
-                $icms->pCredSN = $aliquota;
-                $icms->vCredICMSSN = $valorProdutosReal * ($aliquota / 100);
-            } else if (
-                $dados['produtos'][$i]['cfop'] == '5902' ||
-                $dados['produtos'][$i]['cfop'] == '6912' ||
-                $dados['produtos'][$i]['cfop'] == '6910'
-            ) {
-                $icms->CSOSN = '400';
-                $icms->pCredSN = $aliquota;
-                $icms->vCredICMSSN = $valorProdutosReal * ($aliquota / 100);
-            } else {
-                $icms->CSOSN = '900';
-                $icms->pCredSN = $aliquota;
-                $icms->vCredICMSSN = $valorProdutosReal * ($aliquota / 100);
-            }
-            if(session('config')->crt != 1){
-                $icms->CSOSN = null;
-            }
-            //$icms->modBCST = null;
-            //$icms->pMVAST = null;
-            //$icms->pRedBCST = null;
-            //$icms->vBCST = null;
-            //$icms->pICMSST = null;
-            //$icms->vICMSST = null;
-            //$icms->vBCFCPST = null; //incluso no layout 4.00
-            //$icms->pFCPST = null; //incluso no layout 4.00
-            //$icms->vFCPST = null; //incluso no layout 4.00
-            //$icms->vBCSTRet = null;
-            //$icms->pST = null;
-            //$icms->vICMSSTRet = null;
-            //$icms->vBCFCPSTRet = null; //incluso no layout 4.00
-            //$icms->pFCPSTRet = null; //incluso no layout 4.00
-            //$icms->vFCPSTRet = null; //incluso no layout 4.00
-            //$icms->modBC = null;
-            //$icms->vBC = null;
-            //$icms->pRedBC = null;
-            //$icms->pICMS = null;
-            //$icms->vICMS = 480.21; // change COMENTAR A LINHA OU NULL
-            //$icms->pRedBCEfet = null;
-            //$icms->vBCEfet = null;
-            //$icms->pICMSEfet = null;
-            //$icms->vICMSEfet = null;
-            //$icms->vICMSSubstituto = null;
+                //$icms->modBCST = null;
+                //$icms->pMVAST = null;
+                //$icms->pRedBCST = null;
+                //$icms->vBCST = null;
+                //$icms->pICMSST = null;
+                //$icms->vICMSST = null;
+                //$icms->vBCFCPST = null; //incluso no layout 4.00
+                //$icms->pFCPST = null; //incluso no layout 4.00
+                //$icms->vFCPST = null; //incluso no layout 4.00
+                //$icms->vBCSTRet = null;
+                //$icms->pST = null;
+                //$icms->vICMSSTRet = null;
+                //$icms->vBCFCPSTRet = null; //incluso no layout 4.00
+                //$icms->pFCPSTRet = null; //incluso no layout 4.00
+                //$icms->vFCPSTRet = null; //incluso no layout 4.00
+                //$icms->modBC = null;
+                //$icms->vBC = null;
+                //$icms->pRedBC = null;
+                //$icms->pICMS = null;
+                //$icms->vICMS = 480.21; // change COMENTAR A LINHA OU NULL
+                //$icms->pRedBCEfet = null;
+                //$icms->vBCEfet = null;
+                //$icms->pICMSEfet = null;
+                //$icms->vICMSEfet = null;
+                //$icms->vICMSSubstituto = null;
 
-            $nfe->tagICMSSN($icms);
+                $nfe->tagICMSSN($icms);
+            }
 
             //====================TAG PIS===================
             $pis = new stdClass();
