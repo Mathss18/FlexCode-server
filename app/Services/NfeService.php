@@ -521,10 +521,26 @@ class NfeService
 
         //====================INFO ADICIONAL===================
         $stdInfo = new stdClass();
+        // Verifica se vCredICMSSN é nulo e utiliza outro valor apropriado
+        $vCredICMSSN = $icms->vCredICMSSN ?? $icms->vICMS;
+
+        // Define a informação adicional de acordo com a nova lógica
         if (array_key_exists("infAdFisco", $dados)) {
-            $stdInfo->infAdFisco = $dados['infAdFisco'] . " --- DOCUMENTO EMITIDO POR ME OU EPP OPTANTE PELO SIMPLES NACIONAL, CONFORME LEI COMPLEMENTAR 123/2006 II - NAO GERA DIREITO A CREDITO FISCAL DE IPI. III - PERMITE O APROVEITAMENTO DO CREDITO DE ICMS NO VALOR DE R$ " . $icms->vCredICMSSN . " CORRESPONDENTE A ALIQUOTA DE " . $aliquota . ", NOS TERMOS DO ART. 23 DA LC 123/2006";
+            $stdInfo->infAdFisco = $dados['infAdFisco'] . 
+                " --- DOCUMENTO EMITIDO POR EMPRESA REGIME NORMAL. " . 
+                "NAO GERA DIREITO A CREDITO FISCAL DE IPI. " . 
+                "PERMITE O APROVEITAMENTO DO CREDITO DE ICMS NO VALOR DE R$ " . 
+                number_format($vCredICMSSN, 2, ',', '.') . 
+                ", CORRESPONDENTE A ALIQUOTA DE " . 
+                number_format($aliquota, 2, ',', '.') . "%.";
         } else {
-            $stdInfo->infAdFisco = " --- DOCUMENTO EMITIDO POR ME OU EPP OPTANTE PELO SIMPLES NACIONAL, CONFORME LEI COMPLEMENTAR 123/2006 II - NAO GERA DIREITO A CREDITO FISCAL DE IPI. III - PERMITE O APROVEITAMENTO DO CREDITO DE ICMS NO VALOR DE R$ " . $icms->vCredICMSSN . " CORRESPONDENTE A ALIQUOTA DE " . $aliquota . ", NOS TERMOS DO ART. 23 DA LC 123/2006";
+            $stdInfo->infAdFisco = 
+                " --- DOCUMENTO EMITIDO POR EMPRESA REGIME NORMAL. " . 
+                "NAO GERA DIREITO A CREDITO FISCAL DE IPI. " . 
+                "PERMITE O APROVEITAMENTO DO CREDITO DE ICMS NO VALOR DE R$ " . 
+                number_format($vCredICMSSN, 2, ',', '.') . 
+                ", CORRESPONDENTE A ALIQUOTA DE " . 
+                number_format($aliquota, 2, ',', '.') . "%.";
         }
 
         $stdInfo->infCpl = $dados['infCpl'] ?? '';
