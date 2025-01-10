@@ -343,22 +343,25 @@ class NfeService
 
             $nfe->tagCOFINS($cofis);
 
-            //====================TAG IPI===================
-            // $ipi = new stdClass();
-            // $ipi->item =  $i + 1; //item da NFe
-            // $ipi->clEnq = null;
-            // $ipi->CNPJProd = null;
-            // $ipi->cSelo = null;
-            // $ipi->qSelo = null;
-            // $ipi->cEnq = '999';
-            // $ipi->CST = 99;
-            // $ipi->vIPI = 0.00;
-            // $ipi->vBC = 1000.00;
-            // $ipi->pIPI = 0.00;
-            // $ipi->qUnid = null;
-            // $ipi->vUnid = null;
+            if(session('config')->crt != 1){
+                $aliquotaIPI = 9.75;
+                //====================TAG IPI===================
+                $ipi = new stdClass();
+                $ipi->item =  $i + 1; //item da NFe
+                $ipi->clEnq = null;
+                $ipi->CNPJProd = null;
+                $ipi->cSelo = null;
+                $ipi->qSelo = null;
+                $ipi->cEnq = '999';
+                $ipi->CST = 50;
+                $ipi->vBC = $dados['produtos'][$i]['total'];
+                $ipi->pIPI = $aliquotaIPI;
+                $ipi->vIPI = $ipi->vBC * ($aliquotaIPI / 100);
+                $ipi->qUnid = null;
+                $ipi->vUnid = null;
 
-            // $nfe->tagIPI($ipi);
+                $nfe->tagIPI($ipi);
+            }
 
         }
 
@@ -526,21 +529,31 @@ class NfeService
 
         // Define a informação adicional de acordo com a nova lógica
         if (array_key_exists("infAdFisco", $dados)) {
-            $stdInfo->infAdFisco = $dados['infAdFisco'] . 
-                " --- DOCUMENTO EMITIDO POR EMPRESA REGIME NORMAL. " . 
-                "NAO GERA DIREITO A CREDITO FISCAL DE IPI. " . 
-                "PERMITE O APROVEITAMENTO DO CREDITO DE ICMS NO VALOR DE R$ " . 
-                number_format($vCredICMSSN, 2, ',', '.') . 
-                ", CORRESPONDENTE A ALIQUOTA DE " . 
-                number_format($aliquota, 2, ',', '.') . "%.";
+            if(session('config')->crt != 1){
+                $stdInfo->infAdFisco = $dados['infAdFisco'] . " --- DOCUMENTO EMITIDO POR EMPRESA REGIME NORMAL. ";
+            }
+            else{
+                $stdInfo->infAdFisco = $dados['infAdFisco'] . 
+                    " --- DOCUMENTO EMITIDO POR EMPRESA SIMPLES NACIONAL. " . 
+                    "NAO GERA DIREITO A CREDITO FISCAL DE IPI. " . 
+                    "PERMITE O APROVEITAMENTO DO CREDITO DE ICMS NO VALOR DE R$ " . 
+                    number_format($vCredICMSSN, 2, ',', '.') . 
+                    ", CORRESPONDENTE A ALIQUOTA DE " . 
+                    number_format($aliquota, 2, ',', '.') . "%.";
+            }
         } else {
-            $stdInfo->infAdFisco = 
-                " --- DOCUMENTO EMITIDO POR EMPRESA REGIME NORMAL. " . 
-                "NAO GERA DIREITO A CREDITO FISCAL DE IPI. " . 
-                "PERMITE O APROVEITAMENTO DO CREDITO DE ICMS NO VALOR DE R$ " . 
-                number_format($vCredICMSSN, 2, ',', '.') . 
-                ", CORRESPONDENTE A ALIQUOTA DE " . 
-                number_format($aliquota, 2, ',', '.') . "%.";
+            if(session('config')->crt != 1){
+                $stdInfo->infAdFisco = " --- DOCUMENTO EMITIDO POR EMPRESA REGIME NORMAL. ";
+            }
+            else{
+                $stdInfo->infAdFisco = 
+                    " --- DOCUMENTO EMITIDO POR EMPRESA SIMPLES NACIONAL. " . 
+                    "NAO GERA DIREITO A CREDITO FISCAL DE IPI. " . 
+                    "PERMITE O APROVEITAMENTO DO CREDITO DE ICMS NO VALOR DE R$ " . 
+                    number_format($vCredICMSSN, 2, ',', '.') . 
+                    ", CORRESPONDENTE A ALIQUOTA DE " . 
+                    number_format($aliquota, 2, ',', '.') . "%.";
+            }
         }
 
         $stdInfo->infCpl = $dados['infCpl'] ?? '';
