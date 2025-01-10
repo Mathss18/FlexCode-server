@@ -242,7 +242,7 @@ class NfeService
                 $icms->orig = 0; // Origem da mercadoria (0 = Nacional, 1 = Estrangeira, etc.)
                 $icms->CST = '00'; // Código da Situação Tributária do ICMS (00 = Tributado integralmente)
                 $icms->modBC = 3; // Modalidade de determinação da BC (0 = Valor da Operação)
-                $icms->vBC = $valorProdutosReal; // Base de Cálculo do ICMS
+                $icms->vBC = $dados['produtos'][$i]['preco']; // Base de Cálculo do ICMS
                 $icms->pICMS = $aliquota; // Alíquota do ICMS (%)
                 $icms->vICMS = $icms->vBC * ($icms->pICMS / 100); // Valor do ICMS
     
@@ -364,8 +364,8 @@ class NfeService
 
         //====================TAG ICMSTOTAL===================
         $icmsTotal = new stdClass();
-        $icmsTotal->vBC = $valorProdutosReal;
-        $icmsTotal->vICMS = $valorProdutosReal; //change 480.21
+        $icmsTotal->vBC = $dados['totalProdutos'];
+        $icmsTotal->vICMS = $dados['totalProdutos']; //change 480.21
         $icmsTotal->vICMSDeson = 0.00;
         $icmsTotal->vFCP = 0.00; //incluso no layout 4.00
         $icmsTotal->vBCST = 0.00;
