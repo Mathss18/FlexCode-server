@@ -179,6 +179,7 @@ class NfeService
         //====================TAG PRODUTO===================
         // Armazena o total dos produtos para calculo correto do ICMS
         $valorProdutosReal = 0.0;
+        $totalIPI = 0.00;
         for ($i = 0; $i < count($dados['produtos']); $i++) {
             $prod = new stdClass();
             $prod->item = $i + 1; //item da NFe
@@ -361,6 +362,7 @@ class NfeService
                 $ipi->vUnid = null;
 
                 $nfe->tagIPI($ipi);
+                $totalIPI += $ipi->vIPI;
             }
 
         }
@@ -380,7 +382,7 @@ class NfeService
         $icmsTotal->vSeg = 0.00;
         $icmsTotal->vDesc = 0.00;
         $icmsTotal->vII = 0.00;
-        $icmsTotal->vIPI = 0.00; //change 133.39
+        $icmsTotal->vIPI = $totalIPI; //change 133.39
         $icmsTotal->vIPIDevol = 0.00; //incluso no layout 4.00
         $icmsTotal->vPIS = 0.00;
         $icmsTotal->vCOFINS = 0.00;
