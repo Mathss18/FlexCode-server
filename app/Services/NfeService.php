@@ -387,7 +387,7 @@ class NfeService
         $icmsTotal->vPIS = 0.00;
         $icmsTotal->vCOFINS = 0.00;
         $icmsTotal->vOutro = 0.00; // change to 0.00
-        $icmsTotal->vNF = $dados['totalFinal']; // total produtos + frete
+        $icmsTotal->vNF = $dados['totalFinal'] + $icmsTotal->vIPI; // total produtos + frete
         //$icmsTotal->vTotTrib = 0.00;
 
         $nfe->tagICMSTot($icmsTotal);
