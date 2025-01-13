@@ -345,24 +345,31 @@ class NfeService
             $nfe->tagCOFINS($cofis);
 
             if(session('config')->crt != 1){
-                $aliquotaIPI = 9.75;
-                //====================TAG IPI===================
-                $ipi = new stdClass();
-                $ipi->item =  $i + 1; //item da NFe
-                $ipi->clEnq = null;
-                $ipi->CNPJProd = null;
-                $ipi->cSelo = null;
-                $ipi->qSelo = null;
-                $ipi->cEnq = '999';
-                $ipi->CST = 50;
-                $ipi->vBC = $dados['produtos'][$i]['total'];
-                $ipi->pIPI = $aliquotaIPI;
-                $ipi->vIPI = $ipi->vBC * ($aliquotaIPI / 100);
-                $ipi->qUnid = null;
-                $ipi->vUnid = null;
-
-                $nfe->tagIPI($ipi);
-                $totalIPI += $ipi->vIPI;
+                if (
+                    $dados['produtos'][$i]['cfop'] != '5902' ||
+                    $dados['produtos'][$i]['cfop'] != '6912' ||
+                    $dados['produtos'][$i]['cfop'] != '5124' ||
+                    $dados['produtos'][$i]['cfop'] != '6910'
+                ) {
+                    $aliquotaIPI = 9.75;
+                    //====================TAG IPI===================
+                    $ipi = new stdClass();
+                    $ipi->item =  $i + 1; //item da NFe
+                    $ipi->clEnq = null;
+                    $ipi->CNPJProd = null;
+                    $ipi->cSelo = null;
+                    $ipi->qSelo = null;
+                    $ipi->cEnq = '999';
+                    $ipi->CST = 50;
+                    $ipi->vBC = $dados['produtos'][$i]['total'];
+                    $ipi->pIPI = $aliquotaIPI;
+                    $ipi->vIPI = $ipi->vBC * ($aliquotaIPI / 100);
+                    $ipi->qUnid = null;
+                    $ipi->vUnid = null;
+    
+                    $nfe->tagIPI($ipi);
+                    $totalIPI += $ipi->vIPI;
+                }
             }
 
         }
