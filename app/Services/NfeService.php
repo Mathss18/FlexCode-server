@@ -244,15 +244,8 @@ class NfeService
                 $icms->CST = '00'; // Código da Situação Tributária do ICMS (00 = Tributado integralmente)
                 $icms->modBC = 3; // Modalidade de determinação da BC (0 = Valor da Operação)
                 $icms->vBC = $dados['produtos'][$i]['total']; // Base de Cálculo do ICMS
-                logger("natop", $dados['natOp']);
-                if($dados['natOp']['value'] == 5902){
-                    $icms->pICMS = 0.00;
-                    $icms->vICMS = 0.00;
-                }
-                else{
-                    $icms->pICMS = $aliquota; // Alíquota do ICMS (%)
-                    $icms->vICMS = $icms->vBC * ($icms->pICMS / 100); // Valor do ICMS
-                }
+                $icms->pICMS = $aliquota; // Alíquota do ICMS (%)
+                $icms->vICMS = $icms->vBC * ($icms->pICMS / 100); // Valor do ICMS
 
                 // Adiciona ao XML
                 $nfe->tagICMS($icms);
@@ -348,11 +341,11 @@ class NfeService
 
             $nfe->tagCOFINS($cofis);
 
-            if (session('config')->crt != 1) {
+            if (session('config')->crt != 1 && $dados['natOp']['value'] != '5902') {
+                logger("GERANDO IPI");
                 if (
                     $dados['produtos'][$i]['cfop'] != '5902' ||
                     $dados['produtos'][$i]['cfop'] != '6912' ||
-                    $dados['produtos'][$i]['cfop'] != '5124' ||
                     $dados['produtos'][$i]['cfop'] != '6910'
                 ) {
                     $aliquotaIPI = 9.75;
