@@ -202,7 +202,7 @@ class NfeService
             $prod->vProd = $dados['produtos'][$i]['total'];
 
             // Não conta o cfop 5902 para calculo de ICSM
-            if($dados['produtos'][$i]['cfop'] != '5902'){
+            if ($dados['produtos'][$i]['cfop'] != '5902') {
                 $valorProdutosReal += $dados['produtos'][$i]['total'];
             }
 
@@ -236,7 +236,7 @@ class NfeService
 
             $nfe->tagimposto($imposto);
 
-            if(session('config')->crt != 1){
+            if (session('config')->crt != 1) {
                 //====================TAG ICMS REGIME NORMAL===================
                 $icms = new stdClass();
                 $icms->item = $i + 1; //item da NFe
@@ -246,11 +246,10 @@ class NfeService
                 $icms->vBC = $dados['produtos'][$i]['total']; // Base de Cálculo do ICMS
                 $icms->pICMS = $aliquota; // Alíquota do ICMS (%)
                 $icms->vICMS = $icms->vBC * ($icms->pICMS / 100); // Valor do ICMS
-    
+
                 // Adiciona ao XML
                 $nfe->tagICMS($icms);
-            }
-            else {
+            } else {
                 //====================TAG ICMS SIMPLES NACIONAL ===================
                 $icms = new stdClass();
                 $icms->item = $i + 1; //item da NFe
@@ -263,14 +262,12 @@ class NfeService
                     $dados['produtos'][$i]['cfop'] == '6102'
                 ) {
                     if (strlen($favorecido['cpfCnpj']) == 14) {
-                        if($favorecido['inscricaoEstadual']){
+                        if ($favorecido['inscricaoEstadual']) {
                             $icms->CSOSN = '101';
-                        }
-                        else{
+                        } else {
                             $icms->CSOSN = '400';
                         }
-                    }
-                    else{
+                    } else {
                         $icms->CSOSN = '102';
                     }
                     $icms->pCredSN = $aliquota;
@@ -288,7 +285,7 @@ class NfeService
                     $icms->pCredSN = $aliquota;
                     $icms->vCredICMSSN = $valorProdutosReal * ($aliquota / 100);
                 }
-                if(session('config')->crt != 1){
+                if (session('config')->crt != 1) {
                     $icms->CSOSN = null;
                 }
                 //$icms->modBCST = null;
@@ -344,7 +341,7 @@ class NfeService
 
             $nfe->tagCOFINS($cofis);
 
-            if(session('config')->crt != 1){
+            if (session('config')->crt != 1) {
                 if (
                     $dados['produtos'][$i]['cfop'] != '5902' ||
                     $dados['produtos'][$i]['cfop'] != '6912' ||
@@ -366,18 +363,22 @@ class NfeService
                     $ipi->vIPI = $ipi->vBC * ($aliquotaIPI / 100);
                     $ipi->qUnid = null;
                     $ipi->vUnid = null;
-    
+
                     $nfe->tagIPI($ipi);
                     $totalIPI += $ipi->vIPI;
                 }
             }
-
         }
 
         //====================TAG ICMSTOTAL===================
         $icmsTotal = new stdClass();
-        $icmsTotal->vBC = $dados['totalProdutos'];
-        $icmsTotal->vICMS = $dados['totalProdutos'] * ($aliquota / 100); //change 480.21
+        if (session('config')->crt == 3) {
+            $icmsTotal->vBC = $dados['totalProdutos'];
+            $icmsTotal->vICMS = $dados['totalProdutos'] * ($aliquota / 100); //change 480.21
+        } else {
+            $icmsTotal->vBC = 0.00;
+            $icmsTotal->vICMS = 0.00;
+        }
         $icmsTotal->vICMSDeson = 0.00;
         $icmsTotal->vFCP = 0.00; //incluso no layout 4.00
         $icmsTotal->vBCST = 0.00;
@@ -538,29 +539,27 @@ class NfeService
 
         // Define a informação adicional de acordo com a nova lógica
         if (array_key_exists("infAdFisco", $dados)) {
-            if(session('config')->crt != 1){
+            if (session('config')->crt != 1) {
                 $stdInfo->infAdFisco = $dados['infAdFisco'] . " --- DOCUMENTO EMITIDO POR EMPRESA REGIME NORMAL. ";
-            }
-            else{
-                $stdInfo->infAdFisco = $dados['infAdFisco'] . 
-                    " --- DOCUMENTO EMITIDO POR EMPRESA SIMPLES NACIONAL. " . 
-                    "NAO GERA DIREITO A CREDITO FISCAL DE IPI. " . 
-                    "PERMITE O APROVEITAMENTO DO CREDITO DE ICMS NO VALOR DE R$ " . 
-                    number_format($vCredICMSSN, 2, ',', '.') . 
-                    ", CORRESPONDENTE A ALIQUOTA DE " . 
+            } else {
+                $stdInfo->infAdFisco = $dados['infAdFisco'] .
+                    " --- DOCUMENTO EMITIDO POR EMPRESA SIMPLES NACIONAL. " .
+                    "NAO GERA DIREITO A CREDITO FISCAL DE IPI. " .
+                    "PERMITE O APROVEITAMENTO DO CREDITO DE ICMS NO VALOR DE R$ " .
+                    number_format($vCredICMSSN, 2, ',', '.') .
+                    ", CORRESPONDENTE A ALIQUOTA DE " .
                     number_format($aliquota, 2, ',', '.') . "%.";
             }
         } else {
-            if(session('config')->crt != 1){
+            if (session('config')->crt != 1) {
                 $stdInfo->infAdFisco = " --- DOCUMENTO EMITIDO POR EMPRESA REGIME NORMAL. ";
-            }
-            else{
-                $stdInfo->infAdFisco = 
-                    " --- DOCUMENTO EMITIDO POR EMPRESA SIMPLES NACIONAL. " . 
-                    "NAO GERA DIREITO A CREDITO FISCAL DE IPI. " . 
-                    "PERMITE O APROVEITAMENTO DO CREDITO DE ICMS NO VALOR DE R$ " . 
-                    number_format($vCredICMSSN, 2, ',', '.') . 
-                    ", CORRESPONDENTE A ALIQUOTA DE " . 
+            } else {
+                $stdInfo->infAdFisco =
+                    " --- DOCUMENTO EMITIDO POR EMPRESA SIMPLES NACIONAL. " .
+                    "NAO GERA DIREITO A CREDITO FISCAL DE IPI. " .
+                    "PERMITE O APROVEITAMENTO DO CREDITO DE ICMS NO VALOR DE R$ " .
+                    number_format($vCredICMSSN, 2, ',', '.') .
+                    ", CORRESPONDENTE A ALIQUOTA DE " .
                     number_format($aliquota, 2, ',', '.') . "%.";
             }
         }
