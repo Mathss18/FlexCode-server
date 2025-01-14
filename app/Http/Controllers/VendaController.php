@@ -53,17 +53,18 @@ class VendaController extends Controller
 
         $vendas->numero = $request->input('numero');
         $vendas->cliente_id = $request->input('cliente_id')['value'];
+        $vendas->orcamento_id = $request->input('orcamento_id') ?? null;
         $vendas->situacao = $request->input('situacao');
         $vendas->dataEntrada = $request->input('dataEntrada');
         $vendas->transportadora_id = $request->input('transportadora_id')['value'] ?? null;
-        $vendas->forma_pagamento_id = $request->input('forma_pagamento_id')['value'];
-        $vendas->quantidadeParcelas = $request->input('quantidadeParcelas');
-        $vendas->intervaloParcelas = $request->input('intervaloParcelas');
-        $vendas->somarFreteAoTotal = $request->input('somarFreteAoTotal');
-        $vendas->dataPrimeiraParcela = $request->input('dataPrimeiraParcela');
-        $vendas->tipoFormaPagamento = $request->input('tipoFormaPagamento');
+        $vendas->forma_pagamento_id = $request->input('forma_pagamento_id')['value'] ?? null;
+        $vendas->quantidadeParcelas = $request->input('quantidadeParcelas') ?? null;
+        $vendas->intervaloParcelas = $request->input('intervaloParcelas') ?? null;
+        $vendas->somarFreteAoTotal = $request->input('somarFreteAoTotal')  ?? null;
+        $vendas->dataPrimeiraParcela = $request->input('dataPrimeiraParcela') ?? null;
+        $vendas->tipoFormaPagamento = $request->input('tipoFormaPagamento') ?? null;
         $vendas->frete = number_format((float) $request->input('frete'), session('config')->quantidadeCasasDecimaisValor, '.', '');
-        $vendas->impostos = number_format((float) $request->input('impostos'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $vendas->impostos = number_format((float) $request->input('impostos') ?? 0, session('config')->quantidadeCasasDecimaisValor, '.', '');
         $vendas->desconto = number_format((float) $request->input('desconto'), session('config')->quantidadeCasasDecimaisValor, '.', '');
         $vendas->total = number_format((float) $request->input('total'), session('config')->quantidadeCasasDecimaisValor, '.', '');
         $vendas->observacao = $request->input('observacao');
@@ -71,8 +72,8 @@ class VendaController extends Controller
 
         $produtos = $request->input('produtos');
         $servicos = $request->input('servicos');
-        $parcelas = $request->input('parcelas');
-        $anexos = $request->input('anexos');
+        $parcelas = $request->input('parcelas') ?? null;
+        $anexos = $request->input('anexos') ?? null;
 
         try {
             DB::beginTransaction();
