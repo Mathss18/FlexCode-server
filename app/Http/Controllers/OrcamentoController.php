@@ -49,6 +49,7 @@ class OrcamentoController extends Controller
         $orcamentos->dataEntrada = $request->input('dataEntrada');
         $orcamentos->frete = number_format((float)$request->input('frete'), session('config')->quantidadeCasasDecimaisValor, '.', '');
         $orcamentos->outros = number_format((float)$request->input('outros'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $orcamentos->impostos = number_format((float)$request->input('impostos'), session('config')->quantidadeCasasDecimaisValor, '.', '');
         $orcamentos->desconto = number_format((float)$request->input('desconto'), session('config')->quantidadeCasasDecimaisValor, '.', '');
         $orcamentos->total = number_format((float)$request->input('total'), session('config')->quantidadeCasasDecimaisValor, '.', '');
         $orcamentos->observacao = $request->input('observacao');
