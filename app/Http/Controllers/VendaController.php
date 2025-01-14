@@ -57,12 +57,12 @@ class VendaController extends Controller
         $vendas->situacao = $request->input('situacao');
         $vendas->dataEntrada = $request->input('dataEntrada');
         $vendas->transportadora_id = $request->input('transportadora_id')['value'] ?? null;
-        $vendas->forma_pagamento_id = $request->input('forma_pagamento_id')['value'] ?? null;
-        $vendas->quantidadeParcelas = $request->input('quantidadeParcelas') ?? null;
-        $vendas->intervaloParcelas = $request->input('intervaloParcelas') ?? null;
+        $vendas->forma_pagamento_id = $request->input('forma_pagamento_id')['value'] ?? 1;
+        $vendas->quantidadeParcelas = $request->input('quantidadeParcelas') ?? 1;
+        $vendas->intervaloParcelas = $request->input('intervaloParcelas') ?? 30;
         $vendas->somarFreteAoTotal = $request->input('somarFreteAoTotal')  ?? null;
         $vendas->dataPrimeiraParcela = $request->input('dataPrimeiraParcela') ?? null;
-        $vendas->tipoFormaPagamento = $request->input('tipoFormaPagamento') ?? null;
+        $vendas->tipoFormaPagamento = $request->input('tipoFormaPagamento') ?? 1;
         $vendas->frete = number_format((float) $request->input('frete'), session('config')->quantidadeCasasDecimaisValor, '.', '');
         $vendas->impostos = number_format((float) $request->input('impostos') ?? 0, session('config')->quantidadeCasasDecimaisValor, '.', '');
         $vendas->desconto = number_format((float) $request->input('desconto'), session('config')->quantidadeCasasDecimaisValor, '.', '');
