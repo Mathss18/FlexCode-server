@@ -407,4 +407,5 @@ Route::middleware(['jwt', 'check.jwt.tenant'])->group(function () {
     Route::get('relatorios/vendas', [RelatorioController::class, 'vendas']);
     Route::get('relatorios/previsao-de-saldo', [RelatorioController::class, 'previsaoDeSaldo']);
     Route::post('relatorios/detalhes-de-pagamento', [RelatorioController::class, 'detalhesDePagamento']);
+    Route::post('relatorios/reajuste-de-precos', [RelatorioController::class, 'reajusteDePrecos']);
 });

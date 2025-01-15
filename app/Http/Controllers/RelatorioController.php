@@ -147,10 +147,10 @@ class RelatorioController extends Controller
         $from = $request->query('startDate') . ' 00:00:00'; // Ensuring full day is covered
         $to = $request->query('endDate') . ' 23:59:59'; // Ensuring full day is covered
         try {
-            $query = "SELECT MONTH(v.updated_at) as mes, YEAR(v.updated_at) as ano, SUM(v.total) as total 
-                  FROM vendas v 
-                  WHERE v.situacao = 1 
-                  AND v.updated_at BETWEEN :from AND :to 
+            $query = "SELECT MONTH(v.updated_at) as mes, YEAR(v.updated_at) as ano, SUM(v.total) as total
+                  FROM vendas v
+                  WHERE v.situacao = 1
+                  AND v.updated_at BETWEEN :from AND :to
                   GROUP BY YEAR(v.updated_at), MONTH(v.updated_at)";
             $transacoes = DB::select(DB::raw($query), ['from' => $from, 'to' => $to]);
             $transacoesLastTweeveMonths = DB::select(DB::raw($query), ['from' => date('Y-m-01', strtotime("-12 months")) . ' 00:00:00', 'to' => date('Y-m-t', strtotime("-1 months")) . ' 23:59:59']);
@@ -396,6 +396,62 @@ class RelatorioController extends Controller
             return response()->json($response, 500);
         }
     }
+
+    public function reajusteDePrecos(Request $request)
+    {
+        $clientId = $request->input('client_id');
+        $percentual = $request->input('percentual');
+
+        // Validação dos parâmetros
+        if (
+            !$clientId ||
+            !$percentual ||
+            !is_numeric($percentual) ||
+            $percentual == 0 ||
+            $percentual < -100 ||
+            $percentual > 100
+        ) {
+            $response = APIHelper::APIResponse(false, 400, 'Parâmetros inválidos. O percentual deve estar entre -100 e +100, exceto 0.', null);
+            return response()->json($response, 400);
+        }
+
+        try {
+            // Iniciar transação para garantir a integridade dos dados
+            DB::beginTransaction();
+
+            // Buscar todos os produtos do cliente
+            $produtos = DB::table('produtos')
+                ->where('cliente_id', $clientId)
+                ->get();
+
+            if ($produtos->isEmpty()) {
+                $response = APIHelper::APIResponse(false, 404, 'Nenhum produto encontrado para o cliente especificado.', null);
+                return response()->json($response, 404);
+            }
+
+            // Atualizar os valores de custo com o reajuste do percentual
+            foreach ($produtos as $produto) {
+                $novoValorCusto = $produto->valorCusto * (1 + ($percentual / 100));
+
+                DB::table('produtos')
+                    ->where('id', $produto->id)
+                    ->update(['valorCusto' => $novoValorCusto]);
+            }
+
+            // Confirmar a transação
+            DB::commit();
+
+            $response = APIHelper::APIResponse(true, 200, 'Reajuste de preços aplicado com sucesso.', null);
+            return response()->json($response, 200);
+        } catch (Exception $ex) {
+            // Reverter a transação em caso de erro
+            DB::rollBack();
+
+            $response = APIHelper::APIResponse(false, 500, 'Erro ao aplicar reajuste de preços.', null, $ex);
+            return response()->json($response, 500);
+        }
+    }
+
 
     private function date_range($first, $last, $step = '+1 day', $output_format = 'd/m/Y')
     {
