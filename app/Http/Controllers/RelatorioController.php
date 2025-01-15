@@ -400,18 +400,36 @@ class RelatorioController extends Controller
     public function reajusteDePrecos(Request $request)
     {
         $clientId = $request->input('client_id');
-        $percentual = $request->input('percentual');
+        // Não forçar para int, mas sim pegar o valor cru e depois validar:
+        $percentualRaw = $request->input('porcentagem');
+
+        // Verificar se é numérico antes de converter
+        if (!is_numeric($percentualRaw)) {
+            $response = APIHelper::APIResponse(
+                false, 
+                400, 
+                'Parâmetro "percentual" deve ser numérico (pode ser decimal).', 
+                null
+            );
+            return response()->json($response, 400);
+        }
+
+        // Agora sim converter para float
+        $percentual = floatval($percentualRaw);
+
+        logger($percentual);
 
         // Validação dos parâmetros
         if (
             !$clientId ||
-            !$percentual ||
-            !is_numeric($percentual) ||
-            $percentual == 0 ||
-            $percentual < -100 ||
-            $percentual > 100
+            $percentual == 0
         ) {
-            $response = APIHelper::APIResponse(false, 400, 'Parâmetros inválidos. O percentual deve estar entre -100 e +100, exceto 0.', null);
+            $response = APIHelper::APIResponse(
+                false, 
+                400, 
+                'Parâmetros inválidos. O percentual deve estar exceto 0.', 
+                null
+            );
             return response()->json($response, 400);
         }
 
@@ -425,14 +443,20 @@ class RelatorioController extends Controller
                 ->get();
 
             if ($produtos->isEmpty()) {
-                $response = APIHelper::APIResponse(false, 404, 'Nenhum produto encontrado para o cliente especificado.', null);
+                DB::rollBack(); // Desfaz a transação antes de retornar
+                $response = APIHelper::APIResponse(
+                    false, 
+                    404, 
+                    'Nenhum produto encontrado para o cliente especificado.', 
+                    null
+                );
                 return response()->json($response, 404);
             }
 
             // Atualizar os valores de custo com o reajuste do percentual
             foreach ($produtos as $produto) {
                 $novoValorCusto = $produto->valorCusto * (1 + ($percentual / 100));
-
+                
                 DB::table('produtos')
                     ->where('id', $produto->id)
                     ->update(['valorCusto' => $novoValorCusto]);
@@ -441,13 +465,24 @@ class RelatorioController extends Controller
             // Confirmar a transação
             DB::commit();
 
-            $response = APIHelper::APIResponse(true, 200, 'Reajuste de preços aplicado com sucesso.', null);
+            $response = APIHelper::APIResponse(
+                true, 
+                200, 
+                'Reajuste de preços aplicado com sucesso.', 
+                null
+            );
             return response()->json($response, 200);
         } catch (Exception $ex) {
             // Reverter a transação em caso de erro
             DB::rollBack();
 
-            $response = APIHelper::APIResponse(false, 500, 'Erro ao aplicar reajuste de preços.', null, $ex);
+            $response = APIHelper::APIResponse(
+                false, 
+                500, 
+                'Erro ao aplicar reajuste de preços.', 
+                null, 
+                $ex
+            );
             return response()->json($response, 500);
         }
     }
