@@ -180,6 +180,8 @@ class NfeService
         // Armazena o total dos produtos para calculo correto do ICMS
         $valorProdutosReal = 0.0;
         $totalIPI = 0.00;
+        $totalICMS = 0.00;
+        $totalProdutosCobrados = 0.00;
         for ($i = 0; $i < count($dados['produtos']); $i++) {
             $prod = new stdClass();
             $prod->item = $i + 1; //item da NFe
@@ -238,14 +240,32 @@ class NfeService
 
             if (session('config')->crt != 1) {
                 //====================TAG ICMS REGIME NORMAL===================
-                $icms = new stdClass();
-                $icms->item = $i + 1; //item da NFe
-                $icms->orig = 0; // Origem da mercadoria (0 = Nacional, 1 = Estrangeira, etc.)
-                $icms->CST = '00'; // Código da Situação Tributária do ICMS (00 = Tributado integralmente)
-                $icms->modBC = 3; // Modalidade de determinação da BC (0 = Valor da Operação)
-                $icms->vBC = $dados['produtos'][$i]['total']; // Base de Cálculo do ICMS
-                $icms->pICMS = $aliquota; // Alíquota do ICMS (%)
-                $icms->vICMS = $icms->vBC * ($icms->pICMS / 100); // Valor do ICMS
+                if (
+                    $dados['produtos'][$i]['cfop'] == '5902' ||
+                    $dados['produtos'][$i]['cfop'] == '5102' ||
+                    $dados['produtos'][$i]['cfop'] == '6102'
+                ) {
+                    $icms = new stdClass();
+                    $icms->item = $i + 1; //item da NFe
+                    $icms->orig = 0; // Origem da mercadoria (0 = Nacional, 1 = Estrangeira, etc.)
+                    $icms->CST = '50'; // Código da Situação Tributária do ICMS (00 = Tributado integralmente)
+                    $icms->modBC = 3; // Modalidade de determinação da BC (0 = Valor da Operação)
+                    // $icms->vBC = $dados['produtos'][$i]['total']; // Base de Cálculo do ICMS
+                    // $icms->pICMS = $aliquota; // Alíquota do ICMS (%)
+                    // $icms->vICMS = $icms->vBC * ($icms->pICMS / 100); // Valor do ICMS
+                }
+                else{
+                    $icms = new stdClass();
+                    $icms->item = $i + 1; //item da NFe
+                    $icms->orig = 0; // Origem da mercadoria (0 = Nacional, 1 = Estrangeira, etc.)
+                    $icms->CST = '00'; // Código da Situação Tributária do ICMS (00 = Tributado integralmente)
+                    $icms->modBC = 3; // Modalidade de determinação da BC (0 = Valor da Operação)
+                    $icms->vBC = $dados['produtos'][$i]['total']; // Base de Cálculo do ICMS
+                    $icms->pICMS = $aliquota; // Alíquota do ICMS (%)
+                    $icms->vICMS = $icms->vBC * ($icms->pICMS / 100); // Valor do ICMS
+                    $totalICMS += $icms->vICMS;
+                    $totalProdutosCobrados += $dados['produtos'][$i]['total'];
+                }
 
                 // Adiciona ao XML
                 $nfe->tagICMS($icms);
@@ -341,13 +361,11 @@ class NfeService
 
             $nfe->tagCOFINS($cofis);
 
-            if (session('config')->crt != 1 && $dados['natOp']['value'] != '5902') {
+            if (session('config')->crt != 1) {
                 logger("GERANDO IPI");
-                if (
-                    $dados['produtos'][$i]['cfop'] != '5902' ||
-                    $dados['produtos'][$i]['cfop'] != '6912' ||
-                    $dados['produtos'][$i]['cfop'] != '6910'
-                ) {
+                logger($i,$dados['produtos'][$i]);
+                logger($i,[$dados['produtos'][$i]['cfop']]);
+                if (!in_array($dados['produtos'][$i]['cfop'], ['5902', '6912', '6910'])) {
                     $aliquotaIPI = 9.75;
                     //====================TAG IPI===================
                     $ipi = new stdClass();
@@ -373,8 +391,8 @@ class NfeService
         //====================TAG ICMSTOTAL===================
         $icmsTotal = new stdClass();
         if (session('config')->crt == 3) {
-            $icmsTotal->vBC = $dados['totalProdutos'];
-            $icmsTotal->vICMS = $dados['totalProdutos'] * ($aliquota / 100); //change 480.21
+            $icmsTotal->vBC = $totalProdutosCobrados;
+            $icmsTotal->vICMS = $totalICMS; //change 480.21
         } else {
             $icmsTotal->vBC = 0.00;
             $icmsTotal->vICMS = 0.00;
