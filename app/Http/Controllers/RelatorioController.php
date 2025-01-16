@@ -456,10 +456,11 @@ class RelatorioController extends Controller
             // Atualizar os valores de custo com o reajuste do percentual
             foreach ($produtos as $produto) {
                 $novoValorCusto = $produto->valorCusto * (1 + ($percentual / 100));
+                $valorFinal = $novoValorCusto + $produto->despesasAdicionais + $produto->outrasDespesas;
                 
                 DB::table('produtos')
                     ->where('id', $produto->id)
-                    ->update(['valorCusto' => $novoValorCusto]);
+                    ->update(['valorCusto' => $novoValorCusto, 'custoFinal' => $valorFinal]);
             }
 
             // Confirmar a transação
