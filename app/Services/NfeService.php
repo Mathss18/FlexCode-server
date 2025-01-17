@@ -240,7 +240,7 @@ class NfeService
 
             if (session('config')->crt != 1) {
                 //====================TAG ICMS REGIME NORMAL===================
-                if (in_array($dados['produtos'][$i]['cfop'], ['5902', '5102', '6102', '5124'])) {
+                if (in_array($dados['produtos'][$i]['cfop'], ['5902', '5102', '6102', '5124', '5901'])) {
                     $icms = new stdClass();
                     $icms->item = $i + 1; //item da NFe
                     $icms->orig = 0; // Origem da mercadoria (0 = Nacional, 1 = Estrangeira, etc.)
@@ -361,7 +361,7 @@ class NfeService
                 logger("GERANDO IPI");
                 logger($i,$dados['produtos'][$i]);
                 logger($i,[$dados['produtos'][$i]['cfop']]);
-                if (!in_array($dados['produtos'][$i]['cfop'], ['5902', '6912', '6910', '5124'])) {
+                if (!in_array($dados['produtos'][$i]['cfop'], ['5902', '6912', '6910', '5124', '5901'])) {
                     $aliquotaIPI = 9.75;
                     //====================TAG IPI===================
                     $ipi = new stdClass();
