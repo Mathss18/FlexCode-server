@@ -66,6 +66,8 @@ class CompraController extends Controller
         $compras->impostos = number_format((float)$request->input('impostos'), session('config')->quantidadeCasasDecimaisValor, '.', '');
         $compras->desconto = number_format((float)$request->input('desconto'), session('config')->quantidadeCasasDecimaisValor, '.', '');
         $compras->total = number_format((float)$request->input('total'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $vendas->ipi = number_format((float) $request->input('ipi'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $vendas->icms = number_format((float) $request->input('icms'), session('config')->quantidadeCasasDecimaisValor, '.', '');
         $compras->observacao = $request->input('observacao');
         $compras->observacaoInterna = $request->input('observacaoInterna');
 
@@ -218,6 +220,8 @@ class CompraController extends Controller
         $compras->impostos = number_format((float)$request->input('impostos'), session('config')->quantidadeCasasDecimaisValor, '.', '');
         $compras->desconto = number_format((float)$request->input('desconto'), session('config')->quantidadeCasasDecimaisValor, '.', '');
         $compras->total = number_format((float)$request->input('total'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $vendas->ipi = number_format((float) $request->input('ipi'), session('config')->quantidadeCasasDecimaisValor, '.', '');
+        $vendas->icms = number_format((float) $request->input('icms'), session('config')->quantidadeCasasDecimaisValor, '.', '');
         $compras->observacao = $request->input('observacao');
         $compras->observacaoInterna = $request->input('observacaoInterna');
 

@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('vendas', function (Blueprint $table) {
+        Schema::table('compras', function (Blueprint $table) {
             $table->double('ipi', 9, 4);
             $table->double('icms', 9, 4);
         });
@@ -26,7 +26,7 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('vendas', function (Blueprint $table) {
+        Schema::table('compras', function (Blueprint $table) {
             $table->dropColumn('ipi'); // Drop the column
             $table->dropColumn('icms'); // Drop the column
         });
