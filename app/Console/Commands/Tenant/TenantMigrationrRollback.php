@@ -15,7 +15,7 @@ class TenantMigration extends Command
      *
      * @var string
      */
-    protected $signature = 'tenants:migrate:rollback {id?} {--fresh}';
+    protected $signature = 'tenants:migrate {id?} {--fresh}';
 
     /**
      * The console command description.
