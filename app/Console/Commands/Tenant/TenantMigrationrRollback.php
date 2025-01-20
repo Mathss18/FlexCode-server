@@ -7,7 +7,7 @@ use App\Tenant\ManagerTenant;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;
 
-class TenantMigration extends Command
+class TenantMigrationRollback extends Command
 {
     private $managerTenant;
     /**
@@ -15,14 +15,14 @@ class TenantMigration extends Command
      *
      * @var string
      */
-    protected $signature = 'tenants:migrate {id?} {--fresh}';
+    protected $signature = 'tenants:migrate:rollback {id?}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Run tenants migrations';
+    protected $description = 'Run tenants migrations rollback';
 
     /**
      * Create a new command instance.
@@ -48,7 +48,7 @@ class TenantMigration extends Command
             try{
                 $tenant = Tenant::findOrFail($this->argument('id'));
                 $this->managerTenant->setConnection($tenant);
-                $this->runMigration($tenant);
+                $this->runMigrationRollback($tenant);
             }catch (\Exception $e){
                 $this->error($e->getMessage());
             }
@@ -56,20 +56,20 @@ class TenantMigration extends Command
         else{
             $tenants = Tenant::all();
             foreach ($tenants as $tenant) {
-                $this->runMigration($tenant);
+                $this->runMigrationRollback($tenant);
             }
         }
 
 
     }
 
-    public function runMigration(Tenant $tenant)
+    public function runMigrationRollback(Tenant $tenant)
     {
         $this->managerTenant->setConnection($tenant);
 
-        $command = $this->option('fresh') ? 'migrate:fresh' : 'migrate';
+        $command =  'migrate:rollback';
 
-        $this->info("Running migrations for tenant {$tenant->nome}");
+        $this->info("Running migrations rollback for tenant {$tenant->nome}");
 
         $resp = Artisan::call($command, [
             '--force' => true,
