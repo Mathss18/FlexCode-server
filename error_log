@@ -1,0 +1,2 @@
+[19-Jan-2025 23:47:47 America/Sao_Paulo] PHP Fatal error:  Cannot declare class AddImpostosToOrcamentosTable, because the name is already in use in /home/allmac88/api.allmacoding.com/database/migrations/tenant/2021_07_31_000060_add_ipi_and_icms_to_vendas_table.php on line 7
+[19-Jan-2025 23:48:10 America/Sao_Paulo] PHP Fatal error:  Cannot declare class AddImpostosToOrcamentosTable, because the name is already in use in /home/allmac88/api.allmacoding.com/database/migrations/tenant/2021_07_31_000060_add_ipi_and_icms_to_vendas_table.php on line 7
