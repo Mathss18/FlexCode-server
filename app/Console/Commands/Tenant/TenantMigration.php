@@ -67,7 +67,7 @@ class TenantMigration extends Command
         // Priority: --fresh first, then --rollback, otherwise run normal migrate.
         $command = 'migrate';
         if ($this->option('fresh')) {
-            $command = 'migrate:fresh';
+            // $command = 'migrate:fresh';  commented for security reasons
         } elseif ($this->option('rollback')) {
             $command = 'migrate:rollback';
         }
