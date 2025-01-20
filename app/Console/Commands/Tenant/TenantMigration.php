@@ -9,26 +9,23 @@ use Illuminate\Support\Facades\Artisan;
 
 class TenantMigration extends Command
 {
+    /**
+     * Include the rollback option in the command signature.
+     *
+     * Example usage:
+     *   php artisan tenants:migrate --rollback
+     *
+     * You can still pass in an {id} if you want to target a specific tenant.
+     */
+    protected $signature = 'tenants:migrate {id?} {--fresh : Drop all tables and re-run all migrations} {--rollback : Rollback the last database migration}';
+
+    protected $description = 'Run tenants migrations or rollbacks';
+
+    /**
+     * @var ManagerTenant
+     */
     private $managerTenant;
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'tenants:migrate {id?} {--fresh}';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Run tenants migrations';
-
-    /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
     public function __construct(ManagerTenant $managerTenant)
     {
         parent::__construct();
@@ -37,50 +34,59 @@ class TenantMigration extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return int
      */
     public function handle()
     {
-
-
+        // If an id is passed, we only migrate/rollback for that single tenant.
         if ($this->argument('id')) {
-            try{
+            try {
                 $tenant = Tenant::findOrFail($this->argument('id'));
-                $this->managerTenant->setConnection($tenant);
                 $this->runMigration($tenant);
-            }catch (\Exception $e){
+            } catch (\Exception $e) {
                 $this->error($e->getMessage());
             }
-        }
-        else{
+        } else {
+            // Otherwise, we run the migration/rollback for all tenants.
             $tenants = Tenant::all();
             foreach ($tenants as $tenant) {
                 $this->runMigration($tenant);
             }
         }
-
-
     }
 
+    /**
+     * Determine which Artisan command to run based on given options (fresh, rollback).
+     * Then run the command for the given tenant.
+     */
     public function runMigration(Tenant $tenant)
     {
+        // Switch connection to this specific tenant.
         $this->managerTenant->setConnection($tenant);
 
-        $command = $this->option('fresh') ? 'migrate:fresh' : 'migrate';
+        // Decide which migration command to run.
+        // Priority: --fresh first, then --rollback, otherwise run normal migrate.
+        $command = 'migrate';
+        if ($this->option('fresh')) {
+            $command = 'migrate:fresh';
+        } elseif ($this->option('rollback')) {
+            $command = 'migrate:rollback';
+        }
 
-        $this->info("Running migrations for tenant {$tenant->nome}");
+        $this->info("Running '{$command}' for tenant: {$tenant->nome}");
 
+        // Run the Artisan command. We force it so it doesn't prompt in production.
         $resp = Artisan::call($command, [
             '--force' => true,
-            '--path' => '/database/migrations/tenant',
+            '--path'  => '/database/migrations/tenant',
         ]);
 
+        // Display results based on the return code.
         if ($resp === 0) {
-            $this->info("Migrations for tenant {$tenant->nome} executed successfully");
+            $this->info("Command '{$command}' for tenant {$tenant->nome} executed successfully.");
         } else {
-            $this->error("Migrations for tenant {$tenant->nome} failed");
+            $this->error("Command '{$command}' for tenant {$tenant->nome} failed.");
         }
-        $this->info("\n ------------------------------------------------- \n");
+
+        $this->info("\n-------------------------------------------------\n");
     }
 }
