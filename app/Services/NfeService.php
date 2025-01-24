@@ -27,34 +27,53 @@ class NfeService
     private $success = false;
     private $error;
     private $soap;
+    private $config;
 
     private $tools;
 
     public function __construct($config)
     {
+        // Ensure that there is an active session and configuration
+        $tenant = session('tenant');
+        $activeConfig = session('config');
 
-        // $certificadoDigital = file_get_contents('..\app\Services\certFM.pfx');
+        if (!$tenant || !$activeConfig) {
+            throw new \Exception('Sessão ou configuração ativa não encontrada');
+        }
 
-        if (Storage::disk('local')->exists('public/' . session('tenant')->nome . '/configuracoes/certificadoDigital/certificado-digital.x-pkcs12')) {
-            $path = Storage::disk('local')->path('public/' . session('tenant')->nome . '/configuracoes/certificadoDigital/certificado-digital.x-pkcs12');
+        // Build the certificate file path based on the active tenant's name and configuration
+        $filePath = 'public/' . $tenant->nome . '/configuracoes/' . $activeConfig->id . '/certificadoDigital/certificado-digital.x-pkcs12';
+
+        // Check if the certificate file exists
+        if (Storage::disk('local')->exists($filePath)) {
+            $path = Storage::disk('local')->path($filePath);
             $certificadoDigital = file_get_contents($path);
         } else {
             throw new \Exception('Certificado digital não encontrado');
         }
 
+        // Set the configuration
         $this->config = $config;
+
         try {
-            $this->tools = new Tools(json_encode($config), Certificate::readPfx($certificadoDigital, session('config')->senhaCertificadoDigital));
+            // Initialize the Tools object with the configuration and certificate
+            $this->tools = new Tools(
+                json_encode($config),
+                Certificate::readPfx($certificadoDigital, $activeConfig->senhaCertificadoDigital)
+            );
         } catch (\Exception $ex) {
             throw new \Exception($ex->getMessage());
         }
 
-        $this->soap = new SoapCurl(Certificate::readPfx($certificadoDigital, session('config')->senhaCertificadoDigital));
-        $this->soap->timeout(600); // 10 minutos de timeout // Aumentar tbm na pastar vendor arquivo -> SoapBase.php
-        $this->soap->httpVersion('1.1'); //seta a versão 1.1 do protocolo HTTP
-        // $this->tools->model(55); //estabelece que irá processar NFe
-        $this->tools->loadSoapClass($this->soap); //injeta a classe SoapCurl() no classe Tools
+        // Initialize the SoapCurl object
+        $this->soap = new SoapCurl(Certificate::readPfx($certificadoDigital, $activeConfig->senhaCertificadoDigital));
+        $this->soap->timeout(600); // 10 minutos de timeout
+        $this->soap->httpVersion('1.1'); // Set HTTP protocol version to 1.1
+
+        // Inject the SoapCurl instance into Tools
+        $this->tools->loadSoapClass($this->soap);
     }
+
 
     public function gerarNfe($dados, $favorecido, $produtos, $transportadora, $aliquota)
     {
@@ -249,8 +268,7 @@ class NfeService
                     // $icms->vBC = $dados['produtos'][$i]['total']; // Base de Cálculo do ICMS
                     // $icms->pICMS = $aliquota; // Alíquota do ICMS (%)
                     // $icms->vICMS = $icms->vBC * ($icms->pICMS / 100); // Valor do ICMS
-                }
-                else{
+                } else {
                     $icms = new stdClass();
                     $icms->item = $i + 1; //item da NFe
                     $icms->orig = 0; // Origem da mercadoria (0 = Nacional, 1 = Estrangeira, etc.)
@@ -359,8 +377,8 @@ class NfeService
 
             if (session('config')->crt != 1) {
                 logger("GERANDO IPI");
-                logger($i,$dados['produtos'][$i]);
-                logger($i,[$dados['produtos'][$i]['cfop']]);
+                logger($i, $dados['produtos'][$i]);
+                logger($i, [$dados['produtos'][$i]['cfop']]);
                 if (!in_array($dados['produtos'][$i]['cfop'], ['5902', '6912', '6910', '5124', '5901'])) {
                     $aliquotaIPI = 9.75;
                     //====================TAG IPI===================

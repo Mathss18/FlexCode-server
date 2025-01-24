@@ -41,8 +41,6 @@ class ConfiguracaoController extends Controller
         $configuracoes = new Configuracao;
         $configuracoes->nome = $request->input('nome');
         $configuracoes->nomeFantasia = $request->input('nomeFantasia');
-        // $configuracoes->logo = $request->input('logo');
-        // $configuracoes->certificadoDigital = $request->input('certificadoDigital');
         $configuracoes->senhaCertificadoDigital = $request->input('senhaCertificadoDigital');
         $configuracoes->inscricaoEstadual = $request->input('inscricaoEstadual');
         $configuracoes->crt = $request->input('crt');
@@ -70,29 +68,29 @@ class ConfiguracaoController extends Controller
         $configuracoes->servidorSmtp = $request->input('servidorSmtp');
         $configuracoes->portaSmtp = $request->input('portaSmtp');
         $configuracoes->encryptionSmtp = $request->input('encryptionSmtp');
-        // $configuracoes->emailSmtp = $request->input('emailSmtp');
         $configuracoes->usuarioSmtp = $request->input('usuarioSmtp');
         $configuracoes->senhaSmtp = $request->input('senhaSmtp');
         $configuracoes->quantidadeCasasDecimaisValor = $request->input('quantidadeCasasDecimaisValor');
         $configuracoes->quantidadeCasasDecimaisQuantidade = $request->input('quantidadeCasasDecimaisQuantidade');
         $configuracoes->registrosPorPagina = $request->input('registrosPorPagina');
         $configuracoes->situacao = $request->input('situacao');
+
         if ($request->input('situacao') == true) {
             Configuracao::where('situacao', true)->update(['situacao' => false]);
         }
 
-
         try {
             DB::beginTransaction();
 
+            // Save the Configuracao to get its ID
             $configuracoes->save();
 
-            // Cadastra a logo da empresa
+            // Upload the logo
             if ($request->input('logo')) {
                 if ($this->is_base64($request->input('logo')['url'])) {
                     $image = $request->input('logo')['url'];
                     $imageName = 'logo';
-                    $folderName = "configuracoes/logo"; // ID da config que foi cadastrada
+                    $folderName = "configuracoes/logo";
 
                     if ($return = $this->upload($image, $imageName, $folderName)) {
                         $configuracoes->logo = $return;
@@ -100,12 +98,13 @@ class ConfiguracaoController extends Controller
                 }
             }
 
-            // Cadastra o certificado digital
+            // Upload the certificadoDigital
             if ($request->input('certificadoDigital')) {
                 if ($this->is_base64($request->input('certificadoDigital')['url'])) {
                     $cert = $request->input('certificadoDigital')['url'];
                     $certName = 'certificadoDigital';
-                    $folderName = "configuracoes/certificadoDigital"; // ID da config que foi cadastrada
+                    // Use the newly created ID for folder structure
+                    $folderName = "configuracoes/{$configuracoes->id}/certificadoDigital";
 
                     if ($return = $this->upload($cert, $certName, $folderName)) {
                         $configuracoes->certificadoDigital = $return;
@@ -125,13 +124,12 @@ class ConfiguracaoController extends Controller
         }
     }
 
+
     public function update(Request $request)
     {
         $configuracoes = Configuracao::findOrFail($request->id);
         $configuracoes->nome = $request->input('nome');
         $configuracoes->nomeFantasia = $request->input('nomeFantasia');
-        // $configuracoes->logo = $request->input('logo');
-        // $configuracoes->certificadoDigital = $request->input('certificadoDigital');
         $configuracoes->senhaCertificadoDigital = $request->input('senhaCertificadoDigital');
         $configuracoes->inscricaoEstadual = $request->input('inscricaoEstadual');
         $configuracoes->crt = $request->input('crt');
@@ -159,13 +157,13 @@ class ConfiguracaoController extends Controller
         $configuracoes->servidorSmtp = $request->input('servidorSmtp');
         $configuracoes->portaSmtp = $request->input('portaSmtp');
         $configuracoes->encryptionSmtp = $request->input('encryptionSmtp');
-        // $configuracoes->emailSmtp = $request->input('emailSmtp');
         $configuracoes->usuarioSmtp = $request->input('usuarioSmtp');
         $configuracoes->senhaSmtp = $request->input('senhaSmtp');
         $configuracoes->quantidadeCasasDecimaisValor = $request->input('quantidadeCasasDecimaisValor');
         $configuracoes->quantidadeCasasDecimaisQuantidade = $request->input('quantidadeCasasDecimaisQuantidade');
         $configuracoes->registrosPorPagina = $request->input('registrosPorPagina');
         $configuracoes->situacao = $request->input('situacao');
+
         if ($request->input('situacao') == true) {
             Configuracao::where('situacao', true)->where('id', '!=', $request->id)->update(['situacao' => false]);
         }
@@ -175,12 +173,12 @@ class ConfiguracaoController extends Controller
 
             $configuracoes->save();
 
-            // Cadastra a logo da empresa
+            // Update the logo
             if ($request->input('logo')) {
                 if ($this->is_base64($request->input('logo')['url'])) {
                     $image = $request->input('logo')['url'];
                     $imageName = 'logo';
-                    $folderName = "configuracoes/logo"; // ID da config que foi cadastrada
+                    $folderName = "configuracoes/{$configuracoes->id}/logo"; // Folder based on existing ID
 
                     if ($return = $this->upload($image, $imageName, $folderName)) {
                         $configuracoes->logo = $return;
@@ -188,12 +186,12 @@ class ConfiguracaoController extends Controller
                 }
             }
 
-            // Cadastra o certificado digital
+            // Update the certificadoDigital
             if ($request->input('certificadoDigital')) {
                 if ($this->is_base64($request->input('certificadoDigital')['url'])) {
                     $cert = $request->input('certificadoDigital')['url'];
                     $certName = 'certificadoDigital';
-                    $folderName = "configuracoes/certificadoDigital"; // ID da config que foi cadastrada
+                    $folderName = "configuracoes/{$configuracoes->id}/certificadoDigital"; // Folder based on existing ID
 
                     if ($return = $this->upload($cert, $certName, $folderName)) {
                         $configuracoes->certificadoDigital = $return;
@@ -201,23 +199,26 @@ class ConfiguracaoController extends Controller
                 }
             }
 
+            // Check if at least one configuration is active
             $allEnabledConfigs = Configuracao::where('situacao', true)->get();
-            if(count($allEnabledConfigs) == 0){
+            if ($allEnabledConfigs->isEmpty()) {
                 DB::rollBack();
-                $response = APIHelper::APIResponse(true, 500, 'Não é possivel inativar todas as configurações, pelo menos uma deve ficar ativa.', $configuracoes);
+                $response = APIHelper::APIResponse(true, 500, 'Não é possível inativar todas as configurações, pelo menos uma deve ficar ativa.', $configuracoes);
                 return response()->json($response, 500);
             }
 
             $configuracoes->save();
+
             DB::commit();
             $response = APIHelper::APIResponse(true, 200, 'Sucesso ao editar configurações', $configuracoes);
             return response()->json($response, 200);
-        } catch (Exception  $ex) {
+        } catch (Exception $ex) {
             DB::rollBack();
             $response = APIHelper::APIResponse(false, 500, null, null, $ex);
             return response()->json($response, 500);
         }
     }
+
 
     public function destroy($id)
     {
