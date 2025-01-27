@@ -406,9 +406,9 @@ class RelatorioController extends Controller
         // Verificar se é numérico antes de converter
         if (!is_numeric($percentualRaw)) {
             $response = APIHelper::APIResponse(
-                false, 
-                400, 
-                'Parâmetro "percentual" deve ser numérico (pode ser decimal).', 
+                false,
+                400,
+                'Parâmetro "percentual" deve ser numérico (pode ser decimal).',
                 null
             );
             return response()->json($response, 400);
@@ -425,9 +425,9 @@ class RelatorioController extends Controller
             $percentual == 0
         ) {
             $response = APIHelper::APIResponse(
-                false, 
-                400, 
-                'Parâmetros inválidos. O percentual deve estar exceto 0.', 
+                false,
+                400,
+                'Parâmetros inválidos. O percentual deve estar exceto 0.',
                 null
             );
             return response()->json($response, 400);
@@ -445,9 +445,9 @@ class RelatorioController extends Controller
             if ($produtos->isEmpty()) {
                 DB::rollBack(); // Desfaz a transação antes de retornar
                 $response = APIHelper::APIResponse(
-                    false, 
-                    404, 
-                    'Nenhum produto encontrado para o cliente especificado.', 
+                    false,
+                    404,
+                    'Nenhum produto encontrado para o cliente especificado.',
                     null
                 );
                 return response()->json($response, 404);
@@ -457,7 +457,7 @@ class RelatorioController extends Controller
             foreach ($produtos as $produto) {
                 $novoValorCusto = $produto->valorCusto * (1 + ($percentual / 100));
                 $valorFinal = $novoValorCusto + $produto->despesasAdicionais + $produto->outrasDespesas;
-                
+
                 DB::table('produtos')
                     ->where('id', $produto->id)
                     ->update(['valorCusto' => $novoValorCusto, 'custoFinal' => $valorFinal]);
@@ -467,9 +467,9 @@ class RelatorioController extends Controller
             DB::commit();
 
             $response = APIHelper::APIResponse(
-                true, 
-                200, 
-                'Reajuste de preços aplicado com sucesso.', 
+                true,
+                200,
+                'Reajuste de preços aplicado com sucesso.',
                 null
             );
             return response()->json($response, 200);
@@ -478,15 +478,37 @@ class RelatorioController extends Controller
             DB::rollBack();
 
             $response = APIHelper::APIResponse(
-                false, 
-                500, 
-                'Erro ao aplicar reajuste de preços.', 
-                null, 
+                false,
+                500,
+                'Erro ao aplicar reajuste de preços.',
+                null,
                 $ex
             );
             return response()->json($response, 500);
         }
     }
+
+    public function impostos(Request $request)
+    {
+        try {
+            // Fetch and sum ICMS and IPI from the compras table
+            $totals = DB::table('compras')
+                ->selectRaw('SUM(icms) as icms, SUM(ipi) as ipi')
+                ->first();
+
+            // Prepare the response
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso', [
+                'icms' => $totals->icms ?? 0,
+                'ipi' => $totals->ipi ?? 0,
+            ]);
+
+            return response()->json($response, 200);
+        } catch (Exception $ex) {
+            $response = APIHelper::APIResponse(false, 500, 'Erro ao buscar os impostos.', null, $ex);
+            return response()->json($response, 500);
+        }
+    }
+
 
 
     private function date_range($first, $last, $step = '+1 day', $output_format = 'd/m/Y')
