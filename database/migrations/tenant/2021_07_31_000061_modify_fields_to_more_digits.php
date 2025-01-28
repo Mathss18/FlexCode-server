@@ -13,22 +13,22 @@ return new class extends Migration
      */
     public function up()
     {
-        // Schema::table('vendas', function (Blueprint $table) {
-        //     $table->decimal('total', 12, 4)->change();
-        // });
+        Schema::table('vendas', function (Blueprint $table) {
+            $table->decimal('total', 12, 4)->change();
+        });
 
-        // Schema::table('compras', function (Blueprint $table) {
-        //     $table->decimal('total', 12, 4)->change();
-        // });
+        Schema::table('compras', function (Blueprint $table) {
+            $table->decimal('total', 12, 4)->change();
+        });
 
-        // Schema::table('orcamentos', function (Blueprint $table) {
-        //     $table->decimal('total', 12, 4)->change();
-        // });
+        Schema::table('orcamentos', function (Blueprint $table) {
+            $table->decimal('total', 12, 4)->change();
+        });
 
-        // Schema::table('notas_fiscais', function (Blueprint $table) {
-        //     $table->decimal('totalFinal', 12, 4)->change();
-        //     $table->decimal('totalProdutos', 12, 4)->change();
-        // });
+        Schema::table('notas_fiscais', function (Blueprint $table) {
+            $table->decimal('totalFinal', 12, 4)->change();
+            $table->decimal('totalProdutos', 12, 4)->change();
+        });
     }
 
     /**
