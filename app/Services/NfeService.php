@@ -44,6 +44,8 @@ class NfeService
         // Build the certificate file path based on the active tenant's name and configuration
         $filePath = 'public/' . $tenant->nome . '/configuracoes/' . $activeConfig->id . '/certificadoDigital/certificado-digital.x-pkcs12';
 
+        logger("filepath", [$filePath]);
+
         // Check if the certificate file exists
         if (Storage::disk('local')->exists($filePath)) {
             $path = Storage::disk('local')->path($filePath);
