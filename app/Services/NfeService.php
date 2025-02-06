@@ -275,7 +275,7 @@ class NfeService
                     $icms->CST = '00'; // Código da Situação Tributária do ICMS (00 = Tributado integralmente)
                     $icms->modBC = 3; // Modalidade de determinação da BC (0 = Valor da Operação)
                     $icms->vBC = $dados['produtos'][$i]['total']; // Base de Cálculo do ICMS
-                    $icms->pICMS = $aliquota; // Alíquota do ICMS (%)
+                    $icms->pICMS = strtolower($favorecido->estado) == "sp" ? $aliquota : 12.00; // Alíquota do ICMS (%)
                     $icms->vICMS = $icms->vBC * ($icms->pICMS / 100); // Valor do ICMS
                     $totalICMS += $icms->vICMS;
                     $totalProdutosCobrados += $dados['produtos'][$i]['total'];
