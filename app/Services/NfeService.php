@@ -259,6 +259,13 @@ class NfeService
 
             $nfe->tagimposto($imposto);
 
+            $valorIPI = 0.0;
+            if (session('config')->crt != 1 && !in_array($dados['produtos'][$i]['cfop'], ['5902', '6912', '6910', '5124', '5901', '5916'])) {
+                $aliquotaIPI = 9.75;
+                $valorIPI = $dados['produtos'][$i]['total'] * ($aliquotaIPI / 100);
+            }
+
+
             if (session('config')->crt != 1) {
                 //====================TAG ICMS REGIME NORMAL===================
                 if (in_array($dados['produtos'][$i]['cfop'], ['5902', '5102', '6102', '5124', '5901', '5916'])) {
@@ -277,11 +284,13 @@ class NfeService
                     $icms->orig = 0; // Origem da mercadoria (0 = Nacional, 1 = Estrangeira, etc.)
                     $icms->CST = '00'; // Código da Situação Tributária do ICMS (00 = Tributado integralmente)
                     $icms->modBC = 3; // Modalidade de determinação da BC (0 = Valor da Operação)
-                    $icms->vBC = $dados['produtos'][$i]['total']; // Base de Cálculo do ICMS
+                    $icms->vBC = $dados['produtos'][$i]['total'];                 // COMENTAR SE FOR PARA USO E CONSUMO
+                    // $icms->vBC = $dados['produtos'][$i]['total'] + $valorIPI; // DESCOMENTAR SE FOR PARA USO E CONSUMO
                     $icms->pICMS = strtolower($favorecido->estado) == "sp" ? $aliquota : 12.00; // Alíquota do ICMS (%)
                     $icms->vICMS = $icms->vBC * ($icms->pICMS / 100); // Valor do ICMS
                     $totalICMS += $icms->vICMS;
-                    $totalProdutosCobrados += $dados['produtos'][$i]['total'];
+                    $totalProdutosCobrados += $dados['produtos'][$i]['total'];                 // COMENTAR SE FOR PARA USO E CONSUMO
+                    // $totalProdutosCobrados += $dados['produtos'][$i]['total'] + $valorIPI; // DESCOMENTAR SE FOR PARA USO E CONSUMO
                 }
 
                 // Adiciona ao XML
