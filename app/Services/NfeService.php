@@ -286,7 +286,7 @@ class NfeService
                     $icms->modBC = 3; // Modalidade de determinação da BC (0 = Valor da Operação)
                     $icms->vBC = $dados['produtos'][$i]['total'];                 // COMENTAR SE FOR PARA USO E CONSUMO
                     // $icms->vBC = $dados['produtos'][$i]['total'] + $valorIPI; // DESCOMENTAR SE FOR PARA USO E CONSUMO
-                    $icms->pICMS = strtolower($favorecido->estado) == "sp" ? $aliquota : 12.00; // Alíquota do ICMS (%)
+                    $icms->pICMS = strtolower($favorecido->estado) == "sp" ? $aliquota : $this->getAliquotaByEstado($favorecido->estado); // Alíquota do ICMS (%)
                     $icms->vICMS = $icms->vBC * ($icms->pICMS / 100); // Valor do ICMS
                     $totalICMS += $icms->vICMS;
                     $totalProdutosCobrados += $dados['produtos'][$i]['total'];                 // COMENTAR SE FOR PARA USO E CONSUMO
@@ -1064,6 +1064,97 @@ class NfeService
                 break;
             default:
                 return 35;
+                break;
+        }
+    }
+
+    function getAliquotaByEstado($estadoFavorecido)
+    {
+        $uf = strtoupper($estadoFavorecido);
+        switch ($uf) {
+            case 'AC':
+                return 7;
+                break;
+            case 'AL':
+                return 7;
+                break;
+            case 'AM':
+                return 7;
+                break;
+            case 'AP':
+                return 7;
+                break;
+            case 'BA':
+                return 7;
+                break;
+            case 'CE':
+                return 7;
+                break;
+            case 'DF':
+                return 7;
+                break;
+            case 'ES':
+                return 7;
+                break;
+            case 'GO':
+                return 7;
+                break;
+            case 'MA':
+                return 7;
+                break;
+            case 'MG':
+                return 12;
+                break;
+            case 'MS':
+                return 7;
+                break;
+            case 'MT':
+                return 7;
+                break;
+            case 'PA':
+                return 7;
+                break;
+            case 'PB':
+                return 7;
+                break;
+            case 'PE':
+                return 7;
+                break;
+            case 'PI':
+                return 7;
+                break;
+            case 'PR':
+                return 12;
+                break;
+            case 'RJ':
+                return 12;
+                break;
+            case 'RN':
+                return 7;
+                break;
+            case 'RO':
+                return 7;
+                break;
+            case 'RR':
+                return 7;
+                break;
+            case 'RS':
+                return 12;
+                break;
+            case 'SC':
+                return 12;
+                break;
+            case 'SE':
+                return 7;
+                break;
+            case 'SP':
+                return 18;
+                break;
+            case 'TO':
+                return 7;
+                break;
+            default:
+                return 7;
                 break;
         }
     }
