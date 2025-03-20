@@ -482,74 +482,43 @@ class NfeService
 
 
         if (count($dados['parcelas']) >= 1) {
-
+            // Utiliza o valor de vNF já calculado (vNF = totalFinal + vIPI)
+            $vNF = $icmsTotal->vNF; 
+        
             //====================TAG FATURA===================
             $fat = new stdClass();
             $fat->nFat = $ide->nNF;
-            $fat->vOrig = array_reduce($dados['parcelas'], array($this, "sum"));
-            $fat->vDesc = $dados['desconto'];
-            $fat->vLiq =  $fat->vOrig - $fat->vDesc;
+            // Define o valor original da fatura igual a vNF
+            $fat->vOrig = number_format($vNF, 2, '.', '');
+            // Se houver desconto já aplicado em totalFinal, certifique-se de que este valor esteja refletido em vNF.
+            // Aqui, estamos considerando que o desconto já está embutido em totalFinal, então setamos vDesc = 0.
+            $fat->vDesc = '0.00';
+            $fat->vLiq = number_format($vNF, 2, '.', '');
             $nfe->tagfat($fat);
+        
             //====================TAG DUPLICATA===================
-
-            for ($i = 0; $i < count($dados['parcelas']); $i++) {
-
+            $numParcelas = count($dados['parcelas']);
+            // Calcula o valor de cada parcela (arredondado para 2 casas decimais)
+            $valorParcela = floor(($vNF / $numParcelas) * 100) / 100;
+            $somaParcelas = $valorParcela * $numParcelas;
+            // Calcula a diferença para ajustar a última parcela
+            $diferenca = round($vNF - $somaParcelas, 2);
+        
+            for ($i = 0; $i < $numParcelas; $i++) {
                 $dup = new stdClass();
-
                 $dup->nDup = str_pad($i + 1, 3, "0", STR_PAD_LEFT);
                 $date = DateTime::createFromFormat('d/m/Y', $dados['parcelas'][$i]['dataVencimento']);
                 $dup->dVenc = $date->format('Y-m-d');
-                $dup->vDup = $dados['parcelas'][$i]['valorParcela'];
+                // Se for a última parcela, adiciona a diferença de arredondamento
+                if ($i == $numParcelas - 1) {
+                    $dup->vDup = number_format($valorParcela + $diferenca, 2, '.', '');
+                } else {
+                    $dup->vDup = number_format($valorParcela, 2, '.', '');
+                }
                 $nfe->tagdup($dup);
             }
-
-            // $dup1 = new stdClass();
-            // $dup1->nDup = '001';
-            // $dup1->dVenc = '2022-07-27';
-            // $dup1->vDup = 6323.88;
-            // $nfe->tagdup($dup1);
-
-            // $dup2 = new stdClass();
-            // $dup2->nDup = '002';
-            // $dup2->dVenc = '2022-08-03';
-            // $dup2->vDup = 6323.88;
-            // $nfe->tagdup($dup2);
-
-            // $dup3 = new stdClass();
-            // $dup3->nDup = '003';
-            // $dup3->dVenc = '2022-08-10';
-            // $dup3->vDup = 6323.88;
-            // $nfe->tagdup($dup3);
-
-            // $dup4 = new stdClass();
-            // $dup4->nDup = '004';
-            // $dup4->dVenc = '2022-08-17';
-            // $dup4->vDup = 6323.88;
-            // $nfe->tagdup($dup4);
-
-
-            // $dup5 = new stdClass();
-            // $dup5->nDup = '005';
-            // $dup5->dVenc = '2022-08-24';
-            // $dup5->vDup = 6323.88;
-            // $nfe->tagdup($dup5);
-
-
-            // $dup6 = new stdClass();
-            // $dup6->nDup = '006';
-            // $dup6->dVenc = '2022-08-31';
-            // $dup6->vDup = 6323.88;
-            // $nfe->tagdup($dup6);
-
-
-            // $dup7 = new stdClass();
-            // $dup7->nDup = '007';
-            // $dup7->dVenc = '2022-09-07';
-            // $dup7->vDup = 6323.92;
-            // $nfe->tagdup($dup7);
-
-
         }
+        
 
         //====================TAG PAGAMENTO===================
         $pag = new stdClass();
@@ -560,14 +529,15 @@ class NfeService
         //====================TAG DETALHE PAGAMENTO===================
         if (count($dados['parcelas']) >= 1) {
             $tipoFormaPag = '01';
-            $totalFinalFormaPag = $dados['totalFinal'];
+            // Usa o vNF para garantir que o total do pagamento seja igual ao valor da NF-e
+            $totalFinalFormaPag = $icmsTotal->vNF; 
         } else {
             $tipoFormaPag = '90';
             $totalFinalFormaPag = 0;
         }
         $detPag = new stdClass();
-        $detPag->tPag = $tipoFormaPag; //01-Dinheiro; 02-Cheque; 03-Cartão de Crédito; 04-Cartão de Débito; 05-Crédito Loja; 10-Vale Alimentação; 11-Vale Refeição; 12-Vale Presente; 13-Vale Combustível; 99-Outros
-        $detPag->vPag = $totalFinalFormaPag; //Obs: deve ser informado o valor pago pelo cliente change 0.00
+        $detPag->tPag = $tipoFormaPag;
+        $detPag->vPag = number_format($totalFinalFormaPag, 2, '.', '');
         //$detPag->CNPJ = '12345678901234';
         //$detPag->tBand = '01';
         //$detPag->cAut = '3333333';
