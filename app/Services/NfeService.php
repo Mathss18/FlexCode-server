@@ -480,44 +480,69 @@ class NfeService
 
         $nfe->tagvol($vol);
 
-
-        if (count($dados['parcelas']) >= 1) {
-            // Utiliza o valor de vNF já calculado (vNF = totalFinal + vIPI)
-            $vNF = $icmsTotal->vNF; 
-        
-            //====================TAG FATURA===================
-            $fat = new stdClass();
-            $fat->nFat = $ide->nNF;
-            // Define o valor original da fatura igual a vNF
-            $fat->vOrig = number_format($vNF, 2, '.', '');
-            // Se houver desconto já aplicado em totalFinal, certifique-se de que este valor esteja refletido em vNF.
-            // Aqui, estamos considerando que o desconto já está embutido em totalFinal, então setamos vDesc = 0.
-            $fat->vDesc = '0.00';
-            $fat->vLiq = number_format($vNF, 2, '.', '');
-            $nfe->tagfat($fat);
-        
-            //====================TAG DUPLICATA===================
-            $numParcelas = count($dados['parcelas']);
-            // Calcula o valor de cada parcela (arredondado para 2 casas decimais)
-            $valorParcela = floor(($vNF / $numParcelas) * 100) / 100;
-            $somaParcelas = $valorParcela * $numParcelas;
-            // Calcula a diferença para ajustar a última parcela
-            $diferenca = round($vNF - $somaParcelas, 2);
-        
-            for ($i = 0; $i < $numParcelas; $i++) {
-                $dup = new stdClass();
-                $dup->nDup = str_pad($i + 1, 3, "0", STR_PAD_LEFT);
-                $date = DateTime::createFromFormat('d/m/Y', $dados['parcelas'][$i]['dataVencimento']);
-                $dup->dVenc = $date->format('Y-m-d');
-                // Se for a última parcela, adiciona a diferença de arredondamento
-                if ($i == $numParcelas - 1) {
-                    $dup->vDup = number_format($valorParcela + $diferenca, 2, '.', '');
-                } else {
-                    $dup->vDup = number_format($valorParcela, 2, '.', '');
+        if($dados['parcelasManual'] == 1){
+            if (count($dados['parcelas']) >= 1) {
+                //====================TAG FATURA===================
+                $fat = new stdClass();
+                $fat->nFat = $ide->nNF;
+                $fat->vOrig = array_reduce($dados['parcelas'], array($this, "sum"));
+                $fat->vDesc = $dados['desconto'];
+                $fat->vLiq =  $fat->vOrig - $fat->vDesc;
+                $nfe->tagfat($fat);
+                //====================TAG DUPLICATA===================
+    
+                for ($i = 0; $i < count($dados['parcelas']); $i++) {
+    
+                    $dup = new stdClass();
+    
+                    $dup->nDup = str_pad($i + 1, 3, "0", STR_PAD_LEFT);
+                    $date = DateTime::createFromFormat('d/m/Y', $dados['parcelas'][$i]['dataVencimento']);
+                    $dup->dVenc = $date->format('Y-m-d');
+                    $dup->vDup = $dados['parcelas'][$i]['valorParcela'];
+                    $nfe->tagdup($dup);
                 }
-                $nfe->tagdup($dup);
             }
         }
+        else{
+            if (count($dados['parcelas']) >= 1) {
+                // Utiliza o valor de vNF já calculado (vNF = totalFinal + vIPI)
+                $vNF = $icmsTotal->vNF; 
+            
+                //====================TAG FATURA===================
+                $fat = new stdClass();
+                $fat->nFat = $ide->nNF;
+                // Define o valor original da fatura igual a vNF
+                $fat->vOrig = number_format($vNF, 2, '.', '');
+                // Se houver desconto já aplicado em totalFinal, certifique-se de que este valor esteja refletido em vNF.
+                // Aqui, estamos considerando que o desconto já está embutido em totalFinal, então setamos vDesc = 0.
+                $fat->vDesc = '0.00';
+                $fat->vLiq = number_format($vNF, 2, '.', '');
+                $nfe->tagfat($fat);
+            
+                //====================TAG DUPLICATA===================
+                $numParcelas = count($dados['parcelas']);
+                // Calcula o valor de cada parcela (arredondado para 2 casas decimais)
+                $valorParcela = floor(($vNF / $numParcelas) * 100) / 100;
+                $somaParcelas = $valorParcela * $numParcelas;
+                // Calcula a diferença para ajustar a última parcela
+                $diferenca = round($vNF - $somaParcelas, 2);
+            
+                for ($i = 0; $i < $numParcelas; $i++) {
+                    $dup = new stdClass();
+                    $dup->nDup = str_pad($i + 1, 3, "0", STR_PAD_LEFT);
+                    $date = DateTime::createFromFormat('d/m/Y', $dados['parcelas'][$i]['dataVencimento']);
+                    $dup->dVenc = $date->format('Y-m-d');
+                    // Se for a última parcela, adiciona a diferença de arredondamento
+                    if ($i == $numParcelas - 1) {
+                        $dup->vDup = number_format($valorParcela + $diferenca, 2, '.', '');
+                    } else {
+                        $dup->vDup = number_format($valorParcela, 2, '.', '');
+                    }
+                    $nfe->tagdup($dup);
+                }
+            }
+        }
+        
         
 
         //====================TAG PAGAMENTO===================
@@ -527,13 +552,25 @@ class NfeService
         $nfe->tagpag($pag);
 
         //====================TAG DETALHE PAGAMENTO===================
-        if (count($dados['parcelas']) >= 1) {
-            $tipoFormaPag = '01';
-            // Usa o vNF para garantir que o total do pagamento seja igual ao valor da NF-e
-            $totalFinalFormaPag = $icmsTotal->vNF; 
-        } else {
-            $tipoFormaPag = '90';
-            $totalFinalFormaPag = 0;
+        $totalFinalFormaPag = 0;
+        if($dados['parcelasManual'] == 1){
+            if (count($dados['parcelas']) >= 1) {
+                $tipoFormaPag = '01';
+                $totalFinalFormaPag = $dados['totalFinal'];
+            } else {
+                $tipoFormaPag = '90';
+                $totalFinalFormaPag = 0;
+            }
+        }
+        else{
+            if (count($dados['parcelas']) >= 1) {
+                $tipoFormaPag = '01';
+                // Usa o vNF para garantir que o total do pagamento seja igual ao valor da NF-e
+                $totalFinalFormaPag = $icmsTotal->vNF; 
+            } else {
+                $tipoFormaPag = '90';
+                $totalFinalFormaPag = 0;
+            }
         }
         $detPag = new stdClass();
         $detPag->tPag = $tipoFormaPag;

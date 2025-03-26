@@ -491,25 +491,25 @@ class RelatorioController extends Controller
     public function impostos(Request $request)
     {
         try {
-            // Fetch and sum ICMS and IPI from the compras table
+            // Filter records by the current month
             $totals = DB::table('compras')
+                ->whereYear('created_at', date('Y'))
+                ->whereMonth('created_at', date('m'))
                 ->selectRaw('SUM(icms) as icms, SUM(ipi) as ipi')
                 ->first();
-
+    
             // Prepare the response
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', [
                 'icms' => $totals->icms ?? 0,
                 'ipi' => $totals->ipi ?? 0,
             ]);
-
+    
             return response()->json($response, 200);
         } catch (Exception $ex) {
             $response = APIHelper::APIResponse(false, 500, 'Erro ao buscar os impostos.', null, $ex);
             return response()->json($response, 500);
         }
     }
-
-
 
     private function date_range($first, $last, $step = '+1 day', $output_format = 'd/m/Y')
     {
