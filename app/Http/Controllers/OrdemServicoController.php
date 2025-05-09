@@ -305,6 +305,7 @@ class OrdemServicoController extends Controller
 
             logger("2", [$ordensServicosProdutos]);
             foreach ($ordensServicosProdutos as $ordemServicoProduto) {
+                logger("3.5", [$ordemServicoProduto['situacao']]);
                 $situacao = json_decode($ordemServicoProduto['situacao']);
                 logger("3", [$nomesFuncionariosAndIdsFuncionarios]);
                 foreach ($nomesFuncionariosAndIdsFuncionarios as $funcNomeAndId) {
