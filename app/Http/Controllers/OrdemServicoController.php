@@ -291,7 +291,6 @@ class OrdemServicoController extends Controller
             $ordensServicos = OrdemServico::with(['produtos', 'servicos', 'funcionarios', 'cliente'])->findOrFail($id)->toArray();
             $nomesFuncionarios = [];
             $nomesFuncionariosAndIdsFuncionarios = [];
-            logger("1", [$ordensServicos['funcionarios']]);
             foreach ($ordensServicos['funcionarios'] as $funcionario) {
                 array_push($nomesFuncionarios, $funcionario['nome']);
                 array_push($nomesFuncionariosAndIdsFuncionarios, [
@@ -303,13 +302,12 @@ class OrdemServicoController extends Controller
             $ordensServicosProdutos = OrdemServicoProduto::with(['produto'])->where('ordem_servico_id', $ordensServicos['id'])->get()->toArray();
             $dados = [];
 
-            logger("2", [$ordensServicosProdutos]);
             foreach ($ordensServicosProdutos as $ordemServicoProduto) {
-                logger("3.5", [$ordemServicoProduto['situacao']]);
                 $situacao = json_decode($ordemServicoProduto['situacao']);
-                logger("3", [$nomesFuncionariosAndIdsFuncionarios]);
+                if($situacao === null){
+                    $situacao = "[]";
+                }
                 foreach ($nomesFuncionariosAndIdsFuncionarios as $funcNomeAndId) {
-                    logger("4", [$situacao]);
                     foreach ($situacao as $situ) {
                         if ($situ->usuario_id == $funcNomeAndId['id']) {
                             $dado = [
@@ -333,10 +331,8 @@ class OrdemServicoController extends Controller
             // Foreach para mergear os produtos por cada funcionario
             $produtosPorFuncionarios = [];
             $blacklist = [];
-            logger("5", [$dados]);
             foreach ($dados as $dado1) {
                 $produtos = [];
-                logger("6", [$dados]);
                 foreach ($dados as $dado2) {
                     if ($dado1['nomeFuncionario'] == $dado2['nomeFuncionario'] && !in_array($dado1['nomeFuncionario'], $blacklist)) {
                         array_push($produtos, $dado2['produto']);
@@ -357,9 +353,7 @@ class OrdemServicoController extends Controller
 
             // Foreach para completar os produtos que um funcionario ainda não iniciou (no caso de na tbl ordens_servicos_produtos a situacao não conter o id do funcionario, isso significa que ele nao iniciou)
             $index = 0;
-            logger("7", [$produtosPorFuncionarios]);
             foreach ($produtosPorFuncionarios as $produtoPorFuncionario) {
-                logger("8", [$ordensServicosProdutos]);
                 foreach ($ordensServicosProdutos as $ordemServicoProduto) {
                     if (!in_array($ordemServicoProduto['produto']['id'], array_column($produtoPorFuncionario['produtos'], 'id'))) {
 
