@@ -305,7 +305,7 @@ class OrdemServicoController extends Controller
             foreach ($ordensServicosProdutos as $ordemServicoProduto) {
                 $situacao = json_decode($ordemServicoProduto['situacao']);
                 if($situacao === null){
-                    $situacao = "[]";
+                    $situacao = [];
                 }
                 foreach ($nomesFuncionariosAndIdsFuncionarios as $funcNomeAndId) {
                     foreach ($situacao as $situ) {
