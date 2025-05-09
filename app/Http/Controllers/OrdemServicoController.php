@@ -288,101 +288,169 @@ class OrdemServicoController extends Controller
     public function getProgresso($id)
     {
         try {
-            $ordensServicos = OrdemServico::with(['produtos', 'servicos', 'funcionarios', 'cliente'])->findOrFail($id)->toArray();
+            logger('getProgresso start', ['id' => $id]);
+
+            // 1) Load the ordem de serviço
+            $ordensServicos = OrdemServico::with(['produtos', 'servicos', 'funcionarios', 'cliente'])
+                ->findOrFail($id)
+                ->toArray();
+            logger('ordensServicos loaded', [
+                'is_array' => is_array($ordensServicos),
+                'keys'     => array_keys($ordensServicos),
+            ]);
+
+            // 2) Inspect funcionarios
+            logger('ordensServicos[funcionarios]', [
+                'is_array' => isset($ordensServicos['funcionarios']) && is_array($ordensServicos['funcionarios']),
+                'value'    => $ordensServicos['funcionarios'] ?? null,
+            ]);
+
             $nomesFuncionarios = [];
             $nomesFuncionariosAndIdsFuncionarios = [];
             foreach ($ordensServicos['funcionarios'] as $funcionario) {
-                array_push($nomesFuncionarios, $funcionario['nome']);
-                array_push($nomesFuncionariosAndIdsFuncionarios, [
+                logger('iterating funcionario', ['funcionario' => $funcionario]);
+                $nomesFuncionarios[] = $funcionario['nome'];
+                $nomesFuncionariosAndIdsFuncionarios[] = [
                     'nome' => $funcionario['nome'],
                     'foto' => $funcionario['foto'],
-                    'id' => $funcionario['usuario_id']
-                ]);
+                    'id'   => $funcionario['usuario_id'],
+                ];
             }
-            $ordensServicosProdutos = OrdemServicoProduto::with(['produto'])->where('ordem_servico_id', $ordensServicos['id'])->get()->toArray();
-            $dados = [];
 
+            // 3) Load produtos da ordem
+            $ordensServicosProdutos = OrdemServicoProduto::with(['produto'])
+                ->where('ordem_servico_id', $ordensServicos['id'])
+                ->get()
+                ->toArray();
+            logger('ordensServicosProdutos loaded', [
+                'is_array' => is_array($ordensServicosProdutos),
+                'count'    => count($ordensServicosProdutos),
+                'sample'   => array_slice($ordensServicosProdutos, 0, 2),
+            ]);
+
+            $dados = [];
             foreach ($ordensServicosProdutos as $ordemServicoProduto) {
+                logger('iterating ordensServicosProdutos', [
+                    'produto_id' => $ordemServicoProduto['produto']['id'] ?? null,
+                ]);
+
+                // decode situacao
                 $situacao = json_decode($ordemServicoProduto['situacao']);
+                logger('situacao decoded', [
+                    'raw'     => $ordemServicoProduto['situacao'],
+                    'type'    => gettype($situacao),
+                    'decoded' => $situacao,
+                ]);
+
+                if (!is_array($situacao) && !($situacao instanceof \Traversable)) {
+                    logger('situacao not iterable – skipping', [
+                        'produto_id' => $ordemServicoProduto['produto']['id'] ?? null,
+                    ]);
+                    continue;
+                }
+
                 foreach ($nomesFuncionariosAndIdsFuncionarios as $funcNomeAndId) {
+                    logger('iterating nomesFuncionariosAndIds', ['func' => $funcNomeAndId]);
                     foreach ($situacao as $situ) {
-                        if ($situ->usuario_id == $funcNomeAndId['id']) {
-                            $dado = [
+                        logger('iterating situacao entry', [
+                            'usuario_id' => $situ->usuario_id ?? null,
+                            'expected'   => $funcNomeAndId['id'],
+                        ]);
+                        if (($situ->usuario_id ?? null) === $funcNomeAndId['id']) {
+                            $dados[] = [
                                 'nomeFuncionario' => $funcNomeAndId['nome'],
-                                'foto' => $funcNomeAndId['foto'],
-                                'produto' => [
-                                    'id' => $ordemServicoProduto['produto']['id'],
-                                    'nome' => $ordemServicoProduto['produto']['nome'],
+                                'foto'            => $funcNomeAndId['foto'],
+                                'produto'         => [
+                                    'id'            => $ordemServicoProduto['produto']['id'],
+                                    'nome'          => $ordemServicoProduto['produto']['nome'],
                                     'codigoInterno' => $ordemServicoProduto['produto']['codigoInterno'],
-                                    'quantidade' => $ordemServicoProduto['quantidade'],
-                                    'status' => $situ->situacao,
-                                ]
+                                    'quantidade'    => $ordemServicoProduto['quantidade'],
+                                    'status'        => $situ->situacao,
+                                ],
                             ];
-                            array_push($dados, $dado);
                         }
                     }
                 }
             }
+            logger('dados built', [
+                'count'  => count($dados),
+                'sample' => array_slice($dados, 0, 2),
+            ]);
 
-
-            // Foreach para mergear os produtos por cada funcionario
+            // 4) Merge produtos por funcionario
             $produtosPorFuncionarios = [];
             $blacklist = [];
+            logger('start merging produtosPorFuncionarios', ['dados_count' => count($dados)]);
             foreach ($dados as $dado1) {
+                logger('merge outer loop', ['dado1' => $dado1]);
                 $produtos = [];
                 foreach ($dados as $dado2) {
-                    if ($dado1['nomeFuncionario'] == $dado2['nomeFuncionario'] && !in_array($dado1['nomeFuncionario'], $blacklist)) {
-                        array_push($produtos, $dado2['produto']);
+                    logger('merge inner loop', ['dado2' => $dado2]);
+                    if ($dado1['nomeFuncionario'] === $dado2['nomeFuncionario'] && !in_array($dado1['nomeFuncionario'], $blacklist)) {
+                        $produtos[] = $dado2['produto'];
                     }
                 }
                 if (count($produtos) > 0) {
-                    array_push(
-                        $produtosPorFuncionarios,
-                        [
-                            'nomeFuncionario' => $dado1['nomeFuncionario'],
-                            'foto' => $dado1['foto'],
-                            'produtos' => $produtos
-                        ]
-                    );
+                    $produtosPorFuncionarios[] = [
+                        'nomeFuncionario' => $dado1['nomeFuncionario'],
+                        'foto'            => $dado1['foto'],
+                        'produtos'        => $produtos,
+                    ];
                 }
-                array_push($blacklist, $dado1['nomeFuncionario']);
+                $blacklist[] = $dado1['nomeFuncionario'];
             }
+            logger('merged produtosPorFuncionarios', [
+                'count' => count($produtosPorFuncionarios),
+                'data'  => $produtosPorFuncionarios,
+            ]);
 
-            // Foreach para completar os produtos que um funcionario ainda não iniciou (no caso de na tbl ordens_servicos_produtos a situacao não conter o id do funcionario, isso significa que ele nao iniciou)
+            // 5) Complete produtos não iniciados
+            logger('start completing missing products', ['ordensServicosProdutos_count' => count($ordensServicosProdutos)]);
             $index = 0;
             foreach ($produtosPorFuncionarios as $produtoPorFuncionario) {
+                logger('completing for funcionario', [
+                    'index'            => $index,
+                    'nomeFuncionario'  => $produtoPorFuncionario['nomeFuncionario'],
+                    'current_produtos' => $produtoPorFuncionario['produtos'],
+                ]);
                 foreach ($ordensServicosProdutos as $ordemServicoProduto) {
+                    logger('checking produto completeness', [
+                        'produto_id' => $ordemServicoProduto['produto']['id'],
+                    ]);
                     if (!in_array($ordemServicoProduto['produto']['id'], array_column($produtoPorFuncionario['produtos'], 'id'))) {
-
-                        array_push(
-                            $produtosPorFuncionarios[$index]['produtos'],
-                            [
-                                'id' => $ordemServicoProduto['produto']['id'],
-                                'nome' => $ordemServicoProduto['produto']['nome'],
-                                'codigoInterno' => $ordemServicoProduto['produto']['codigoInterno'],
-                                'quantidade' => $ordemServicoProduto['quantidade'],
-                                'status' => false,
-                            ]
-                        );
+                        $produtosPorFuncionarios[$index]['produtos'][] = [
+                            'id'            => $ordemServicoProduto['produto']['id'],
+                            'nome'          => $ordemServicoProduto['produto']['nome'],
+                            'codigoInterno' => $ordemServicoProduto['produto']['codigoInterno'],
+                            'quantidade'    => $ordemServicoProduto['quantidade'],
+                            'status'        => false,
+                        ];
                     }
                 }
                 $index++;
             }
+            logger('completed produtosPorFuncionarios', ['data' => $produtosPorFuncionarios]);
 
+            // 6) Build and return payload
             $payload = [
-                'numero' => $ordensServicos['numero'],
-                'nomeCliente' => $ordensServicos['cliente']['nome'],
+                'numero'            => $ordensServicos['numero'],
+                'nomeCliente'       => $ordensServicos['cliente']['nome'],
                 'nomesFuncionarios' => $nomesFuncionarios,
-                'funcionarios' => $produtosPorFuncionarios
+                'funcionarios'      => $produtosPorFuncionarios,
             ];
+            logger('getProgresso sucesso', ['payload' => $payload]);
 
-            $response = APIHelper::APIResponse(true, 200, 'Sucesso', $payload);
-            return response()->json($response, 200);
-        } catch (Exception  $ex) {
-            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
-            return response()->json($response, 500);
+            return response()->json(APIHelper::APIResponse(true, 200, 'Sucesso', $payload), 200);
+
+        } catch (Exception $ex) {
+            logger('getProgresso exception', [
+                'message' => $ex->getMessage(),
+                'trace'   => $ex->getTraceAsString(),
+            ]);
+            return response()->json(APIHelper::APIResponse(false, 500, null, null, $ex), 500);
         }
     }
+
 
     function in_array_r($needle, $haystack, $strict = false)
     {
