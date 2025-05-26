@@ -6,7 +6,8 @@ use App\Helpers\APIHelper;
 use App\Models\Funcionario;
 use App\Models\OrdemServico;
 use App\Models\OrdemServicoFuncionario;
-use App\Models\Usuario;
+use App\Models\OrdemServicoLog;
+use Tymon\JWTAuth\Facades\JWTAuth;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -183,16 +184,44 @@ class OrdemServicoFuncionarioController extends Controller
 
     public function marcarFazendoProduto(Request $request)
     {
-
         try {
             $ordem_servico_id = $request->input('ordem_servico_id');
             $produto_id = $request->input('produto_id');
             $situacao = $request->input('situacao');
+            $user_id = JWTAuth::user()->id; // Assumindo que o user_id é passado na requisição
 
-            $ordensServicosProdutos = DB::table('ordens_servicos_produtos')->where('ordem_servico_id', $ordem_servico_id)->where('produto_id', $produto_id)->update(['situacao' => $situacao]);
+            DB::beginTransaction();
+
+            // Verifica se já existe um log para este usuário, ordem de serviço e produto
+            $logExistente = OrdemServicoLog::where('user_id', $user_id)
+                ->where('ordem_servico_id', $ordem_servico_id)
+                ->where('produto_id', $produto_id)
+                ->first();
+
+            if ($logExistente) {
+                // Se existe, significa que está desmarcando - remove o log
+                $logExistente->delete();
+            } else {
+                // Se não existe, significa que está marcando - cria novo log
+                OrdemServicoLog::create([
+                    'user_id' => $user_id,
+                    'ordem_servico_id' => $ordem_servico_id,
+                    'produto_id' => $produto_id
+                ]);
+            }
+
+            // Atualiza a situação na tabela ordens_servicos_produtos
+            $ordensServicosProdutos = DB::table('ordens_servicos_produtos')
+                ->where('ordem_servico_id', $ordem_servico_id)
+                ->where('produto_id', $produto_id)
+                ->update(['situacao' => $situacao]);
+
+            DB::commit();
+
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', $ordensServicosProdutos);
             return response()->json($response, 200);
         } catch (Exception  $ex) {
+            DB::rollBack();
             $response = APIHelper::APIResponse(false, 500, null, null, $ex);
             return response()->json($response, 500);
         }
