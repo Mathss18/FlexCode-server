@@ -546,14 +546,22 @@ class RelatorioController extends Controller
                             'usuario_nome' => $log->usuario->nome
                         ],
                         'total_produtos_trabalhados' => 0,
+                        'total_quantidade_produtos' => 0, // Nova propriedade para somar as quantidades
                         'total_ordens_servico' => 0,
                         'ordens_servico' => [],
                         'produtos_por_data' => []
                     ];
                 }
 
-                // Incrementa total de produtos trabalhados
+                // Busca a quantidade do produto na ordem de serviço
+                $quantidadeProduto = DB::table('ordens_servicos_produtos')
+                    ->where('ordem_servico_id', $log->ordem_servico_id)
+                    ->where('produto_id', $log->produto_id)
+                    ->value('quantidade') ?? 0;
+
+                // Incrementa total de produtos trabalhados e quantidade
                 $performanceData[$funcionarioId]['total_produtos_trabalhados']++;
+                $performanceData[$funcionarioId]['total_quantidade_produtos'] += $quantidadeProduto;
 
                 // Agrupa por ordem de serviço
                 $ordemServicoId = $log->ordem_servico_id;
@@ -568,7 +576,8 @@ class RelatorioController extends Controller
                             ]
                         ],
                         'produtos' => [],
-                        'total_produtos' => 0
+                        'total_produtos' => 0,
+                        'total_quantidade' => 0 // Nova propriedade para quantidade total por ordem
                     ];
                     $performanceData[$funcionarioId]['total_ordens_servico']++;
                 }
@@ -577,10 +586,12 @@ class RelatorioController extends Controller
                 $performanceData[$funcionarioId]['ordens_servico'][$ordemServicoId]['produtos'][] = [
                     'id' => $log->produto->id,
                     'nome' => $log->produto->nome,
+                    'quantidade' => $quantidadeProduto,
                     'data_marcacao' => $log->created_at->format('d/m/Y H:i:s')
                 ];
 
                 $performanceData[$funcionarioId]['ordens_servico'][$ordemServicoId]['total_produtos']++;
+                $performanceData[$funcionarioId]['ordens_servico'][$ordemServicoId]['total_quantidade'] += $quantidadeProduto;
 
                 // Agrupa produtos por data
                 $dataMarcacao = $log->created_at->format('d/m/Y');
@@ -591,7 +602,8 @@ class RelatorioController extends Controller
                 $performanceData[$funcionarioId]['produtos_por_data'][$dataMarcacao][] = [
                     'produto' => [
                         'id' => $log->produto->id,
-                        'nome' => $log->produto->nome
+                        'nome' => $log->produto->nome,
+                        'quantidade' => $quantidadeProduto
                     ],
                     'ordem_servico' => [
                         'id' => $log->ordemServico->id,
