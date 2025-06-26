@@ -202,8 +202,6 @@ class NfeService
         $valorProdutosReal = 0.0;
         $totalIPI = 0.00;
         $totalICMS = 0.00;
-        $totalICMSST = 0.00; // Total do ICMS-ST
-        $totalBCST = 0.00;   // Total da Base de Cálculo do ICMS-ST
         $totalProdutosCobrados = 0.00;
         for ($i = 0; $i < count($dados['produtos']); $i++) {
             $prod = new stdClass();
@@ -280,59 +278,18 @@ class NfeService
                     // $icms->pICMS = $aliquota; // Alíquota do ICMS (%)
                     // $icms->vICMS = $icms->vBC * ($icms->pICMS / 100); // Valor do ICMS
                 } else {
-                    // Verifica se o produto está sujeito a substituição tributária
-                    $sujeitoST = isset($dados['produtos'][$i]['icms_st']) && $dados['produtos'][$i]['icms_st'];
-
                     $icms = new stdClass();
                     $icms->item = $i + 1; //item da NFe
                     $icms->orig = 0; // Origem da mercadoria (0 = Nacional, 1 = Estrangeira, etc.)
-
-                    if (true) {
-                        // CST 10 - Tributada com cobrança do ICMS por substituição tributária
-                        $icms->CST = '10';
-                        $icms->modBC = 3; // Modalidade de determinação da BC do ICMS próprio
-                        $icms->vBC = $dados['produtos'][$i]['total'];
-                        $icms->pICMS = strtolower($favorecido->estado) == "sp" ? $aliquota : $this->getAliquotaByEstado($favorecido->estado);
-                        $icms->vICMS = $icms->vBC * ($icms->pICMS / 100);
-
-                        // Campos específicos para ICMS-ST
-                        $icms->modBCST = 4; // Modalidade de determinação da BC do ICMS ST (4 = Margem Valor Agregado)
-
-                        // Obtém a MVA configurada para o produto ou calcula baseada no estado
-                        $icms->pMVAST = $this->getMVAByEstado($favorecido->estado, $produtos[$i]['ncm']);
-                        $icms->pRedBCST = 0.00; // % da Redução da BC do ICMS ST
-
-                        // Cálculo da base de cálculo do ICMS-ST
-                        $baseCalculoST = ($icms->vBC + $valorIPI) * (1 + ($icms->pMVAST / 100));
-                        $icms->vBCST = $baseCalculoST * (1 - ($icms->pRedBCST / 100));
-
-                        // Alíquota interna do estado de destino para ICMS-ST
-                        $icms->pICMSST = $this->getAliquotaInternaByEstado($favorecido->estado);
-
-                        // Valor do ICMS-ST = (BC ST × Alíquota ST) - ICMS próprio
-                        $icms->vICMSST = ($icms->vBCST * ($icms->pICMSST / 100)) - $icms->vICMS;
-
-                        // Garante que o valor do ICMS-ST não seja negativo
-                        if ($icms->vICMSST < 0) {
-                            $icms->vICMSST = 0.00;
-                        }
-
-                        // Acumula os totais
-                        $totalICMS += $icms->vICMS;
-                        $totalICMSST += $icms->vICMSST;
-                        $totalBCST += $icms->vBCST;
-
-                    } else {
-                        // Tributação normal sem ST
-                        $icms->CST = '00'; // Tributado integralmente
-                        $icms->modBC = 3;
-                        $icms->vBC = $dados['produtos'][$i]['total'];
-                        $icms->pICMS = strtolower($favorecido->estado) == "sp" ? $aliquota : $this->getAliquotaByEstado($favorecido->estado);
-                        $icms->vICMS = $icms->vBC * ($icms->pICMS / 100);
-                        $totalICMS += $icms->vICMS;
-                    }
-
-                    $totalProdutosCobrados += $dados['produtos'][$i]['total'];
+                    $icms->CST = '00'; // Código da Situação Tributária do ICMS (00 = Tributado integralmente)
+                    $icms->modBC = 3; // Modalidade de determinação da BC (0 = Valor da Operação)
+                    $icms->vBC = $dados['produtos'][$i]['total'];                 // COMENTAR SE FOR PARA USO E CONSUMO
+                    // $icms->vBC = $dados['produtos'][$i]['total'] + $valorIPI; // DESCOMENTAR SE FOR PARA USO E CONSUMO
+                    $icms->pICMS = strtolower($favorecido->estado) == "sp" ? $aliquota : $this->getAliquotaByEstado($favorecido->estado); // Alíquota do ICMS (%)
+                    $icms->vICMS = $icms->vBC * ($icms->pICMS / 100); // Valor do ICMS
+                    $totalICMS += $icms->vICMS;
+                    $totalProdutosCobrados += $dados['produtos'][$i]['total'];                 // COMENTAR SE FOR PARA USO E CONSUMO
+                    // $totalProdutosCobrados += $dados['produtos'][$i]['total'] + $valorIPI; // DESCOMENTAR SE FOR PARA USO E CONSUMO
                 }
 
                 // Adiciona ao XML
@@ -467,8 +424,8 @@ class NfeService
         }
         $icmsTotal->vICMSDeson = 0.00;
         $icmsTotal->vFCP = 0.00; //incluso no layout 4.00
-        $icmsTotal->vBCST = $totalBCST; // Base de Cálculo do ICMS-ST
-        $icmsTotal->vST = $totalICMSST; // Valor do ICMS-ST
+        $icmsTotal->vBCST = 0.00;
+        $icmsTotal->vST = 0.00;
         $icmsTotal->vFCPST = 0.00; //incluso no layout 4.00
         $icmsTotal->vFCPSTRet = 0.00; //incluso no layout 4.00
         $icmsTotal->vProd = $dados['totalProdutos'];
@@ -481,7 +438,7 @@ class NfeService
         $icmsTotal->vPIS = 0.00;
         $icmsTotal->vCOFINS = 0.00;
         $icmsTotal->vOutro = 0.00; // change to 0.00
-        $icmsTotal->vNF = $dados['totalFinal'] + $icmsTotal->vIPI + $icmsTotal->vST; // total produtos + frete + ICMS-ST
+        $icmsTotal->vNF = $dados['totalFinal'] + $icmsTotal->vIPI; // total produtos + frete
         //$icmsTotal->vTotTrib = 0.00;
 
         $nfe->tagICMSTot($icmsTotal);
@@ -532,11 +489,11 @@ class NfeService
                 $fat->vLiq =  $fat->vOrig - $fat->vDesc;
                 $nfe->tagfat($fat);
                 //====================TAG DUPLICATA===================
-
+    
                 for ($i = 0; $i < count($dados['parcelas']); $i++) {
-
+    
                     $dup = new stdClass();
-
+    
                     $dup->nDup = str_pad($i + 1, 3, "0", STR_PAD_LEFT);
                     $date = DateTime::createFromFormat('d/m/Y', $dados['parcelas'][$i]['dataVencimento']);
                     $dup->dVenc = $date->format('Y-m-d');
@@ -548,8 +505,8 @@ class NfeService
         else{
             if (count($dados['parcelas']) >= 1) {
                 // Utiliza o valor de vNF já calculado (vNF = totalFinal + vIPI)
-                $vNF = $icmsTotal->vNF;
-
+                $vNF = $icmsTotal->vNF; 
+            
                 //====================TAG FATURA===================
                 $fat = new stdClass();
                 $fat->nFat = $ide->nNF;
@@ -560,7 +517,7 @@ class NfeService
                 $fat->vDesc = '0.00';
                 $fat->vLiq = number_format($vNF, 2, '.', '');
                 $nfe->tagfat($fat);
-
+            
                 //====================TAG DUPLICATA===================
                 $numParcelas = count($dados['parcelas']);
                 // Calcula o valor de cada parcela (arredondado para 2 casas decimais)
@@ -568,7 +525,7 @@ class NfeService
                 $somaParcelas = $valorParcela * $numParcelas;
                 // Calcula a diferença para ajustar a última parcela
                 $diferenca = round($vNF - $somaParcelas, 2);
-
+            
                 for ($i = 0; $i < $numParcelas; $i++) {
                     $dup = new stdClass();
                     $dup->nDup = str_pad($i + 1, 3, "0", STR_PAD_LEFT);
@@ -584,8 +541,8 @@ class NfeService
                 }
             }
         }
-
-
+        
+        
 
         //====================TAG PAGAMENTO===================
         $pag = new stdClass();
@@ -608,7 +565,7 @@ class NfeService
             if (count($dados['parcelas']) >= 1) {
                 $tipoFormaPag = '01';
                 // Usa o vNF para garantir que o total do pagamento seja igual ao valor da NF-e
-                $totalFinalFormaPag = $icmsTotal->vNF;
+                $totalFinalFormaPag = $icmsTotal->vNF; 
             } else {
                 $tipoFormaPag = '90';
                 $totalFinalFormaPag = 0;
@@ -1205,54 +1162,6 @@ class NfeService
             default:
                 return 7;
                 break;
-        }
-    }
-
-    /**
-     * Retorna a MVA (Margem de Valor Agregado) conforme o estado de destino
-     * Esta função pode ser personalizada conforme a tabela de MVA da sua empresa
-     */
-    function getMVAByEstado($estadoDestino, $ncm = null)
-    {
-        $uf = strtoupper($estadoDestino);
-
-        // Tabela de MVA simplificada - ajustar conforme necessário
-        $mvaTabel = [
-            'SP' => 72.15, // São Paulo
-            'RJ' => 35.00, // Rio de Janeiro
-            'MG' => 40.00, // Minas Gerais
-            'RS' => 30.00, // Rio Grande do Sul
-            'PR' => 25.00, // Paraná
-            'SC' => 30.00, // Santa Catarina
-            // Adicionar outros estados conforme necessário
-        ];
-
-        return $mvaTabel[$uf] ?? 30.00; // Retorna 30% como padrão
-    }
-
-    /**
-     * Retorna a alíquota interna do ICMS-ST por estado
-     */
-    function getAliquotaInternaByEstado($estadoDestino)
-    {
-        $uf = strtoupper($estadoDestino);
-
-        switch ($uf) {
-            case 'SP':
-                return 18.00;
-            case 'RJ':
-                return 20.00;
-            case 'MG':
-                return 18.00;
-            case 'RS':
-                return 17.00;
-            case 'PR':
-                return 18.00;
-            case 'SC':
-                return 17.00;
-            // Adicionar outros estados conforme necessário
-            default:
-                return 18.00; // Alíquota padrão
         }
     }
 }
