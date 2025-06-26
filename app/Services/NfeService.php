@@ -290,7 +290,7 @@ class NfeService
                     $totalICMS += $icms->vICMS;
                     $totalProdutosCobrados += $dados['produtos'][$i]['total'];                 // COMENTAR SE FOR PARA USO E CONSUMO
                     // $totalProdutosCobrados += $dados['produtos'][$i]['total'] + $valorIPI; // DESCOMENTAR SE FOR PARA USO E CONSUMO
-                    $icms->vICMSST = 670.86;
+                    // $icms->vICMSST = 670.86;
                 }
 
                 // Adiciona ao XML
