@@ -260,7 +260,7 @@ class NfeService
             $nfe->tagimposto($imposto);
 
             $valorIPI = 0.0;
-            if (session('config')->crt != 1 && !in_array($dados['produtos'][$i]['cfop'], ['5902', '6912', '6910', '5124', '5901', '5916'])) {
+            if (session('config')->crt != 1 && !in_array($dados['produtos'][$i]['cfop'], ['5902', '6912', '6910', '5124', '5901', '5916', '5949'])) {
                 $aliquotaIPI = 9.75;
                 $valorIPI = $dados['produtos'][$i]['total'] * ($aliquotaIPI / 100);
             }
@@ -268,11 +268,11 @@ class NfeService
 
             if (session('config')->crt != 1) {
                 //====================TAG ICMS REGIME NORMAL===================
-                if (in_array($dados['produtos'][$i]['cfop'], ['5902', '5102', '6102', '5124', '5901', '5916', '5556'])) {
+                if (in_array($dados['produtos'][$i]['cfop'], ['5902', '5102', '6102', '5124', '5901', '5916', '5556', '5949'])) {
                     $icms = new stdClass();
                     $icms->item = $i + 1; //item da NFe
                     $icms->orig = 0; // Origem da mercadoria (0 = Nacional, 1 = Estrangeira, etc.)
-                    $icms->CST = '50'; // Código da Situação Tributária do ICMS (00 = Tributado integralmente)
+                    $icms->CST = '50'; // Código da Situação Tributária do ICMS (50 = Isenta ou não tributada e com cobrança do ICMS por substituição tributária)
                     $icms->modBC = 3; // Modalidade de determinação da BC (0 = Valor da Operação)
                     // $icms->vBC = $dados['produtos'][$i]['total']; // Base de Cálculo do ICMS
                     // $icms->pICMS = $aliquota; // Alíquota do ICMS (%)
@@ -390,7 +390,7 @@ class NfeService
                 logger("GERANDO IPI");
                 logger($i, $dados['produtos'][$i]);
                 logger($i, [$dados['produtos'][$i]['cfop']]);
-                if (!in_array($dados['produtos'][$i]['cfop'], ['5902', '6912', '6910', '5124', '5901', '5916', '5556'])) {
+                if (!in_array($dados['produtos'][$i]['cfop'], ['5902', '6912', '6910', '5124', '5901', '5916', '5556', '5949'])) {
                     $aliquotaIPI = 9.75;
                     //====================TAG IPI===================
                     $ipi = new stdClass();
@@ -489,11 +489,11 @@ class NfeService
                 $fat->vLiq =  $fat->vOrig - $fat->vDesc;
                 $nfe->tagfat($fat);
                 //====================TAG DUPLICATA===================
-    
+
                 for ($i = 0; $i < count($dados['parcelas']); $i++) {
-    
+
                     $dup = new stdClass();
-    
+
                     $dup->nDup = str_pad($i + 1, 3, "0", STR_PAD_LEFT);
                     $date = DateTime::createFromFormat('d/m/Y', $dados['parcelas'][$i]['dataVencimento']);
                     $dup->dVenc = $date->format('Y-m-d');
@@ -505,8 +505,8 @@ class NfeService
         else{
             if (count($dados['parcelas']) >= 1) {
                 // Utiliza o valor de vNF já calculado (vNF = totalFinal + vIPI)
-                $vNF = $icmsTotal->vNF; 
-            
+                $vNF = $icmsTotal->vNF;
+
                 //====================TAG FATURA===================
                 $fat = new stdClass();
                 $fat->nFat = $ide->nNF;
@@ -517,7 +517,7 @@ class NfeService
                 $fat->vDesc = '0.00';
                 $fat->vLiq = number_format($vNF, 2, '.', '');
                 $nfe->tagfat($fat);
-            
+
                 //====================TAG DUPLICATA===================
                 $numParcelas = count($dados['parcelas']);
                 // Calcula o valor de cada parcela (arredondado para 2 casas decimais)
@@ -525,7 +525,7 @@ class NfeService
                 $somaParcelas = $valorParcela * $numParcelas;
                 // Calcula a diferença para ajustar a última parcela
                 $diferenca = round($vNF - $somaParcelas, 2);
-            
+
                 for ($i = 0; $i < $numParcelas; $i++) {
                     $dup = new stdClass();
                     $dup->nDup = str_pad($i + 1, 3, "0", STR_PAD_LEFT);
@@ -541,8 +541,8 @@ class NfeService
                 }
             }
         }
-        
-        
+
+
 
         //====================TAG PAGAMENTO===================
         $pag = new stdClass();
@@ -565,7 +565,7 @@ class NfeService
             if (count($dados['parcelas']) >= 1) {
                 $tipoFormaPag = '01';
                 // Usa o vNF para garantir que o total do pagamento seja igual ao valor da NF-e
-                $totalFinalFormaPag = $icmsTotal->vNF; 
+                $totalFinalFormaPag = $icmsTotal->vNF;
             } else {
                 $tipoFormaPag = '90';
                 $totalFinalFormaPag = 0;
