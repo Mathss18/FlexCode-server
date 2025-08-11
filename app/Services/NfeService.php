@@ -197,7 +197,17 @@ class NfeService
 
         $nfe->tagenderDest($enderDest);
 
-        //====================TAG PRODUTO===================
+    //====================REGRAS ESPECIAIS (flags)===================
+    // Considera IPI suspenso quando venda para Comercial Exportadora com destinação de exportação.
+    // Use $dados['comercialExportadora'] = true para ativar esta regra.
+    $isComercialExportadora = !empty($dados['comercialExportadora']);
+    $ipiSuspenso = $isComercialExportadora === true; // regra simples: suspende IPI para Comercial Exportadora
+
+    // Para forçar CFOP 6.101 (venda de produção própria para fora do estado),
+    // use $dados['forcarCFOP6101'] = true. Será aplicado apenas quando idDest == 2 (interestadual).
+    $forcarCFOP6101 = true;
+
+    //====================TAG PRODUTO===================
         // Armazena o total dos produtos para calculo correto do ICMS
         $valorProdutosReal = 0.0;
         $totalIPI = 0.00;
@@ -215,6 +225,10 @@ class NfeService
 
             //$prod->EXTIPI;
             $prod->CFOP = $dados['produtos'][$i]['cfop'];
+            // Ajusta CFOP para 6.101 se solicitado e a operação for interestadual
+            if ($forcarCFOP6101 && ($ide->idDest ?? null) == 2) {
+                $prod->CFOP = '6101';
+            }
             $prod->uCom = $produtos[$i]['unidade_produto']['sigla'] ?? 'PC'; //Unidade do produto
             $prod->qCom = $dados['produtos'][$i]['quantidade']; //Quantidade do produto
             $prod->vUnCom = $dados['produtos'][$i]['preco']; // Valor total - %desconto
@@ -260,9 +274,11 @@ class NfeService
             $nfe->tagimposto($imposto);
 
             $valorIPI = 0.0;
-            if (session('config')->crt != 1 && !in_array($dados['produtos'][$i]['cfop'], ['5902', '6912', '6910', '5124', '5901', '5916', '5949'])) {
-                $aliquotaIPI = 9.75;
-                $valorIPI = $dados['produtos'][$i]['total'] * ($aliquotaIPI / 100);
+            if (!$ipiSuspenso) {
+                if (session('config')->crt != 1 && !in_array($dados['produtos'][$i]['cfop'], ['5902', '6912', '6910', '5124', '5901', '5916', '5949'])) {
+                    $aliquotaIPI = 9.75;
+                    $valorIPI = $dados['produtos'][$i]['total'] * ($aliquotaIPI / 100);
+                }
             }
 
 
@@ -390,25 +406,35 @@ class NfeService
                 logger("GERANDO IPI");
                 logger($i, $dados['produtos'][$i]);
                 logger($i, [$dados['produtos'][$i]['cfop']]);
-                if (!in_array($dados['produtos'][$i]['cfop'], ['5902', '6912', '6910', '5124', '5901', '5916', '5556', '5949'])) {
-                    $aliquotaIPI = 9.75;
-                    //====================TAG IPI===================
+                if ($ipiSuspenso) {
+                    // IPI Suspenso: utilizar CST 55 (IPINT) sem destacar valores
                     $ipi = new stdClass();
                     $ipi->item =  $i + 1; //item da NFe
-                    $ipi->clEnq = null;
-                    $ipi->CNPJProd = null;
-                    $ipi->cSelo = null;
-                    $ipi->qSelo = null;
                     $ipi->cEnq = '999';
-                    $ipi->CST = 50;
-                    $ipi->vBC = $dados['produtos'][$i]['total'];
-                    $ipi->pIPI = $aliquotaIPI;
-                    $ipi->vIPI = $ipi->vBC * ($aliquotaIPI / 100);
-                    $ipi->qUnid = null;
-                    $ipi->vUnid = null;
-
+                    $ipi->CST = 55;
                     $nfe->tagIPI($ipi);
-                    $totalIPI += $ipi->vIPI;
+                    // não altera $totalIPI (permanece 0)
+                } else {
+                    if (!in_array($dados['produtos'][$i]['cfop'], ['5902', '6912', '6910', '5124', '5901', '5916', '5556', '5949'])) {
+                        $aliquotaIPI = 9.75;
+                        //====================TAG IPI===================
+                        $ipi = new stdClass();
+                        $ipi->item =  $i + 1; //item da NFe
+                        $ipi->clEnq = null;
+                        $ipi->CNPJProd = null;
+                        $ipi->cSelo = null;
+                        $ipi->qSelo = null;
+                        $ipi->cEnq = '999';
+                        $ipi->CST = 50;
+                        $ipi->vBC = $dados['produtos'][$i]['total'];
+                        $ipi->pIPI = $aliquotaIPI;
+                        $ipi->vIPI = $ipi->vBC * ($aliquotaIPI / 100);
+                        $ipi->qUnid = null;
+                        $ipi->vUnid = null;
+
+                        $nfe->tagIPI($ipi);
+                        $totalIPI += $ipi->vIPI;
+                    }
                 }
             }
         }
@@ -588,31 +614,25 @@ class NfeService
         $vCredICMSSN = $icms->vCredICMSSN ?? $icms->vICMS;
 
         // Define a informação adicional de acordo com a nova lógica
+        $msgBase = '';
         if (array_key_exists("infAdFisco", $dados)) {
-            if (session('config')->crt != 1) {
-                $stdInfo->infAdFisco = $dados['infAdFisco'] . " --- DOCUMENTO EMITIDO POR EMPRESA REGIME NORMAL. ";
-            } else {
-                $stdInfo->infAdFisco = $dados['infAdFisco'] .
-                    " --- DOCUMENTO EMITIDO POR EMPRESA SIMPLES NACIONAL. " .
-                    "NAO GERA DIREITO A CREDITO FISCAL DE IPI. " .
-                    "PERMITE O APROVEITAMENTO DO CREDITO DE ICMS NO VALOR DE R$ " .
-                    number_format($vCredICMSSN, 2, ',', '.') .
-                    ", CORRESPONDENTE A ALIQUOTA DE " .
-                    number_format($aliquota, 2, ',', '.') . "%.";
-            }
-        } else {
-            if (session('config')->crt != 1) {
-                $stdInfo->infAdFisco = " --- DOCUMENTO EMITIDO POR EMPRESA REGIME NORMAL. ";
-            } else {
-                $stdInfo->infAdFisco =
-                    " --- DOCUMENTO EMITIDO POR EMPRESA SIMPLES NACIONAL. " .
-                    "NAO GERA DIREITO A CREDITO FISCAL DE IPI. " .
-                    "PERMITE O APROVEITAMENTO DO CREDITO DE ICMS NO VALOR DE R$ " .
-                    number_format($vCredICMSSN, 2, ',', '.') .
-                    ", CORRESPONDENTE A ALIQUOTA DE " .
-                    number_format($aliquota, 2, ',', '.') . "%.";
-            }
+            $msgBase = $dados['infAdFisco'];
         }
+        if (session('config')->crt != 1) {
+            $msgBase .= " --- DOCUMENTO EMITIDO POR EMPRESA REGIME NORMAL. ";
+        } else {
+            $msgBase .=
+                " --- DOCUMENTO EMITIDO POR EMPRESA SIMPLES NACIONAL. " .
+                "NAO GERA DIREITO A CREDITO FISCAL DE IPI. " .
+                "PERMITE O APROVEITAMENTO DO CREDITO DE ICMS NO VALOR DE R$ " .
+                number_format($vCredICMSSN, 2, ',', '.') .
+                ", CORRESPONDENTE A ALIQUOTA DE " .
+                number_format($aliquota, 2, ',', '.') . "%.";
+        }
+        if ($ipiSuspenso) {
+            $msgBase .= " IPI suspenso de acordo com o artigo 43, inciso V do Decreto nº 7.212/2010 - RIPI.";
+        }
+        $stdInfo->infAdFisco = trim($msgBase);
 
         $stdInfo->infCpl = $dados['infCpl'] ?? '';
 
