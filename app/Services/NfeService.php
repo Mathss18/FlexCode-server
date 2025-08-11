@@ -201,6 +201,14 @@ class NfeService
     // Por padrão: não destacar IPI (IPI suspenso) em todas as notas
     $ipiSuspenso = true;
 
+    // Verifica se o destinatário é uma comercial exportadora
+    // Se houver uma marcação específica nos dados ou se for detectado automaticamente
+    if (isset($dados['comercialExportadora']) && $dados['comercialExportadora'] === true) {
+        $ipiSuspenso = true; // IPI suspenso para comerciais exportadoras
+    } elseif (isset($favorecido['tipoEmpresa']) && strpos(strtolower($favorecido['tipoEmpresa']), 'comercial exportadora') !== false) {
+        $ipiSuspenso = true; // IPI suspenso se detectado que é comercial exportadora
+    }
+
     // Comportamento padrão: se a operação for interestadual e o CFOP informado for 5101 (produção própria),
     // ajusta automaticamente para 6101.
     $forcarCFOP6101 = true;
@@ -406,9 +414,11 @@ class NfeService
                 logger($i, [$dados['produtos'][$i]['cfop']]);
                 if ($ipiSuspenso) {
                     // IPI Suspenso: utilizar CST 55 (IPINT) sem destacar valores
+                    // Para comerciais exportadoras usa código de enquadramento legal 305
+                    // que corresponde ao art. 43, inciso V do Decreto nº 7.212/2010 - RIPI
                     $ipi = new stdClass();
                     $ipi->item =  $i + 1; //item da NFe
-                    $ipi->cEnq = '999';
+                    $ipi->cEnq = '305'; // Código 305: Suspensão - art. 43, inciso V do Decreto nº 7.212/2010 - RIPI
                     $ipi->CST = 55;
                     $nfe->tagIPI($ipi);
                     // não altera $totalIPI (permanece 0)
