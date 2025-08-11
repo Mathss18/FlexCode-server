@@ -400,7 +400,7 @@ class NfeService
                     $ipi->CNPJProd = null;
                     $ipi->cSelo = null;
                     $ipi->qSelo = null;
-                    $ipi->cEnq = '313'; // Código de enquadramento para suspensão (Decreto 7.212/2010)
+                    $ipi->cEnq = '199'; // Código de enquadramento para suspensão - faixa 101-199
                     $ipi->CST = 55; // CST 55 - Saída com Suspensão
                     $ipi->vBC = $dados['produtos'][$i]['total'];
                     $ipi->pIPI = 0.00; // IPI suspenso - alíquota zerada
