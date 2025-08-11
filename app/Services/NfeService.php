@@ -197,23 +197,7 @@ class NfeService
 
         $nfe->tagenderDest($enderDest);
 
-    //====================REGRAS ESPECIAIS (flags)===================
-    // Por padrão: não destacar IPI (IPI suspenso) em todas as notas
-    $ipiSuspenso = true;
-
-    // Verifica se o destinatário é uma comercial exportadora
-    // Se houver uma marcação específica nos dados ou se for detectado automaticamente
-    if (isset($dados['comercialExportadora']) && $dados['comercialExportadora'] === true) {
-        $ipiSuspenso = true; // IPI suspenso para comerciais exportadoras
-    } elseif (isset($favorecido['tipoEmpresa']) && strpos(strtolower($favorecido['tipoEmpresa']), 'comercial exportadora') !== false) {
-        $ipiSuspenso = true; // IPI suspenso se detectado que é comercial exportadora
-    }
-
-    // Comportamento padrão: se a operação for interestadual e o CFOP informado for 5101 (produção própria),
-    // ajusta automaticamente para 6101.
-    $forcarCFOP6101 = true;
-
-    //====================TAG PRODUTO===================
+        //====================TAG PRODUTO===================
         // Armazena o total dos produtos para calculo correto do ICMS
         $valorProdutosReal = 0.0;
         $totalIPI = 0.00;
@@ -231,10 +215,6 @@ class NfeService
 
             //$prod->EXTIPI;
             $prod->CFOP = $dados['produtos'][$i]['cfop'];
-            // Ajusta CFOP para 6.101 se a operação for interestadual e CFOP original for 5101 (produção própria)
-            if ($forcarCFOP6101 && ($ide->idDest ?? null) == 2 && $prod->CFOP === '5101') {
-                $prod->CFOP = '6101';
-            }
             $prod->uCom = $produtos[$i]['unidade_produto']['sigla'] ?? 'PC'; //Unidade do produto
             $prod->qCom = $dados['produtos'][$i]['quantidade']; //Quantidade do produto
             $prod->vUnCom = $dados['produtos'][$i]['preco']; // Valor total - %desconto
@@ -244,8 +224,8 @@ class NfeService
             $prod->vUnTrib = $dados['produtos'][$i]['preco'];
             $prod->vProd = $dados['produtos'][$i]['total'];
 
-            // Não conta o CFOP 5902 para calculo de ICMS
-            if ($prod->CFOP != '5902') {
+            // Não conta o cfop 5902 para calculo de ICSM
+            if ($dados['produtos'][$i]['cfop'] != '5902') {
                 $valorProdutosReal += $dados['produtos'][$i]['total'];
             }
 
@@ -280,17 +260,15 @@ class NfeService
             $nfe->tagimposto($imposto);
 
             $valorIPI = 0.0;
-            if (!$ipiSuspenso) {
-                if (session('config')->crt != 1 && !in_array($prod->CFOP, ['5902', '6912', '6910', '5124', '5901', '5916', '5949'])) {
-                    $aliquotaIPI = 9.75;
-                    $valorIPI = $dados['produtos'][$i]['total'] * ($aliquotaIPI / 100);
-                }
+            if (session('config')->crt != 1 && !in_array($dados['produtos'][$i]['cfop'], ['5902', '6912', '6910', '5124', '5901', '5916', '5949'])) {
+                $aliquotaIPI = 9.75;
+                $valorIPI = $dados['produtos'][$i]['total'] * ($aliquotaIPI / 100);
             }
 
 
             if (session('config')->crt != 1) {
                 //====================TAG ICMS REGIME NORMAL===================
-                if (in_array($prod->CFOP, ['5902', '5102', '6102', '5124', '5901', '5916', '5556', '5949'])) {
+                if (in_array($dados['produtos'][$i]['cfop'], ['5902', '5102', '6102', '5124', '5901', '5916', '5556', '5949'])) {
                     $icms = new stdClass();
                     $icms->item = $i + 1; //item da NFe
                     $icms->orig = 0; // Origem da mercadoria (0 = Nacional, 1 = Estrangeira, etc.)
@@ -323,10 +301,10 @@ class NfeService
                 $icms->orig = 0;
                 //VERIFICA SE TEM IE OU NÃO
                 if (
-                    $prod->CFOP == '5101' ||
-                    $prod->CFOP == '5102' ||
-                    $prod->CFOP == '6101' ||
-                    $prod->CFOP == '6102'
+                    $dados['produtos'][$i]['cfop'] == '5101' ||
+                    $dados['produtos'][$i]['cfop'] == '5102' ||
+                    $dados['produtos'][$i]['cfop'] == '6101' ||
+                    $dados['produtos'][$i]['cfop'] == '6102'
                 ) {
                     if (strlen($favorecido['cpfCnpj']) == 14) {
                         if ($favorecido['inscricaoEstadual']) {
@@ -340,9 +318,9 @@ class NfeService
                     $icms->pCredSN = $aliquota;
                     $icms->vCredICMSSN = $valorProdutosReal * ($aliquota / 100);
                 } else if (
-                    $prod->CFOP == '5902' ||
-                    $prod->CFOP == '6912' ||
-                    $prod->CFOP == '6910'
+                    $dados['produtos'][$i]['cfop'] == '5902' ||
+                    $dados['produtos'][$i]['cfop'] == '6912' ||
+                    $dados['produtos'][$i]['cfop'] == '6910'
                 ) {
                     $icms->CSOSN = '400';
                     $icms->pCredSN = $aliquota;
@@ -412,37 +390,25 @@ class NfeService
                 logger("GERANDO IPI");
                 logger($i, $dados['produtos'][$i]);
                 logger($i, [$dados['produtos'][$i]['cfop']]);
-                if ($ipiSuspenso) {
-                    // IPI Suspenso: utilizar CST 55 (IPINT) sem destacar valores
-                    // Para comerciais exportadoras usa código de enquadramento legal 305
-                    // que corresponde ao art. 43, inciso V do Decreto nº 7.212/2010 - RIPI
+                if (!in_array($dados['produtos'][$i]['cfop'], ['5902', '6912', '6910', '5124', '5901', '5916', '5556', '5949'])) {
+                    //====================TAG IPI===================
                     $ipi = new stdClass();
                     $ipi->item =  $i + 1; //item da NFe
-                    $ipi->cEnq = '305'; // Código 305: Suspensão - art. 43, inciso V do Decreto nº 7.212/2010 - RIPI
-                    $ipi->CST = 55;
-                    $nfe->tagIPI($ipi);
-                    // não altera $totalIPI (permanece 0)
-                } else {
-                    if (!in_array($prod->CFOP, ['5902', '6912', '6910', '5124', '5901', '5916', '5556', '5949'])) {
-                        $aliquotaIPI = 9.75;
-                        //====================TAG IPI===================
-                        $ipi = new stdClass();
-                        $ipi->item =  $i + 1; //item da NFe
-                        $ipi->clEnq = null;
-                        $ipi->CNPJProd = null;
-                        $ipi->cSelo = null;
-                        $ipi->qSelo = null;
-                        $ipi->cEnq = '999';
-                        $ipi->CST = 50;
-                        $ipi->vBC = $dados['produtos'][$i]['total'];
-                        $ipi->pIPI = $aliquotaIPI;
-                        $ipi->vIPI = $ipi->vBC * ($aliquotaIPI / 100);
-                        $ipi->qUnid = null;
-                        $ipi->vUnid = null;
+                    $ipi->clEnq = null;
+                    $ipi->CNPJProd = null;
+                    $ipi->cSelo = null;
+                    $ipi->qSelo = null;
+                    $ipi->cEnq = '999';
+                    $ipi->CST = 55; // CST 55 - Saída com Suspensão
+                    $ipi->vBC = $dados['produtos'][$i]['total'];
+                    $ipi->pIPI = 0.00; // IPI suspenso - alíquota zerada
+                    $ipi->vIPI = 0.00; // IPI suspenso - valor zerado
+                    $ipi->qUnid = null;
+                    $ipi->vUnid = null;
 
-                        $nfe->tagIPI($ipi);
-                        $totalIPI += $ipi->vIPI;
-                    }
+                    $nfe->tagIPI($ipi);
+                    // Não soma ao total do IPI pois está suspenso
+                    // $totalIPI += $ipi->vIPI;
                 }
             }
         }
@@ -622,25 +588,31 @@ class NfeService
         $vCredICMSSN = $icms->vCredICMSSN ?? $icms->vICMS;
 
         // Define a informação adicional de acordo com a nova lógica
-        $msgBase = '';
         if (array_key_exists("infAdFisco", $dados)) {
-            $msgBase = $dados['infAdFisco'];
-        }
-        if (session('config')->crt != 1) {
-            $msgBase .= " --- DOCUMENTO EMITIDO POR EMPRESA REGIME NORMAL. ";
+            if (session('config')->crt != 1) {
+                $stdInfo->infAdFisco = $dados['infAdFisco'] . " --- DOCUMENTO EMITIDO POR EMPRESA REGIME NORMAL. IPI suspenso de acordo com o artigo 43, inciso V do Decreto nº 7.212/2010 - RIPI. ";
+            } else {
+                $stdInfo->infAdFisco = $dados['infAdFisco'] .
+                    " --- DOCUMENTO EMITIDO POR EMPRESA SIMPLES NACIONAL. " .
+                    "NAO GERA DIREITO A CREDITO FISCAL DE IPI. " .
+                    "PERMITE O APROVEITAMENTO DO CREDITO DE ICMS NO VALOR DE R$ " .
+                    number_format($vCredICMSSN, 2, ',', '.') .
+                    ", CORRESPONDENTE A ALIQUOTA DE " .
+                    number_format($aliquota, 2, ',', '.') . "%.";
+            }
         } else {
-            $msgBase .=
-                " --- DOCUMENTO EMITIDO POR EMPRESA SIMPLES NACIONAL. " .
-                "NAO GERA DIREITO A CREDITO FISCAL DE IPI. " .
-                "PERMITE O APROVEITAMENTO DO CREDITO DE ICMS NO VALOR DE R$ " .
-                number_format($vCredICMSSN, 2, ',', '.') .
-                ", CORRESPONDENTE A ALIQUOTA DE " .
-                number_format($aliquota, 2, ',', '.') . "%.";
+            if (session('config')->crt != 1) {
+                $stdInfo->infAdFisco = " --- DOCUMENTO EMITIDO POR EMPRESA REGIME NORMAL. IPI suspenso de acordo com o artigo 43, inciso V do Decreto nº 7.212/2010 - RIPI. ";
+            } else {
+                $stdInfo->infAdFisco =
+                    " --- DOCUMENTO EMITIDO POR EMPRESA SIMPLES NACIONAL. " .
+                    "NAO GERA DIREITO A CREDITO FISCAL DE IPI. " .
+                    "PERMITE O APROVEITAMENTO DO CREDITO DE ICMS NO VALOR DE R$ " .
+                    number_format($vCredICMSSN, 2, ',', '.') .
+                    ", CORRESPONDENTE A ALIQUOTA DE " .
+                    number_format($aliquota, 2, ',', '.') . "%.";
+            }
         }
-        if ($ipiSuspenso) {
-            $msgBase .= " IPI suspenso de acordo com o artigo 43, inciso V do Decreto nº 7.212/2010 - RIPI.";
-        }
-        $stdInfo->infAdFisco = trim($msgBase);
 
         $stdInfo->infCpl = $dados['infCpl'] ?? '';
 
