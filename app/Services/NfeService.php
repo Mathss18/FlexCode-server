@@ -105,7 +105,7 @@ class NfeService
         $ide->tpNF = $dados['tpNF'];
         // Corrige a verificação do estado para determinar se é operação interna ou interestadual
         $estadoFavorecido = isset($favorecido['estado']) ? $favorecido['estado'] : $favorecido->estado;
-        $ide->idDest = 2;
+        $ide->idDest = 1;
         $ide->cMunFG = session('config')->codigoMunicipio;
         $ide->tpImp = 1; //Formato de Impressão da DANFE 1-Retrato / 2-Paisagem
         $ide->tpEmis = 1;
