@@ -198,13 +198,11 @@ class NfeService
         $nfe->tagenderDest($enderDest);
 
     //====================REGRAS ESPECIAIS (flags)===================
-    // Considera IPI suspenso quando venda para Comercial Exportadora com destinação de exportação.
-    // Use $dados['comercialExportadora'] = true para ativar esta regra.
-    $isComercialExportadora = !empty($dados['comercialExportadora']);
-    $ipiSuspenso = $isComercialExportadora === true; // regra simples: suspende IPI para Comercial Exportadora
+    // Por padrão: não destacar IPI (IPI suspenso) em todas as notas
+    $ipiSuspenso = true;
 
-    // Para forçar CFOP 6.101 (venda de produção própria para fora do estado),
-    // use $dados['forcarCFOP6101'] = true. Será aplicado apenas quando idDest == 2 (interestadual).
+    // Comportamento padrão: se a operação for interestadual e o CFOP informado for 5101 (produção própria),
+    // ajusta automaticamente para 6101.
     $forcarCFOP6101 = true;
 
     //====================TAG PRODUTO===================
@@ -225,8 +223,8 @@ class NfeService
 
             //$prod->EXTIPI;
             $prod->CFOP = $dados['produtos'][$i]['cfop'];
-            // Ajusta CFOP para 6.101 se solicitado e a operação for interestadual
-            if ($forcarCFOP6101 && ($ide->idDest ?? null) == 2) {
+            // Ajusta CFOP para 6.101 se a operação for interestadual e CFOP original for 5101 (produção própria)
+            if ($forcarCFOP6101 && ($ide->idDest ?? null) == 2 && $prod->CFOP === '5101') {
                 $prod->CFOP = '6101';
             }
             $prod->uCom = $produtos[$i]['unidade_produto']['sigla'] ?? 'PC'; //Unidade do produto
@@ -238,8 +236,8 @@ class NfeService
             $prod->vUnTrib = $dados['produtos'][$i]['preco'];
             $prod->vProd = $dados['produtos'][$i]['total'];
 
-            // Não conta o cfop 5902 para calculo de ICSM
-            if ($dados['produtos'][$i]['cfop'] != '5902') {
+            // Não conta o CFOP 5902 para calculo de ICMS
+            if ($prod->CFOP != '5902') {
                 $valorProdutosReal += $dados['produtos'][$i]['total'];
             }
 
@@ -275,7 +273,7 @@ class NfeService
 
             $valorIPI = 0.0;
             if (!$ipiSuspenso) {
-                if (session('config')->crt != 1 && !in_array($dados['produtos'][$i]['cfop'], ['5902', '6912', '6910', '5124', '5901', '5916', '5949'])) {
+                if (session('config')->crt != 1 && !in_array($prod->CFOP, ['5902', '6912', '6910', '5124', '5901', '5916', '5949'])) {
                     $aliquotaIPI = 9.75;
                     $valorIPI = $dados['produtos'][$i]['total'] * ($aliquotaIPI / 100);
                 }
@@ -284,7 +282,7 @@ class NfeService
 
             if (session('config')->crt != 1) {
                 //====================TAG ICMS REGIME NORMAL===================
-                if (in_array($dados['produtos'][$i]['cfop'], ['5902', '5102', '6102', '5124', '5901', '5916', '5556', '5949'])) {
+                if (in_array($prod->CFOP, ['5902', '5102', '6102', '5124', '5901', '5916', '5556', '5949'])) {
                     $icms = new stdClass();
                     $icms->item = $i + 1; //item da NFe
                     $icms->orig = 0; // Origem da mercadoria (0 = Nacional, 1 = Estrangeira, etc.)
@@ -317,10 +315,10 @@ class NfeService
                 $icms->orig = 0;
                 //VERIFICA SE TEM IE OU NÃO
                 if (
-                    $dados['produtos'][$i]['cfop'] == '5101' ||
-                    $dados['produtos'][$i]['cfop'] == '5102' ||
-                    $dados['produtos'][$i]['cfop'] == '6101' ||
-                    $dados['produtos'][$i]['cfop'] == '6102'
+                    $prod->CFOP == '5101' ||
+                    $prod->CFOP == '5102' ||
+                    $prod->CFOP == '6101' ||
+                    $prod->CFOP == '6102'
                 ) {
                     if (strlen($favorecido['cpfCnpj']) == 14) {
                         if ($favorecido['inscricaoEstadual']) {
@@ -334,9 +332,9 @@ class NfeService
                     $icms->pCredSN = $aliquota;
                     $icms->vCredICMSSN = $valorProdutosReal * ($aliquota / 100);
                 } else if (
-                    $dados['produtos'][$i]['cfop'] == '5902' ||
-                    $dados['produtos'][$i]['cfop'] == '6912' ||
-                    $dados['produtos'][$i]['cfop'] == '6910'
+                    $prod->CFOP == '5902' ||
+                    $prod->CFOP == '6912' ||
+                    $prod->CFOP == '6910'
                 ) {
                     $icms->CSOSN = '400';
                     $icms->pCredSN = $aliquota;
@@ -415,7 +413,7 @@ class NfeService
                     $nfe->tagIPI($ipi);
                     // não altera $totalIPI (permanece 0)
                 } else {
-                    if (!in_array($dados['produtos'][$i]['cfop'], ['5902', '6912', '6910', '5124', '5901', '5916', '5556', '5949'])) {
+                    if (!in_array($prod->CFOP, ['5902', '6912', '6910', '5124', '5901', '5916', '5556', '5949'])) {
                         $aliquotaIPI = 9.75;
                         //====================TAG IPI===================
                         $ipi = new stdClass();
