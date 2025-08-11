@@ -103,7 +103,9 @@ class NfeService
         $ide->dhEmi = date('Y-m-d\TH:i:sP');
         $ide->dhSaiEnt = date('Y-m-d\TH:i:sP');
         $ide->tpNF = $dados['tpNF'];
-        $ide->idDest = $favorecido['estado'] == session('config')->estado ? 1 : 2;
+        // Corrige a verificação do estado para determinar se é operação interna ou interestadual
+        $estadoFavorecido = isset($favorecido['estado']) ? $favorecido['estado'] : $favorecido->estado;
+        $ide->idDest = $estadoFavorecido == session('config')->estado ? 1 : 2;
         $ide->cMunFG = session('config')->codigoMunicipio;
         $ide->tpImp = 1; //Formato de Impressão da DANFE 1-Retrato / 2-Paisagem
         $ide->tpEmis = 1;
