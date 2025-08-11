@@ -103,9 +103,7 @@ class NfeService
         $ide->dhEmi = date('Y-m-d\TH:i:sP');
         $ide->dhSaiEnt = date('Y-m-d\TH:i:sP');
         $ide->tpNF = $dados['tpNF'];
-        // Corrige a verificação do estado para determinar se é operação interna ou interestadual
-        $estadoFavorecido = isset($favorecido['estado']) ? $favorecido['estado'] : $favorecido->estado;
-        $ide->idDest = $estadoFavorecido == session('config')->estado ? 1 : 2;
+        $ide->idDest = $favorecido['estado'] == session('config')->estado ? 1 : 2;
         $ide->cMunFG = session('config')->codigoMunicipio;
         $ide->tpImp = 1; //Formato de Impressão da DANFE 1-Retrato / 2-Paisagem
         $ide->tpEmis = 1;
@@ -393,6 +391,7 @@ class NfeService
                 logger($i, $dados['produtos'][$i]);
                 logger($i, [$dados['produtos'][$i]['cfop']]);
                 if (!in_array($dados['produtos'][$i]['cfop'], ['5902', '6912', '6910', '5124', '5901', '5916', '5556', '5949'])) {
+                    $aliquotaIPI = 9.75;
                     //====================TAG IPI===================
                     $ipi = new stdClass();
                     $ipi->item =  $i + 1; //item da NFe
@@ -400,17 +399,16 @@ class NfeService
                     $ipi->CNPJProd = null;
                     $ipi->cSelo = null;
                     $ipi->qSelo = null;
-                    $ipi->cEnq = '113'; // Código de enquadramento para suspensão - faixa 101-199
-                    $ipi->CST = 55; // CST 55 - Saída com Suspensão
+                    $ipi->cEnq = '999'; // Usar 113 para Saída com Suspensão
+                    $ipi->CST = 50; // CST 55 - Saída com Suspensão
                     $ipi->vBC = $dados['produtos'][$i]['total'];
-                    $ipi->pIPI = 0.00; // IPI suspenso - alíquota zerada
-                    $ipi->vIPI = 0.00; // IPI suspenso - valor zerado
+                    $ipi->pIPI = $aliquotaIPI;
+                    $ipi->vIPI = $ipi->vBC * ($aliquotaIPI / 100);
                     $ipi->qUnid = null;
                     $ipi->vUnid = null;
 
                     $nfe->tagIPI($ipi);
-                    // Não soma ao total do IPI pois está suspenso
-                    // $totalIPI += $ipi->vIPI;
+                    $totalIPI += $ipi->vIPI;
                 }
             }
         }
@@ -481,7 +479,7 @@ class NfeService
 
         $nfe->tagvol($vol);
 
-        if($dados['parcelasManual'] == 1){
+        if ($dados['parcelasManual'] == 1) {
             if (count($dados['parcelas']) >= 1) {
                 //====================TAG FATURA===================
                 $fat = new stdClass();
@@ -503,8 +501,7 @@ class NfeService
                     $nfe->tagdup($dup);
                 }
             }
-        }
-        else{
+        } else {
             if (count($dados['parcelas']) >= 1) {
                 // Utiliza o valor de vNF já calculado (vNF = totalFinal + vIPI)
                 $vNF = $icmsTotal->vNF;
@@ -554,7 +551,7 @@ class NfeService
 
         //====================TAG DETALHE PAGAMENTO===================
         $totalFinalFormaPag = 0;
-        if($dados['parcelasManual'] == 1){
+        if ($dados['parcelasManual'] == 1) {
             if (count($dados['parcelas']) >= 1) {
                 $tipoFormaPag = '01';
                 $totalFinalFormaPag = $dados['totalFinal'];
@@ -562,8 +559,7 @@ class NfeService
                 $tipoFormaPag = '90';
                 $totalFinalFormaPag = 0;
             }
-        }
-        else{
+        } else {
             if (count($dados['parcelas']) >= 1) {
                 $tipoFormaPag = '01';
                 // Usa o vNF para garantir que o total do pagamento seja igual ao valor da NF-e
@@ -592,7 +588,7 @@ class NfeService
         // Define a informação adicional de acordo com a nova lógica
         if (array_key_exists("infAdFisco", $dados)) {
             if (session('config')->crt != 1) {
-                $stdInfo->infAdFisco = $dados['infAdFisco'] . " --- DOCUMENTO EMITIDO POR EMPRESA REGIME NORMAL. IPI suspenso de acordo com o artigo 43, inciso V do Decreto nº 7.212/2010 - RIPI. ";
+                $stdInfo->infAdFisco = $dados['infAdFisco'] . " --- DOCUMENTO EMITIDO POR EMPRESA REGIME NORMAL. ";
             } else {
                 $stdInfo->infAdFisco = $dados['infAdFisco'] .
                     " --- DOCUMENTO EMITIDO POR EMPRESA SIMPLES NACIONAL. " .
@@ -604,7 +600,7 @@ class NfeService
             }
         } else {
             if (session('config')->crt != 1) {
-                $stdInfo->infAdFisco = " --- DOCUMENTO EMITIDO POR EMPRESA REGIME NORMAL. IPI suspenso de acordo com o artigo 43, inciso V do Decreto nº 7.212/2010 - RIPI. ";
+                $stdInfo->infAdFisco = " --- DOCUMENTO EMITIDO POR EMPRESA REGIME NORMAL. ";
             } else {
                 $stdInfo->infAdFisco =
                     " --- DOCUMENTO EMITIDO POR EMPRESA SIMPLES NACIONAL. " .
