@@ -795,6 +795,25 @@ class NfeService
         }
     }
 
+    /**
+     * Inutiliza uma faixa de numeração da NF-e.
+     * Alias para inutilizaNumerosNfe para compatibilidade com implementações antigas.
+     *
+     * Espera um array $dados com as chaves:
+     * - 'serie' (int|string)
+     * - 'numeroInicial' (int|string)
+     * - 'numeroFinal' (int|string)
+     * - 'justificativa' (string)
+     *
+     * @param array $dados
+     * @return string URL do XML salvo
+     * @throws \Exception
+     */
+    public function inutilizarNfe($dados)
+    {
+        return $this->inutilizaNumerosNfe($dados);
+    }
+
     public function inutilizaNumerosNfe($dados)
     {
 
