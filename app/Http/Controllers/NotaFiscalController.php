@@ -14,39 +14,7 @@ use App\Models\Transportadora;
 use App\Services\NfeService;
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Suppor        } catch (\Exception $ex) {
-            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
-            return response()->json($response, 500);
-        }
-    }
-
-    private function tirarAcentos($string)
-    {
-        return preg_replace(
-            array("/(á|à|ã|â|ä)/", "/(Á|À|Ã|Â|Ä)/", "/(é|è|ê|ë)/", "/(É|È|Ê|Ë)/", "/(í|ì|î|ï)/", "/(Í|Ì|Î|Ï)/", "/(ó|ò|õ|ô|ö)/", "/(Ó|Ò|Õ|Ô|Ö)/", "/(ú|ù|û|ü)/", "/(Ú|Ù|Û|Ü)/", "/(ñ)/", "/(Ñ)/", "/(Ç)/", "/(ç)/"),
-            explode(" ", "a A e E i I o O u U n N C c"),
-            $string
-        );
-    }
-
-    private function uploadXML($xml, $chave)
-    {
-        $mes = date('m');
-        $ano = date('Y');
-        $path = 'public/' . session('tenant')->nome . '/nfe/' . $mes . '-' . $ano . '/' . $chave . '.xml';
-        Storage::put($path, $xml);
-        return config('app.url') . config('app.port') . '/storage/' . session('tenant')->nome . '/nfe/' . $mes . '-' . $ano . '/' . $chave . '.xml';
-    }
-
-    private function uploadDANFE($danfe, $chave)
-    {
-        $mes = date('m');
-        $ano = date('Y');
-        $path = 'public/' . session('tenant')->nome . '/nfe/' . $mes . '-' . $ano . '/' . $chave . '.pdf';
-        Storage::put($path, $danfe);
-        return config('app.url') . config('app.port') . '/storage/' . session('tenant')->nome . '/nfe/' . $mes . '-' . $ano . '/' . $chave . '.pdf';
-    }
-}des\DB;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
@@ -208,7 +176,6 @@ class NotaFiscalController extends Controller
 
     public function inutilizar(Request $request)
     {
-        // Basic validation to comply with SEFAZ requirements
         $request->validate([
             'serie' => 'required|integer|min:0',
             'numeroInicial' => 'required|integer|min:0',
@@ -236,7 +203,6 @@ class NotaFiscalController extends Controller
         ];
         try {
             $nfeService = new NfeService($config);
-            // Aliasing to support older/newer implementations
             $resp = $nfeService->inutilizarNfe($request->all());
             $response = APIHelper::APIResponse(true, 200, 'Sucesso ao inutilzar números', $resp);
             return response()->json($response, 200);
@@ -408,32 +374,5 @@ class NotaFiscalController extends Controller
             $response = APIHelper::APIResponse(false, 500, null, null, $ex);
             return response()->json($response, 500);
         }
-    }
-
-    private function tirarAcentos($string)
-    {
-        return preg_replace(
-            array("/(á|à|ã|â|ä)/", "/(Á|À|Ã|Â|Ä)/", "/(é|è|ê|ë)/", "/(É|È|Ê|Ë)/", "/(í|ì|î|ï)/", "/(Í|Ì|Î|Ï)/", "/(ó|ò|õ|ô|ö)/", "/(Ó|Ò|Õ|Ô|Ö)/", "/(ú|ù|û|ü)/", "/(Ú|Ù|Û|Ü)/", "/(ñ)/", "/(Ñ)/", "/(Ç)/", "/(ç)/"),
-            explode(" ", "a A e E i I o O u U n N C c"),
-            $string
-        );
-    }
-
-    private function uploadXML($xml, $chave)
-    {
-        $mes = date('m');
-        $ano = date('Y');
-        $path = 'public/' . session('tenant')->nome . '/nfe/' . $mes . '-' . $ano . '/' . $chave . '.xml';
-        Storage::put($path, $xml);
-        return config('app.url') . config('app.port') . '/storage/' . session('tenant')->nome . '/nfe/' . $mes . '-' . $ano . '/' . $chave . '.xml';
-    }
-
-    private function uploadDANFE($danfe, $chave)
-    {
-        $mes = date('m');
-        $ano = date('Y');
-        $path = 'public/' . session('tenant')->nome . '/nfe/' . $mes . '-' . $ano . '/' . $chave . '.pdf';
-        Storage::put($path, $danfe);
-        return config('app.url') . config('app.port') . '/storage/' . session('tenant')->nome . '/nfe/' . $mes . '-' . $ano . '/' . $chave . '.pdf';
     }
 }
