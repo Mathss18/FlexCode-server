@@ -203,36 +203,6 @@ class NfeService
         $totalIPI = 0.00;
         $totalICMS = 0.00;
         $totalProdutosCobrados = 0.00;
-        // Rateio de frete por item (proporcional ao valor de cada produto)
-        $freteTotal = isset($dados['frete']) ? (float) $dados['frete'] : 0.0;
-        $qtdItens = isset($dados['produtos']) ? count($dados['produtos']) : 0;
-        $somaValoresItensParaRateio = 0.0;
-        if ($qtdItens > 0) {
-            foreach ($dados['produtos'] as $p) {
-                $somaValoresItensParaRateio += (float) ($p['total'] ?? 0);
-            }
-        }
-        $freteDistribuido = [];
-        if ($freteTotal > 0 && $somaValoresItensParaRateio > 0 && $qtdItens > 0) {
-            $acumulado = 0.0;
-            for ($i = 0; $i < $qtdItens; $i++) {
-                // Para os primeiros itens, arredonda e acumula
-                if ($i < $qtdItens - 1) {
-                    $quota = ($dados['produtos'][$i]['total'] / $somaValoresItensParaRateio) * $freteTotal;
-                    $valorRateado = round($quota, 2);
-                    $freteDistribuido[$i] = $valorRateado;
-                    $acumulado += $valorRateado;
-                } else {
-                    // Último item recebe a diferença para fechar exatamente o total do frete
-                    $freteDistribuido[$i] = round($freteTotal - $acumulado, 2);
-                }
-            }
-        } else {
-            // Sem frete ou sem base, todos zero
-            for ($i = 0; $i < $qtdItens; $i++) {
-                $freteDistribuido[$i] = 0.00;
-            }
-        }
         for ($i = 0; $i < count($dados['produtos']); $i++) {
             $prod = new stdClass();
             $prod->item = $i + 1; //item da NFe
@@ -259,9 +229,10 @@ class NfeService
                 $valorProdutosReal += $dados['produtos'][$i]['total'];
             }
 
-            // Informar o frete rateado no item (soma deve bater com ICMSTot->vFrete)
-            if ($freteTotal > 0.00) {
-                $prod->vFrete = number_format($freteDistribuido[$i] ?? 0, 2, '.', '');
+            if ($dados['frete'] > 0.00) {
+                if ($i == count($dados['produtos']) - 1) {
+                    $prod->vFrete = number_format($dados['frete'], 2, '.', '');
+                }
             }
             //$prod->vSeg = 0.00;
             //$prod->vDesc =  (($nfe2['precoProd'][$i] * $nfe3['porcento'])/100);
@@ -291,8 +262,7 @@ class NfeService
             $valorIPI = 0.0;
             if (session('config')->crt != 1 && !in_array($dados['produtos'][$i]['cfop'], ['5902', '6912', '6910', '5124', '5901', '5916', '5949'])) {
                 $aliquotaIPI = 9.75;
-                $baseIpiTemp = (float) $dados['produtos'][$i]['total'] + (float) ($freteDistribuido[$i] ?? 0);
-                $valorIPI = $baseIpiTemp * ($aliquotaIPI / 100);
+                $valorIPI = $dados['produtos'][$i]['total'] * ($aliquotaIPI / 100);
             }
 
 
@@ -431,8 +401,7 @@ class NfeService
                     $ipi->qSelo = null;
                     $ipi->cEnq = '999'; // Usar 113 para Saída com Suspensão
                     $ipi->CST = 50; // CST 55 - Saída com Suspensão
-                    // Base do IPI = valor do item + parcela do frete rateado
-                    $ipi->vBC = (float) $dados['produtos'][$i]['total'] + (float) ($freteDistribuido[$i] ?? 0);
+                    $ipi->vBC = $dados['produtos'][$i]['total'];
                     $ipi->pIPI = $aliquotaIPI;
                     $ipi->vIPI = $ipi->vBC * ($aliquotaIPI / 100);
                     $ipi->qUnid = null;
