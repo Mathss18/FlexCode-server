@@ -313,7 +313,7 @@ class NfeService
                     $icms->orig = 0; // Origem da mercadoria (0 = Nacional, 1 = Estrangeira, etc.)
                     $icms->CST = '00'; // Código da Situação Tributária do ICMS (00 = Tributado integralmente)
                     $icms->modBC = 3; // Modalidade de determinação da BC (0 = Valor da Operação)
-                    $icms->vBC = $dados['produtos'][$i]['total'];                 // COMENTAR SE FOR PARA USO E CONSUMO
+                    $icms->vBC = (float) $dados['produtos'][$i]['total'] + (float) ($freteDistribuido[$i] ?? 0);             // COMENTAR SE FOR PARA USO E CONSUMO
                     // $icms->vBC = $dados['produtos'][$i]['total'] + $valorIPI; // DESCOMENTAR SE FOR PARA USO E CONSUMO
                     $icms->pICMS = strtolower($favorecido->estado) == "sp" ? $aliquota : $this->getAliquotaByEstado($favorecido->estado); // Alíquota do ICMS (%)
                     $icms->vICMS = 62.85;
