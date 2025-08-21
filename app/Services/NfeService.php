@@ -447,7 +447,7 @@ class NfeService
         //====================TAG ICMSTOTAL===================
         $icmsTotal = new stdClass();
         if (session('config')->crt == 3) {
-            $icmsTotal->vBC = $totalProdutosCobrados;
+            $icmsTotal->vBC = $totalProdutosCobrados + $freteTotal; // Base de Cálculo do ICMS
             $icmsTotal->vICMS = 62.85; //change 480.21
         } else {
             $icmsTotal->vBC = 0.00;
