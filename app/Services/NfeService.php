@@ -203,6 +203,17 @@ class NfeService
         $totalIPI = 0.00;
         $totalICMS = 0.00;
         $totalProdutosCobrados = 0.00;
+        // Flag opcional do frontend: quando true aplica uso e consumo (inclui IPI na base do ICMS)
+        $usoEConsumo = false;
+        if (array_key_exists('usoEConsumo', $dados)) {
+            $valUso = $dados['usoEConsumo'];
+            if (is_bool($valUso)) {
+                $usoEConsumo = $valUso;
+            } else {
+                $parsed = filter_var($valUso, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+                $usoEConsumo = $parsed === null ? false : $parsed;
+            }
+        }
         // Rateio de frete por item (proporcional ao valor de cada produto)
         $freteTotal = isset($dados['frete']) ? (float) $dados['frete'] : 0.0;
         $qtdItens = isset($dados['produtos']) ? count($dados['produtos']) : 0;
@@ -313,13 +324,21 @@ class NfeService
                     $icms->orig = 0; // Origem da mercadoria (0 = Nacional, 1 = Estrangeira, etc.)
                     $icms->CST = '00'; // Código da Situação Tributária do ICMS (00 = Tributado integralmente)
                     $icms->modBC = 3; // Modalidade de determinação da BC (0 = Valor da Operação)
-                    $icms->vBC = (float) $dados['produtos'][$i]['total'] + (float) ($freteDistribuido[$i] ?? 0);                        // COMENTAR SE FOR PARA USO E CONSUMO
-                    // $icms->vBC = (float) $dados['produtos'][$i]['total'] + (float) ($freteDistribuido[$i] ?? 0) + (float) $valorIPI; // DESCOMENTAR SE FOR PARA USO E CONSUMO
+                    // Base de cálculo do ICMS: inclui IPI quando uso e consumo estiver habilitado
+                    if ($usoEConsumo) {
+                        $icms->vBC = (float) $dados['produtos'][$i]['total'] + (float) ($freteDistribuido[$i] ?? 0) + (float) $valorIPI; // USO E CONSUMO
+                    } else {
+                        $icms->vBC = (float) $dados['produtos'][$i]['total'] + (float) ($freteDistribuido[$i] ?? 0);
+                    }
                     $icms->pICMS = strtolower($favorecido->estado) == "sp" ? $aliquota : $this->getAliquotaByEstado($favorecido->estado); // Alíquota do ICMS (%)
                     $icms->vICMS = $icms->vBC * ($icms->pICMS / 100); // Valor do ICMS
                     $totalICMS += $icms->vICMS;
-                    $totalProdutosCobrados += $dados['produtos'][$i]['total'];                 // COMENTAR SE FOR PARA USO E CONSUMO
-                    // $totalProdutosCobrados += $dados['produtos'][$i]['total'] + $valorIPI; // DESCOMENTAR SE FOR PARA USO E CONSUMO
+                    // Soma para totalização da base: inclui IPI quando uso e consumo estiver habilitado
+                    if ($usoEConsumo) {
+                        $totalProdutosCobrados += $dados['produtos'][$i]['total'] + $valorIPI; // USO E CONSUMO
+                    } else {
+                        $totalProdutosCobrados += $dados['produtos'][$i]['total'];
+                    }
                 }
 
                 // Adiciona ao XML
