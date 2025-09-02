@@ -10,6 +10,7 @@ use App\Models\VendaAnexo;
 use App\Models\VendaParcela;
 use App\Models\Produto;
 use App\Models\Transacao;
+use App\Models\NotaFiscal;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
@@ -223,6 +224,11 @@ class VendaController extends Controller
         $oldVendas = clone $vendas;
         $user = JWTAuth::user();
 
+        // Se existir NFe emitida (Autorizada) para esta venda, alterações de parcelas não devem refletir no Money
+        $hasNFeEmitted = NotaFiscal::where('venda_id', $vendas->id)
+            ->where('situacao', 'Autorizada')
+            ->exists();
+
 
         $vendas->numero = $request->input('numero');
         $vendas->cliente_id = $request->input('cliente_id')['value'];
@@ -300,17 +306,20 @@ class VendaController extends Controller
             if ($parcelas) {
                 $vendas->parcelas()->delete();
                 $index = 0;
-                if ($oldVendas->situacao == 0 && $vendas->situacao == 1) {
-                    DB::table('transacoes')->where('venda_id', $vendas->id)->delete();
-                }
-                if ($oldVendas->situacao == 1 && $vendas->situacao == 3) {
-                    DB::table('transacoes')->where('venda_id', $vendas->id)->delete();
-                }
-                if ($oldVendas->situacao == 1 && $vendas->situacao == 0) {
-                    DB::table('transacoes')->where('venda_id', $vendas->id)->delete();
-                }
-                if ($vendas->situacao == 2) {
-                    DB::table('transacoes')->where('venda_id', $vendas->id)->delete();
+                // Somente alterar transações se NÃO houver NFe emitida para esta venda
+                if (!$hasNFeEmitted) {
+                    if ($oldVendas->situacao == 0 && $vendas->situacao == 1) {
+                        DB::table('transacoes')->where('venda_id', $vendas->id)->delete();
+                    }
+                    if ($oldVendas->situacao == 1 && $vendas->situacao == 3) {
+                        DB::table('transacoes')->where('venda_id', $vendas->id)->delete();
+                    }
+                    if ($oldVendas->situacao == 1 && $vendas->situacao == 0) {
+                        DB::table('transacoes')->where('venda_id', $vendas->id)->delete();
+                    }
+                    if ($vendas->situacao == 2) {
+                        DB::table('transacoes')->where('venda_id', $vendas->id)->delete();
+                    }
                 }
                 foreach ($parcelas as $parcela) {
                     $vendas->parcelas()->saveMany(
@@ -329,7 +338,8 @@ class VendaController extends Controller
 
                     );
 
-                    if ($oldVendas->situacao == 0 && $vendas->situacao == 1 || $oldVendas->situacao == 3 && $vendas->situacao == 1) {
+                    // Não criar/atualizar transações se houver NFe emitida para esta venda
+                    if (!$hasNFeEmitted && ($oldVendas->situacao == 0 && $vendas->situacao == 1 || $oldVendas->situacao == 3 && $vendas->situacao == 1)) {
                         //Cadastra as parcelas no money
                         $formaPagamento = FormaPagamento::with(['conta_bancaria'])->findOrFail($parcela['forma_pagamento_id']);
 
