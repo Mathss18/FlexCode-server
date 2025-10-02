@@ -204,7 +204,7 @@ class NfeService
         $totalICMS = 0.00;
         $totalProdutosCobrados = 0.00;
         // Regra nova: suspensão de IPI para Comercial Exportadora com destinação exportação
-        $isComercialExportadora = true;
+        $isComercialExportadora = false;
 
         // Frase obrigatória quando IPI suspenso (CST 55)
         $fraseIpiSuspenso = 'IPI suspenso de acordo com o artigo 43, inciso V do Decreto nº 7.212/2010 - RIPI';
