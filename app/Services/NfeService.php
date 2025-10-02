@@ -203,6 +203,11 @@ class NfeService
         $totalIPI = 0.00;
         $totalICMS = 0.00;
         $totalProdutosCobrados = 0.00;
+        // Regra nova: suspensão de IPI para Comercial Exportadora com destinação exportação
+        $isComercialExportadora = true;
+
+        // Frase obrigatória quando IPI suspenso (CST 55)
+        $fraseIpiSuspenso = 'IPI suspenso de acordo com o artigo 43, inciso V do Decreto nº 7.212/2010 - RIPI';
         // Flag opcional do frontend: quando true aplica uso e consumo (inclui IPI na base do ICMS)
         $usoEConsumo = false;
         if (array_key_exists('usoEConsumo', $dados)) {
@@ -301,9 +306,12 @@ class NfeService
 
             $valorIPI = 0.0;
             if (session('config')->crt != 1 && !in_array($dados['produtos'][$i]['cfop'], ['5902', '6912', '6910', '5124', '5901', '5916', '5949'])) {
-                $aliquotaIPI = 9.75;
-                $baseIpiTemp = (float) $dados['produtos'][$i]['total'] + (float) ($freteDistribuido[$i] ?? 0);
-                $valorIPI = $baseIpiTemp * ($aliquotaIPI / 100);
+                // Quando suspensão (CST 55) não calcula valor de IPI
+                if (!$isComercialExportadora) {
+                    $aliquotaIPI = 9.75;
+                    $baseIpiTemp = (float) $dados['produtos'][$i]['total'] + (float) ($freteDistribuido[$i] ?? 0);
+                    $valorIPI = $baseIpiTemp * ($aliquotaIPI / 100);
+                }
             }
 
 
@@ -440,7 +448,6 @@ class NfeService
                 logger($i, $dados['produtos'][$i]);
                 logger($i, [$dados['produtos'][$i]['cfop']]);
                 if (!in_array($dados['produtos'][$i]['cfop'], ['5902', '6912', '6910', '5124', '5901', '5916', '5556', '5949'])) {
-                    $aliquotaIPI = 9.75;
                     //====================TAG IPI===================
                     $ipi = new stdClass();
                     $ipi->item =  $i + 1; //item da NFe
@@ -448,17 +455,25 @@ class NfeService
                     $ipi->CNPJProd = null;
                     $ipi->cSelo = null;
                     $ipi->qSelo = null;
-                    $ipi->cEnq = '999'; // Usar 113 para Saída com Suspensão
-                    $ipi->CST = 50; // CST 55 - Saída com Suspensão
-                    // Base do IPI = valor do item + parcela do frete rateado
-                    $ipi->vBC = (float) $dados['produtos'][$i]['total'] + (float) ($freteDistribuido[$i] ?? 0);
-                    $ipi->pIPI = $aliquotaIPI;
-                    $ipi->vIPI = $ipi->vBC * ($aliquotaIPI / 100);
+                    if ($isComercialExportadora) {
+                        // Suspensão conforme art. 43, inciso V do Decreto 7.212/2010 - RIPI
+                        $ipi->cEnq = '113';
+                        $ipi->CST = 55; // Saída com Suspensão
+                        $ipi->vBC = (float) $dados['produtos'][$i]['total'] + (float) ($freteDistribuido[$i] ?? 0);
+                        $ipi->pIPI = 0.00;
+                        $ipi->vIPI = 0.00;
+                    } else {
+                        $aliquotaIPI = 9.75; // Alíquota padrão utilizada anteriormente
+                        $ipi->cEnq = '999';
+                        $ipi->CST = 50; // Saída Tributada
+                        $ipi->vBC = (float) $dados['produtos'][$i]['total'] + (float) ($freteDistribuido[$i] ?? 0);
+                        $ipi->pIPI = $aliquotaIPI;
+                        $ipi->vIPI = $ipi->vBC * ($aliquotaIPI / 100);
+                        $totalIPI += $ipi->vIPI; // Só soma quando não suspenso
+                    }
                     $ipi->qUnid = null;
                     $ipi->vUnid = null;
-
                     $nfe->tagIPI($ipi);
-                    $totalIPI += $ipi->vIPI;
                 }
             }
         }
@@ -663,6 +678,12 @@ class NfeService
         }
 
         $stdInfo->infCpl = $dados['infCpl'] ?? '';
+        // Acrescenta frase de suspensão de IPI se aplicável e ainda não presente
+        if ($isComercialExportadora) {
+            if (stripos($stdInfo->infCpl, $fraseIpiSuspenso) === false) {
+                $stdInfo->infCpl = trim(($stdInfo->infCpl ? $stdInfo->infCpl . ' | ' : '') . $fraseIpiSuspenso);
+            }
+        }
 
         $nfe->taginfAdic($stdInfo);
 
