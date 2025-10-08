@@ -309,7 +309,8 @@ class NfeService
                 // Quando suspensão (CST 55) não calcula valor de IPI
                 if (!$isComercialExportadora) {
                     $aliquotaIPI = 9.75;
-                    $baseIpiTemp = (float) $dados['produtos'][$i]['total'] + (float) ($freteDistribuido[$i] ?? 0);
+                    // $baseIpiTemp = (float) $dados['produtos'][$i]['total'] + (float) ($freteDistribuido[$i] ?? 0);
+                    $baseIpiTemp = (float) $dados['produtos'][$i]['total'];
                     $valorIPI = $baseIpiTemp * ($aliquotaIPI / 100);
                 }
             }
@@ -334,9 +335,11 @@ class NfeService
                     $icms->modBC = 3; // Modalidade de determinação da BC (0 = Valor da Operação)
                     // Base de cálculo do ICMS: inclui IPI quando uso e consumo estiver habilitado
                     if ($usoEConsumo) {
-                        $icms->vBC = (float) $dados['produtos'][$i]['total'] + (float) ($freteDistribuido[$i] ?? 0) + (float) $valorIPI; // USO E CONSUMO
+                        // $icms->vBC = (float) $dados['produtos'][$i]['total'] + (float) ($freteDistribuido[$i] ?? 0) + (float) $valorIPI; // USO E CONSUMO
+                        $icms->vBC = (float) $dados['produtos'][$i]['total'] + (float) $valorIPI; // USO E CONSUMO
                     } else {
-                        $icms->vBC = (float) $dados['produtos'][$i]['total'] + (float) ($freteDistribuido[$i] ?? 0);
+                        // $icms->vBC = (float) $dados['produtos'][$i]['total'] + (float) ($freteDistribuido[$i] ?? 0);
+                        $icms->vBC = (float) $dados['produtos'][$i]['total'];
                     }
                     $icms->pICMS = strtolower($favorecido->estado) == "sp" ? $aliquota : $this->getAliquotaByEstado($favorecido->estado); // Alíquota do ICMS (%)
                     $icms->vICMS = $icms->vBC * ($icms->pICMS / 100); // Valor do ICMS
@@ -459,14 +462,16 @@ class NfeService
                         // Suspensão conforme art. 43, inciso V do Decreto 7.212/2010 - RIPI
                         $ipi->cEnq = '113';
                         $ipi->CST = 55; // Saída com Suspensão
-                        $ipi->vBC = (float) $dados['produtos'][$i]['total'] + (float) ($freteDistribuido[$i] ?? 0);
+                        // $ipi->vBC = (float) $dados['produtos'][$i]['total'] + (float) ($freteDistribuido[$i] ?? 0);
+                        $ipi->vBC = (float) $dados['produtos'][$i]['total'];
                         $ipi->pIPI = 0.00;
                         $ipi->vIPI = 0.00;
                     } else {
                         $aliquotaIPI = 9.75; // Alíquota padrão utilizada anteriormente
                         $ipi->cEnq = '999';
                         $ipi->CST = 50; // Saída Tributada
-                        $ipi->vBC = (float) $dados['produtos'][$i]['total'] + (float) ($freteDistribuido[$i] ?? 0);
+                        // $ipi->vBC = (float) $dados['produtos'][$i]['total'] + (float) ($freteDistribuido[$i] ?? 0);
+                        $ipi->vBC = (float) $dados['produtos'][$i]['total'];
                         $ipi->pIPI = $aliquotaIPI;
                         $ipi->vIPI = $ipi->vBC * ($aliquotaIPI / 100);
                         $totalIPI += $ipi->vIPI; // Só soma quando não suspenso
