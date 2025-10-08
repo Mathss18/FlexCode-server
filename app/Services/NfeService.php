@@ -333,22 +333,20 @@ class NfeService
                     $icms->orig = 0; // Origem da mercadoria (0 = Nacional, 1 = Estrangeira, etc.)
                     $icms->CST = '00'; // Código da Situação Tributária do ICMS (00 = Tributado integralmente)
                     $icms->modBC = 3; // Modalidade de determinação da BC (0 = Valor da Operação)
-                    // Base de cálculo do ICMS: inclui IPI quando uso e consumo estiver habilitado
+                    // Base de cálculo do ICMS: inclui frete rateado e IPI quando uso e consumo estiver habilitado
                     if ($usoEConsumo) {
-                        // $icms->vBC = (float) $dados['produtos'][$i]['total'] + (float) ($freteDistribuido[$i] ?? 0) + (float) $valorIPI; // USO E CONSUMO
-                        $icms->vBC = (float) $dados['produtos'][$i]['total'] + (float) $valorIPI; // USO E CONSUMO
+                        $icms->vBC = (float) $dados['produtos'][$i]['total'] + (float) ($freteDistribuido[$i] ?? 0) + (float) $valorIPI; // USO E CONSUMO
                     } else {
-                        // $icms->vBC = (float) $dados['produtos'][$i]['total'] + (float) ($freteDistribuido[$i] ?? 0);
-                        $icms->vBC = (float) $dados['produtos'][$i]['total'];
+                        $icms->vBC = (float) $dados['produtos'][$i]['total'] + (float) ($freteDistribuido[$i] ?? 0);
                     }
                     $icms->pICMS = strtolower($favorecido->estado) == "sp" ? $aliquota : $this->getAliquotaByEstado($favorecido->estado); // Alíquota do ICMS (%)
                     $icms->vICMS = $icms->vBC * ($icms->pICMS / 100); // Valor do ICMS
                     $totalICMS += $icms->vICMS;
-                    // Soma para totalização da base: inclui IPI quando uso e consumo estiver habilitado
+                    // Soma para totalização da base: inclui frete rateado e IPI quando uso e consumo estiver habilitado
                     if ($usoEConsumo) {
-                        $totalProdutosCobrados += $dados['produtos'][$i]['total'] + $valorIPI; // USO E CONSUMO
+                        $totalProdutosCobrados += $dados['produtos'][$i]['total'] + ($freteDistribuido[$i] ?? 0) + $valorIPI; // USO E CONSUMO
                     } else {
-                        $totalProdutosCobrados += $dados['produtos'][$i]['total'];
+                        $totalProdutosCobrados += $dados['produtos'][$i]['total'] + ($freteDistribuido[$i] ?? 0);
                     }
                 }
 
@@ -486,7 +484,7 @@ class NfeService
         //====================TAG ICMSTOTAL===================
         $icmsTotal = new stdClass();
         if (session('config')->crt == 3) {
-            $icmsTotal->vBC = $totalProdutosCobrados + $freteTotal; // Base de Cálculo do ICMS
+            $icmsTotal->vBC = $totalProdutosCobrados; // Base de Cálculo do ICMS (já inclui o frete rateado por item)
             $icmsTotal->vICMS = $totalICMS; //change 480.21
         } else {
             $icmsTotal->vBC = 0.00;
