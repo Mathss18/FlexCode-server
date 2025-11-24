@@ -686,12 +686,12 @@ class RelatorioController extends Controller
                 preg_match('/<natOp>(.*?)<\/natOp>/', $xmlContent, $natOpMatch);
                 $natOpValue = $natOpMatch[1] ?? 'não encontrado';
 
-                // Verificar natOp se for Flex Mol
+                // Verificar natOp se for Flex Mol - verificar apenas no campo natOp específico
                 if ($tenantName === 'Flex Mol') {
-                    // Verificar se contém 6101 ou 5101
-                    if (!str_contains($xmlContent, '6101') && !str_contains($xmlContent, '5101')) {
+                    // Verificar se o natOp começa com 6101 ou 5101
+                    if (!preg_match('/^(6101|5101)/', $natOpValue)) {
                         $debug['notas_natop_invalido']++;
-                        if (count($debug['notas_natop_invalido_detalhes']) < 5) {
+                        if (count($debug['notas_natop_invalido_detalhes']) < 10) {
                             $debug['notas_natop_invalido_detalhes'][] = [
                                 'numero' => $nota->nNF,
                                 'chave' => $nota->chaveNF,
