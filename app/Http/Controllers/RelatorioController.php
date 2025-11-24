@@ -713,8 +713,9 @@ class RelatorioController extends Controller
                         $vendasPorMes[$mesAno]['total'] += $valorNota;
                         $vendasPorMes[$mesAno]['quantidade_notas']++;
                         $vendasPorMes[$mesAno]['notas'][] = [
-                            'numero' => $nota->numero ?? 'N/A',
+                            'numero' => $nota->nNF,
                             'chave' => $nota->chaveNF,
+                            'favorecido' => $nota->favorecido_nome,
                             'valor' => $valorNota,
                             'data' => $dataCreated->format('d/m/Y')
                         ];
