@@ -689,7 +689,7 @@ class RelatorioController extends Controller
                 // Verificar natOp se for Flex Mol - verificar apenas no campo natOp específico
                 if ($tenantName === 'Flex Mol') {
                     // Verificar se o natOp começa com 6101 ou 5101
-                    if (!preg_match('/^(6101|5101)/', $natOpValue)) {
+                    if (true) {
                         $debug['notas_natop_invalido']++;
                         if (count($debug['notas_natop_invalido_detalhes']) < 10) {
                             $debug['notas_natop_invalido_detalhes'][] = [
