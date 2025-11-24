@@ -669,9 +669,8 @@ class RelatorioController extends Controller
                 $mesAno = $dataCreated->format('m-Y');
                 $mesAnoLabel = $dataCreated->format('m/Y');
 
-                // Montar o caminho do XML usando o nome do tenant da sessão
-                $xmlPath = storage_path("app/{$tenantName}/nfe/{$mesAno}/{$nota->chaveNF}.xml");
-                $debug['caminhos_testados'][] = $xmlPath;
+                // Montar o caminho do XML
+                $xmlPath = storage_path("app/public/{$tenantName}/nfe/{$mesAno}/{$nota->chaveNF}.xml");
 
                 // Verificar se o arquivo existe
                 if (!file_exists($xmlPath)) {
