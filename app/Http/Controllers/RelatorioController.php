@@ -638,6 +638,105 @@ class RelatorioController extends Controller
         }
     }
 
+    public function faturamento(Request $request)
+    {
+        try {
+            $from = $request->query('startDate');
+            $to = $request->query('endDate');
+            $tenantName = session('tenant')->nome;
+
+            // Buscar notas fiscais autorizadas no período
+            $notasFiscais = DB::table('notas_fiscais')
+                ->where('situacao', 'Autorizada')
+                ->whereBetween('created_at', [$from . ' 00:00:00', $to . ' 23:59:59'])
+                ->orderBy('created_at', 'asc')
+                ->get();
+
+            $vendasPorMes = [];
+            $totalGeral = 0;
+
+            foreach ($notasFiscais as $nota) {
+                // Extrair mês e ano do created_at
+                $dataCreated = \Carbon\Carbon::parse($nota->created_at);
+                $mesAno = $dataCreated->format('m-Y');
+                $mesAnoLabel = $dataCreated->format('m/Y');
+
+                // Montar o caminho do XML
+                $xmlPath = storage_path("app/Flex Mol/nfe/{$mesAno}/{$nota->chaveNF}.xml");
+
+                // Verificar se o arquivo existe
+                if (!file_exists($xmlPath)) {
+                    continue;
+                }
+
+                // Ler e parsear o XML
+                $xmlContent = file_get_contents($xmlPath);
+
+                // Verificar natOp se for Flex Mol
+                if ($tenantName === 'Flex Mol') {
+                    // Verificar se contém 6101 ou 5101
+                    if (!str_contains($xmlContent, '6101') && !str_contains($xmlContent, '5101')) {
+                        continue;
+                    }
+                }
+
+                // Extrair o valor da nota (vNF)
+                try {
+                    $xml = simplexml_load_string($xmlContent);
+                    $xml->registerXPathNamespace('nfe', 'http://www.portalfiscal.inf.br/nfe');
+
+                    $vNFNodes = $xml->xpath('//nfe:total/nfe:ICMSTot/nfe:vNF');
+
+                    if (!empty($vNFNodes)) {
+                        $valorNota = (float) $vNFNodes[0];
+
+                        // Agrupar por mês
+                        if (!isset($vendasPorMes[$mesAno])) {
+                            $vendasPorMes[$mesAno] = [
+                                'mes_ano' => $mesAnoLabel,
+                                'total' => 0,
+                                'quantidade_notas' => 0,
+                                'notas' => []
+                            ];
+                        }
+
+                        $vendasPorMes[$mesAno]['total'] += $valorNota;
+                        $vendasPorMes[$mesAno]['quantidade_notas']++;
+                        $vendasPorMes[$mesAno]['notas'][] = [
+                            'numero' => $nota->numero ?? 'N/A',
+                            'chave' => $nota->chaveNF,
+                            'valor' => $valorNota,
+                            'data' => $dataCreated->format('d/m/Y')
+                        ];
+
+                        $totalGeral += $valorNota;
+                    }
+                } catch (Exception $xmlEx) {
+                    // Se falhar ao parsear o XML, continuar para a próxima nota
+                    continue;
+                }
+            }
+
+            // Converter array associativo para indexado
+            $vendasPorMesIndexado = array_values($vendasPorMes);
+
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso', [
+                'periodo' => [
+                    'data_inicio' => $from,
+                    'data_fim' => $to
+                ],
+                'empresa' => $tenantName,
+                'total_geral' => number_format($totalGeral, 2, '.', ''),
+                'vendas_por_mes' => $vendasPorMesIndexado
+            ]);
+
+            return response()->json($response, 200);
+        } catch (Exception $ex) {
+            $response = APIHelper::APIResponse(false, 500, 'Erro ao buscar vendas por nota fiscal.', null, $ex);
+            return response()->json($response, 500);
+        }
+    }
+
     private function date_range($first, $last, $step = '+1 day', $output_format = 'd/m/Y')
     {
 
