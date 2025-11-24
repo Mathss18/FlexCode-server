@@ -659,8 +659,9 @@ class RelatorioController extends Controller
                 'notas_processadas' => 0,
                 'notas_sem_xml' => 0,
                 'notas_natop_invalido' => 0,
+                'notas_natop_invalido_detalhes' => [],
                 'notas_erro_parse' => 0,
-                'caminhos_testados' => []
+                'exemplo_notas_processadas' => []
             ];
 
             foreach ($notasFiscais as $nota) {
@@ -681,11 +682,22 @@ class RelatorioController extends Controller
                 // Ler e parsear o XML
                 $xmlContent = file_get_contents($xmlPath);
 
+                // Extrair natOp para debug
+                preg_match('/<natOp>(.*?)<\/natOp>/', $xmlContent, $natOpMatch);
+                $natOpValue = $natOpMatch[1] ?? 'não encontrado';
+
                 // Verificar natOp se for Flex Mol
                 if ($tenantName === 'Flex Mol') {
                     // Verificar se contém 6101 ou 5101
                     if (!str_contains($xmlContent, '6101') && !str_contains($xmlContent, '5101')) {
                         $debug['notas_natop_invalido']++;
+                        if (count($debug['notas_natop_invalido_detalhes']) < 5) {
+                            $debug['notas_natop_invalido_detalhes'][] = [
+                                'numero' => $nota->nNF,
+                                'chave' => $nota->chaveNF,
+                                'natOp' => $natOpValue
+                            ];
+                        }
                         continue;
                     }
                 }
@@ -716,12 +728,22 @@ class RelatorioController extends Controller
                             'numero' => $nota->nNF,
                             'chave' => $nota->chaveNF,
                             'favorecido' => $nota->favorecido_nome,
+                            'natOp' => $natOpValue,
                             'valor' => $valorNota,
                             'data' => $dataCreated->format('d/m/Y')
                         ];
 
                         $totalGeral += $valorNota;
                         $debug['notas_processadas']++;
+
+                        // Guardar exemplos das primeiras 5 notas processadas
+                        if (count($debug['exemplo_notas_processadas']) < 5) {
+                            $debug['exemplo_notas_processadas'][] = [
+                                'numero' => $nota->nNF,
+                                'valor' => $valorNota,
+                                'natOp' => $natOpValue
+                            ];
+                        }
                     }
                 } catch (Exception $xmlEx) {
                     // Se falhar ao parsear o XML, continuar para a próxima nota
