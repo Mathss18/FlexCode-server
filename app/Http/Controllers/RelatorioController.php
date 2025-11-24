@@ -654,6 +654,14 @@ class RelatorioController extends Controller
 
             $vendasPorMes = [];
             $totalGeral = 0;
+            $debug = [
+                'total_notas_encontradas' => $notasFiscais->count(),
+                'notas_processadas' => 0,
+                'notas_sem_xml' => 0,
+                'notas_natop_invalido' => 0,
+                'notas_erro_parse' => 0,
+                'caminhos_testados' => []
+            ];
 
             foreach ($notasFiscais as $nota) {
                 // Extrair mês e ano do created_at
@@ -661,11 +669,13 @@ class RelatorioController extends Controller
                 $mesAno = $dataCreated->format('m-Y');
                 $mesAnoLabel = $dataCreated->format('m/Y');
 
-                // Montar o caminho do XML
-                $xmlPath = storage_path("app/Flex Mol/nfe/{$mesAno}/{$nota->chaveNF}.xml");
+                // Montar o caminho do XML usando o nome do tenant da sessão
+                $xmlPath = storage_path("app/{$tenantName}/nfe/{$mesAno}/{$nota->chaveNF}.xml");
+                $debug['caminhos_testados'][] = $xmlPath;
 
                 // Verificar se o arquivo existe
                 if (!file_exists($xmlPath)) {
+                    $debug['notas_sem_xml']++;
                     continue;
                 }
 
@@ -676,6 +686,7 @@ class RelatorioController extends Controller
                 if ($tenantName === 'Flex Mol') {
                     // Verificar se contém 6101 ou 5101
                     if (!str_contains($xmlContent, '6101') && !str_contains($xmlContent, '5101')) {
+                        $debug['notas_natop_invalido']++;
                         continue;
                     }
                 }
@@ -710,9 +721,11 @@ class RelatorioController extends Controller
                         ];
 
                         $totalGeral += $valorNota;
+                        $debug['notas_processadas']++;
                     }
                 } catch (Exception $xmlEx) {
                     // Se falhar ao parsear o XML, continuar para a próxima nota
+                    $debug['notas_erro_parse']++;
                     continue;
                 }
             }
@@ -727,7 +740,8 @@ class RelatorioController extends Controller
                 ],
                 'empresa' => $tenantName,
                 'total_geral' => number_format($totalGeral, 2, '.', ''),
-                'vendas_por_mes' => $vendasPorMesIndexado
+                'vendas_por_mes' => $vendasPorMesIndexado,
+                'debug' => $debug
             ]);
 
             return response()->json($response, 200);
