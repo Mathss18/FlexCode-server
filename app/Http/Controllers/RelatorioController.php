@@ -702,16 +702,43 @@ class RelatorioController extends Controller
                     }
                 }
 
-                // Extrair o valor da nota (vNF)
+                // Extrair o valor da nota
                 try {
                     $xml = simplexml_load_string($xmlContent);
                     $xml->registerXPathNamespace('nfe', 'http://www.portalfiscal.inf.br/nfe');
 
-                    $vNFNodes = $xml->xpath('//nfe:total/nfe:ICMSTot/nfe:vNF');
+                    $valorNota = 0;
+                    $metodoExtracao = '';
 
-                    if (!empty($vNFNodes)) {
-                        $valorNota = (float) $vNFNodes[0];
+                    // Se for METALFLEX, buscar vLiq da cobrança
+                    if ($tenantName === 'Metal Flex') {
+                        // Verificar se existe a tag nFat (cobrança)
+                        $nFatNodes = $xml->xpath('//nfe:cobr/nfe:fat/nfe:nFat');
 
+                        if (!empty($nFatNodes)) {
+                            // Se existe nFat, extrair o vLiq
+                            $vLiqNodes = $xml->xpath('//nfe:cobr/nfe:fat/nfe:vLiq');
+
+                            if (!empty($vLiqNodes)) {
+                                $valorNota = (float) $vLiqNodes[0];
+                                $metodoExtracao = 'vLiq';
+                            }
+                        } else {
+                            // Se não existe nFat, ignorar esta nota
+                            continue;
+                        }
+                    } else {
+                        // Para outros tenants, usar vNF
+                        $vNFNodes = $xml->xpath('//nfe:total/nfe:ICMSTot/nfe:vNF');
+
+                        if (!empty($vNFNodes)) {
+                            $valorNota = (float) $vNFNodes[0];
+                            $metodoExtracao = 'vNF';
+                        }
+                    }
+
+                    // Se conseguiu extrair o valor, adicionar ao total
+                    if ($valorNota > 0) {
                         // Agrupar por mês
                         if (!isset($vendasPorMes[$mesAno])) {
                             $vendasPorMes[$mesAno] = [
@@ -730,7 +757,8 @@ class RelatorioController extends Controller
                             'favorecido' => $nota->favorecido_nome,
                             'natOp' => $natOpValue,
                             'valor' => $valorNota,
-                            'data' => $dataCreated->format('d/m/Y')
+                            'data' => $dataCreated->format('d/m/Y'),
+                            'metodo_extracao' => $metodoExtracao
                         ];
 
                         $totalGeral += $valorNota;
@@ -741,7 +769,8 @@ class RelatorioController extends Controller
                             $debug['exemplo_notas_processadas'][] = [
                                 'numero' => $nota->nNF,
                                 'valor' => $valorNota,
-                                'natOp' => $natOpValue
+                                'natOp' => $natOpValue,
+                                'metodo_extracao' => $metodoExtracao
                             ];
                         }
                     }
