@@ -305,7 +305,7 @@ class NfeService
             $nfe->tagimposto($imposto);
 
             $valorIPI = 0.0;
-            if (session('config')->crt != 1 && !in_array($dados['produtos'][$i]['cfop'], ['5902', '6912', '6910', '5124', '5901', '5916', '5949'])) {
+            if (session('config')->crt != 1 && !in_array($dados['produtos'][$i]['cfop'], ['5902', '6912', '6910', '5124', '5901', '5916', '5949', '6916'])) {
                 // Quando suspensão (CST 55) não calcula valor de IPI
                 if (!$isComercialExportadora) {
                     $aliquotaIPI = 9.75;
@@ -448,7 +448,7 @@ class NfeService
                 logger("GERANDO IPI");
                 logger($i, $dados['produtos'][$i]);
                 logger($i, [$dados['produtos'][$i]['cfop']]);
-                if (!in_array($dados['produtos'][$i]['cfop'], ['5902', '6912', '6910', '5124', '5901', '5916', '5556', '5949'])) {
+                if (!in_array($dados['produtos'][$i]['cfop'], ['5902', '6912', '6910', '5124', '5901', '5916', '5556', '5949', '6916'])) {
                     //====================TAG IPI===================
                     $ipi = new stdClass();
                     $ipi->item =  $i + 1; //item da NFe
