@@ -654,6 +654,7 @@ class RelatorioController extends Controller
 
             $vendasPorMes = [];
             $totalGeral = 0;
+            $totalGeralDescontadoIPI = 0;
             $debug = [
                 'total_notas_encontradas' => $notasFiscais->count(),
                 'notas_processadas' => 0,
@@ -708,6 +709,7 @@ class RelatorioController extends Controller
                     $xml->registerXPathNamespace('nfe', 'http://www.portalfiscal.inf.br/nfe');
 
                     $valorNota = 0;
+                    $valorIPI = 0;
                     $metodoExtracao = '';
 
                     // Se for METALFLEX, buscar vLiq da cobrança
@@ -735,21 +737,35 @@ class RelatorioController extends Controller
                             $valorNota = (float) $vNFNodes[0];
                             $metodoExtracao = 'vNF';
                         }
+
+                        // Se for Flex Mol, extrair também o IPI
+                        if ($tenantName === 'Flex Mol') {
+                            $vIPINodes = $xml->xpath('//nfe:total/nfe:ICMSTot/nfe:vIPI');
+                            if (!empty($vIPINodes)) {
+                                $valorIPI = (float) $vIPINodes[0];
+                            }
+                        }
                     }
 
                     // Se conseguiu extrair o valor, adicionar ao total
                     if ($valorNota > 0) {
+                        $valorDescontadoIPI = $valorNota - $valorIPI;
+
                         // Agrupar por mês
                         if (!isset($vendasPorMes[$mesAno])) {
                             $vendasPorMes[$mesAno] = [
                                 'mes_ano' => $mesAnoLabel,
                                 'total' => 0,
+                                'total_descontado_ipi' => 0,
+                                'total_ipi' => 0,
                                 'quantidade_notas' => 0,
                                 'notas' => []
                             ];
                         }
 
                         $vendasPorMes[$mesAno]['total'] += $valorNota;
+                        $vendasPorMes[$mesAno]['total_descontado_ipi'] += $valorDescontadoIPI;
+                        $vendasPorMes[$mesAno]['total_ipi'] += $valorIPI;
                         $vendasPorMes[$mesAno]['quantidade_notas']++;
                         $vendasPorMes[$mesAno]['notas'][] = [
                             'numero' => $nota->nNF,
@@ -757,11 +773,14 @@ class RelatorioController extends Controller
                             'favorecido' => $nota->favorecido_nome,
                             'natOp' => $natOpValue,
                             'valor' => $valorNota,
+                            'valor_ipi' => $valorIPI,
+                            'valor_descontado_ipi' => $valorDescontadoIPI,
                             'data' => $dataCreated->format('d/m/Y'),
                             'metodo_extracao' => $metodoExtracao
                         ];
 
                         $totalGeral += $valorNota;
+                        $totalGeralDescontadoIPI += $valorDescontadoIPI;
                         $debug['notas_processadas']++;
 
                         // Guardar exemplos das primeiras 5 notas processadas
@@ -769,6 +788,8 @@ class RelatorioController extends Controller
                             $debug['exemplo_notas_processadas'][] = [
                                 'numero' => $nota->nNF,
                                 'valor' => $valorNota,
+                                'valor_ipi' => $valorIPI,
+                                'valor_descontado_ipi' => $valorDescontadoIPI,
                                 'natOp' => $natOpValue,
                                 'metodo_extracao' => $metodoExtracao
                             ];
@@ -791,6 +812,8 @@ class RelatorioController extends Controller
                 ],
                 'empresa' => $tenantName,
                 'total_geral' => number_format($totalGeral, 2, '.', ''),
+                'total_geral_descontado_ipi' => number_format($totalGeralDescontadoIPI, 2, '.', ''),
+                'total_ipi' => number_format($totalGeral - $totalGeralDescontadoIPI, 2, '.', ''),
                 'vendas_por_mes' => $vendasPorMesIndexado,
                 'debug' => $debug
             ]);
