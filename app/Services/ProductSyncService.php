@@ -17,8 +17,12 @@ class ProductSyncService
 
     /**
      * Sync a product from source to target database
+     *
+     * @param int $productId Product ID in source database
+     * @param string $sourceDatabase Source database name (flexmol or metalflex)
+     * @param string|null $oldCodigoInterno Old codigoInterno (if it was changed during update)
      */
-    public function syncProduct($productId, $sourceDatabase)
+    public function syncProduct($productId, $sourceDatabase, $oldCodigoInterno = null)
     {
         // Prevent recursive syncing
         if ($this->syncingInProgress) {
@@ -43,10 +47,17 @@ class ProductSyncService
             }
 
             // Check if product already exists in target by codigoInterno
+            // If oldCodigoInterno is provided, use it to find the product (codigoInterno was changed)
+            $searchCodigoInterno = $oldCodigoInterno ?? $sourceProduct->codigoInterno;
             $targetProduct = DB::connection($this->targetDb)
                 ->table('produtos')
-                ->where('codigoInterno', $sourceProduct->codigoInterno)
+                ->where('codigoInterno', $searchCodigoInterno)
                 ->first();
+
+            // If we searched by old code and found it, log that we're updating the code
+            if ($oldCodigoInterno && $targetProduct) {
+                Log::info("Product codigoInterno changed from '{$oldCodigoInterno}' to '{$sourceProduct->codigoInterno}' - updating in {$this->targetDb}");
+            }
 
             DB::connection($this->targetDb)->beginTransaction();
 

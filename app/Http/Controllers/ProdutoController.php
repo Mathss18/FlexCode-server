@@ -412,8 +412,11 @@ class ProdutoController extends Controller
             $response = APIHelper::APIResponse(true, 200, 'Sucesso ao editar o produto', $produto);
             DB::commit();
 
-            // Sync product to other database
-            $this->syncProductToOtherDatabase($produto->id);
+            // Sync product to other database (pass old codigoInterno if it changed)
+            $oldCodigoInterno = $oldProduto->codigoInterno !== $produto->codigoInterno
+                ? $oldProduto->codigoInterno
+                : null;
+            $this->syncProductToOtherDatabase($produto->id, $oldCodigoInterno);
 
             return response()->json($response, 200);
         } catch (Exception $ex) {
@@ -426,14 +429,14 @@ class ProdutoController extends Controller
     /**
      * Sync product to the other database (flexmol <-> metalflex)
      */
-    protected function syncProductToOtherDatabase($productId)
+    protected function syncProductToOtherDatabase($productId, $oldCodigoInterno = null)
     {
         try {
             $syncService = new ProductSyncService();
             $currentDb = $syncService->getCurrentDatabaseName();
 
             if ($currentDb) {
-                $syncService->syncProduct($productId, $currentDb);
+                $syncService->syncProduct($productId, $currentDb, $oldCodigoInterno);
                 Log::info("Product {$productId} synced from {$currentDb} to other database");
             }
         } catch (Exception $e) {
