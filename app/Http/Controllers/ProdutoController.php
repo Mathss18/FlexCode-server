@@ -9,10 +9,12 @@ use App\Models\FotoProduto;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use App\Models\Produto;
+use App\Services\ProductSyncService;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Pagination\Paginator;
 
@@ -249,6 +251,10 @@ class ProdutoController extends Controller
 
         $produto->save();
         DB::commit();
+
+        // Sync product to other database
+        $this->syncProductToOtherDatabase($produto->id);
+
         $response = APIHelper::APIResponse(true, 200, "Produto cadastrado com sucesso", $produto);
         return response()->json($response, 200);
     }
@@ -405,11 +411,34 @@ class ProdutoController extends Controller
             $produto->save();
             $response = APIHelper::APIResponse(true, 200, 'Sucesso ao editar o produto', $produto);
             DB::commit();
+
+            // Sync product to other database
+            $this->syncProductToOtherDatabase($produto->id);
+
             return response()->json($response, 200);
         } catch (Exception $ex) {
             DB::rollBack();
             $response = APIHelper::APIResponse(false, 500, null, null, $ex);
             return response()->json($response, 500);
+        }
+    }
+
+    /**
+     * Sync product to the other database (flexmol <-> metalflex)
+     */
+    protected function syncProductToOtherDatabase($productId)
+    {
+        try {
+            $syncService = new ProductSyncService();
+            $currentDb = $syncService->getCurrentDatabaseName();
+
+            if ($currentDb) {
+                $syncService->syncProduct($productId, $currentDb);
+                Log::info("Product {$productId} synced from {$currentDb} to other database");
+            }
+        } catch (Exception $e) {
+            // Log error but don't fail the request
+            Log::error("Product sync failed for product {$productId}: " . $e->getMessage());
         }
     }
 
