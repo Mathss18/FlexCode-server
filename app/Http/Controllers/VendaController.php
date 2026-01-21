@@ -19,6 +19,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use Illuminate\Pagination\Paginator;
 
 class VendaController extends Controller
 {
@@ -30,6 +31,50 @@ class VendaController extends Controller
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', $vendas);
             return response()->json($response, 200);
         } catch (Exception $ex) {
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+            return response()->json($response, 500);
+        }
+    }
+
+    public function indexMini(Request $request)
+    {
+        $itemsPerPage = $request->get('itemsPerPage', 10);
+        $currentPage = $request->get('currentPage', 1);
+        $searchText = $request->get('searchText', "");
+
+        try {
+            Paginator::currentPageResolver(function () use ($currentPage) {
+                return $currentPage;
+            });
+
+            $query = Venda::with(['produtos', 'servicos', 'cliente', 'transportadora', 'forma_pagamento', 'parcelas', 'parcelas.forma_pagamento', 'anexos'])->orderBy('id', 'desc');
+
+            // Add search condition if searchText is provided
+            if (!empty($searchText)) {
+                $query->where(function ($q) use ($searchText) {
+                    $q->where('numero', 'like', '%' . $searchText . '%')
+                        ->orWhere('situacao', 'like', '%' . $searchText . '%')
+                        ->orWhere('observacao', 'like', '%' . $searchText . '%')
+                        ->orWhere('totalFinal', 'like', '%' . $searchText . '%')
+                        ->orWhereHas('cliente', function ($q2) use ($searchText) {
+                            $q2->where('nome', 'like', '%' . $searchText . '%');
+                        });
+                });
+            }
+
+            $vendas = $query->paginate($itemsPerPage);
+
+            $responseData = [
+                'data' => $vendas->items(),
+                'totalItems' => $vendas->total(),
+                'currentPage' => $vendas->currentPage(),
+                'perPage' => $vendas->perPage(),
+                'lastPage' => $vendas->lastPage()
+            ];
+
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso', $responseData);
+            return response()->json($response, 200);
+        } catch (\Exception $ex) {
             $response = APIHelper::APIResponse(false, 500, null, null, $ex);
             return response()->json($response, 500);
         }

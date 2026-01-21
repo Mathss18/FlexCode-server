@@ -216,6 +216,8 @@ Route::middleware(['jwt', 'check.jwt.tenant'])->group(function () {
     //============================ ORDENS SERVICOS ==============================
     Route::get('ordens-servicos', [OrdemServicoController::class, 'index']);
 
+    Route::get('ordens-servicos-mini', [OrdemServicoController::class, 'indexMini']);
+
     Route::get('ordens-servicos/{id}', [OrdemServicoController::class, 'show']);
 
     Route::get('ordens-servicos-proximo', [OrdemServicoController::class, 'getNextId']);
@@ -301,6 +303,8 @@ Route::middleware(['jwt', 'check.jwt.tenant'])->group(function () {
 
     //============================ VENDAS ==============================
     Route::get('vendas', [VendaController::class, 'index']);
+
+    Route::get('vendas-mini', [VendaController::class, 'indexMini']);
 
     Route::get('vendas/{id}', [VendaController::class, 'show']);
 
