@@ -1106,7 +1106,6 @@ class RelatorioController extends Controller
                 ->select(
                     'produtos.id',
                     'produtos.nome',
-                    'produtos.referencia',
                     'produtos.preco as preco_atual',
                     DB::raw('SUM(vendas_produtos.quantidade) as quantidade_vendida'),
                     DB::raw('SUM(vendas_produtos.quantidade * vendas_produtos.precoUnitario) as valor_total_vendido'),
@@ -1115,7 +1114,7 @@ class RelatorioController extends Controller
                 )
                 ->whereBetween('vendas.dataEntrada', [$from, $to])
                 ->whereIn('vendas.situacao', [1, 3])
-                ->groupBy('produtos.id', 'produtos.nome', 'produtos.referencia', 'produtos.preco')
+                ->groupBy('produtos.id', 'produtos.nome', 'produtos.preco')
                 ->orderBy('quantidade_vendida', 'desc')
                 ->limit(50)
                 ->get();
@@ -1127,7 +1126,6 @@ class RelatorioController extends Controller
                 ->select(
                     'produtos.id',
                     'produtos.nome',
-                    'produtos.referencia',
                     'produtos.preco as preco_tabela',
                     'produtos.custo as custo_produto',
                     DB::raw('SUM(vendas_produtos.quantidade) as quantidade_vendida'),
@@ -1144,7 +1142,7 @@ class RelatorioController extends Controller
                 ->whereBetween('vendas.dataEntrada', [$from, $to])
                 ->whereIn('vendas.situacao', [1, 3])
                 ->where('produtos.custo', '>', 0)
-                ->groupBy('produtos.id', 'produtos.nome', 'produtos.referencia', 'produtos.preco', 'produtos.custo')
+                ->groupBy('produtos.id', 'produtos.nome', 'produtos.preco', 'produtos.custo')
                 ->orderBy('margem_percentual', 'desc')
                 ->get();
 
@@ -1164,13 +1162,12 @@ class RelatorioController extends Controller
                 ->select(
                     'produtos.id',
                     'produtos.nome',
-                    'produtos.referencia',
                     DB::raw('SUM(vendas_produtos.quantidade * vendas_produtos.precoUnitario) as valor_total'),
                     DB::raw('SUM(vendas_produtos.quantidade) as quantidade_total')
                 )
                 ->whereBetween('vendas.dataEntrada', [$from, $to])
                 ->whereIn('vendas.situacao', [1, 3])
-                ->groupBy('produtos.id', 'produtos.nome', 'produtos.referencia')
+                ->groupBy('produtos.id', 'produtos.nome')
                 ->orderBy('valor_total', 'desc')
                 ->get();
 
@@ -1193,7 +1190,6 @@ class RelatorioController extends Controller
                 return (object) [
                     'id' => $produto->id,
                     'nome' => $produto->nome,
-                    'referencia' => $produto->referencia,
                     'valor_total' => $produto->valor_total,
                     'quantidade_total' => $produto->quantidade_total,
                     'percentual' => $percentual,
