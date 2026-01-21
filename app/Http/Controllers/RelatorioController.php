@@ -1615,7 +1615,7 @@ class RelatorioController extends Controller
                 AND tipoFavorecido != 'contas_bancarias'
                 AND data BETWEEN ? AND ?
                 GROUP BY DATE_FORMAT(data, '%Y-%m'), DATE_FORMAT(data, '%m/%Y')
-                ORDER BY mes ASC
+                ORDER BY mes DESC
             ", [$from, $to]);
 
             // Despesas por categoria (excluindo contas_bancarias)
@@ -1647,7 +1647,7 @@ class RelatorioController extends Controller
                 AND tipoFavorecido != 'contas_bancarias'
                 AND data BETWEEN ? AND ?
                 GROUP BY DATE_FORMAT(data, '%Y-%m'), DATE_FORMAT(data, '%m/%Y'), tipoFavorecido
-                ORDER BY mes ASC, total DESC
+                ORDER BY mes DESC, total DESC
             ", [$from, $to]);
 
             // Top 20 favorecidos com mais despesas (excluindo contas_bancarias)
@@ -1735,7 +1735,7 @@ class RelatorioController extends Controller
                     AND data BETWEEN ? AND ?
                     AND favorecido_id = ?
                     GROUP BY DATE_FORMAT(data, '%Y-%m'), DATE_FORMAT(data, '%m/%Y')
-                    ORDER BY mes ASC
+                    ORDER BY mes DESC
                 ", [$from, $to, $favorecidoId]);
             } elseif ($searchTerm) {
                 // Se só tiver termo de busca, retorna sugestões de favorecidos
