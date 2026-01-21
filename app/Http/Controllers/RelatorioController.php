@@ -1728,6 +1728,22 @@ class RelatorioController extends Controller
             $sugestoesDespesas = [];
 
             if ($favorecidoId) {
+                // Debug: Ver todas as transações que serão contadas
+                $debugTransacoes = DB::select("
+                    SELECT id, data, title, favorecido_nome, favorecido_id, valor, tipo, tipoFavorecido
+                    FROM transacoes
+                    WHERE tipo = 'despesa'
+                    AND tipoFavorecido != 'contas_bancarias'
+                    AND data BETWEEN ? AND ?
+                    AND favorecido_id = ?
+                    ORDER BY data DESC
+                ", [$from, $to, $favorecidoId]);
+
+                \Log::info('DEBUG: Transações encontradas para favorecido_id ' . $favorecidoId, [
+                    'total' => count($debugTransacoes),
+                    'transacoes' => $debugTransacoes
+                ]);
+
                 // Busca específica por favorecido selecionado
                 $transacaoPorMes = DB::select("
                     SELECT
