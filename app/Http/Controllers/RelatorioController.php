@@ -1268,7 +1268,7 @@ class RelatorioController extends Controller
                     DB::raw('COUNT(*) as total_concluidas')
                 )
                 ->whereNotNull('dataSaida')
-                ->where('situacao', '!=', 0) // Excluir OS abertas
+                ->where('situacao', 2) // Apenas OS finalizadas
                 ->whereBetween('dataEntrada', [$from, $to])
                 ->first();
 
@@ -1286,7 +1286,7 @@ class RelatorioController extends Controller
                     DB::raw('ROUND(AVG(total), 2) as valor_medio')
                 )
                 ->whereNotNull('dataSaida')
-                ->where('situacao', '!=', 0)
+                ->where('situacao', 2) // Apenas OS finalizadas
                 ->whereBetween('dataEntrada', [$from, $to])
                 ->groupBy('faixa')
                 ->orderByRaw('FIELD(faixa, "0-1 dia", "2-3 dias", "4-7 dias", "8-15 dias", "Mais de 15 dias")')
@@ -1297,9 +1297,9 @@ class RelatorioController extends Controller
                 ->select(
                     DB::raw('COUNT(*) as total_vendas'),
                     DB::raw('SUM(CASE WHEN situacao = 2 THEN 1 ELSE 0 END) as vendas_canceladas'),
-                    DB::raw('SUM(CASE WHEN situacao != 2 THEN 1 ELSE 0 END) as vendas_concluidas'),
+                    DB::raw('SUM(CASE WHEN situacao = 1 THEN 1 ELSE 0 END) as vendas_concluidas'),
                     DB::raw('SUM(CASE WHEN situacao = 2 THEN total ELSE 0 END) as valor_cancelado'),
-                    DB::raw('SUM(CASE WHEN situacao != 2 THEN total ELSE 0 END) as valor_concluido')
+                    DB::raw('SUM(CASE WHEN situacao = 1 THEN total ELSE 0 END) as valor_concluido')
                 )
                 ->whereBetween('dataEntrada', [$from, $to])
                 ->first();
@@ -1312,10 +1312,10 @@ class RelatorioController extends Controller
             $osStats = DB::table('ordens_servicos')
                 ->select(
                     DB::raw('COUNT(*) as total_os'),
-                    DB::raw('SUM(CASE WHEN situacao = 2 THEN 1 ELSE 0 END) as os_canceladas'),
-                    DB::raw('SUM(CASE WHEN situacao != 2 THEN 1 ELSE 0 END) as os_concluidas'),
-                    DB::raw('SUM(CASE WHEN situacao = 2 THEN total ELSE 0 END) as valor_cancelado'),
-                    DB::raw('SUM(CASE WHEN situacao != 2 THEN total ELSE 0 END) as valor_concluido')
+                    DB::raw('SUM(CASE WHEN situacao = 3 THEN 1 ELSE 0 END) as os_canceladas'),
+                    DB::raw('SUM(CASE WHEN situacao = 2 THEN 1 ELSE 0 END) as os_concluidas'),
+                    DB::raw('SUM(CASE WHEN situacao = 3 THEN total ELSE 0 END) as valor_cancelado'),
+                    DB::raw('SUM(CASE WHEN situacao = 2 THEN total ELSE 0 END) as valor_concluido')
                 )
                 ->whereBetween('dataEntrada', [$from, $to])
                 ->first();
@@ -1336,7 +1336,7 @@ class RelatorioController extends Controller
                     'os.total'
                 )
                 ->whereNotNull('os.dataSaida')
-                ->where('os.situacao', '!=', 0)
+                ->where('os.situacao', 2) // Apenas OS finalizadas
                 ->whereBetween('os.dataEntrada', [$from, $to])
                 ->orderBy('lead_time_dias', 'desc')
                 ->limit(10)
@@ -1350,7 +1350,7 @@ class RelatorioController extends Controller
                     DB::raw('COUNT(*) as total_canceladas'),
                     DB::raw('SUM(v.total) as valor_total_cancelado')
                 )
-                ->where('v.situacao', 2)
+                ->where('v.situacao', 2) // Apenas vendas canceladas
                 ->whereBetween('v.dataEntrada', [$from, $to])
                 ->groupBy('c.id', 'c.nome')
                 ->orderBy('total_canceladas', 'desc')
@@ -1365,7 +1365,7 @@ class RelatorioController extends Controller
                     DB::raw('COUNT(*) as total_canceladas'),
                     DB::raw('SUM(os.total) as valor_total_cancelado')
                 )
-                ->where('os.situacao', 2)
+                ->where('os.situacao', 3) // Apenas OS canceladas
                 ->whereBetween('os.dataEntrada', [$from, $to])
                 ->groupBy('c.id', 'c.nome')
                 ->orderBy('total_canceladas', 'desc')
@@ -1381,7 +1381,7 @@ class RelatorioController extends Controller
                     DB::raw('COUNT(*) as total')
                 )
                 ->whereNotNull('dataSaida')
-                ->where('situacao', '!=', 0)
+                ->where('situacao', 2) // Apenas OS finalizadas
                 ->whereBetween('dataEntrada', [$from, $to])
                 ->first();
 
