@@ -420,4 +420,5 @@ Route::middleware(['jwt', 'check.jwt.tenant'])->group(function () {
     Route::get('relatorios/analise-clientes', [RelatorioController::class, 'analiseClientes']);
     Route::get('relatorios/analise-produtos', [RelatorioController::class, 'analiseProdutos']);
     Route::get('relatorios/analise-financeira', [RelatorioController::class, 'analiseFinanceira']);
+    Route::get('relatorios/analise-operacional', [RelatorioController::class, 'analiseOperacional']);
 });

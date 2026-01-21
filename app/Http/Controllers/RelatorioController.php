@@ -1253,4 +1253,186 @@ class RelatorioController extends Controller
             return response()->json($response, 500);
         }
     }
+
+    public function analiseOperacional(Request $request) {
+        try {
+            $from = $request->from;
+            $to = $request->to;
+
+            // Lead Time de Ordens de Serviço (tempo médio entre abertura e conclusão)
+            $leadTimeData = DB::table('ordens_servicos')
+                ->select(
+                    DB::raw('AVG(DATEDIFF(dataSaida, dataEntrada)) as lead_time_medio'),
+                    DB::raw('MIN(DATEDIFF(dataSaida, dataEntrada)) as lead_time_minimo'),
+                    DB::raw('MAX(DATEDIFF(dataSaida, dataEntrada)) as lead_time_maximo'),
+                    DB::raw('COUNT(*) as total_concluidas')
+                )
+                ->whereNotNull('dataSaida')
+                ->where('situacao', '!=', 0) // Excluir OS abertas
+                ->whereBetween('dataEntrada', [$from, $to])
+                ->first();
+
+            // Distribuição de Lead Time por faixas
+            $leadTimeFaixas = DB::table('ordens_servicos')
+                ->select(
+                    DB::raw('CASE
+                        WHEN DATEDIFF(dataSaida, dataEntrada) <= 1 THEN "0-1 dia"
+                        WHEN DATEDIFF(dataSaida, dataEntrada) <= 3 THEN "2-3 dias"
+                        WHEN DATEDIFF(dataSaida, dataEntrada) <= 7 THEN "4-7 dias"
+                        WHEN DATEDIFF(dataSaida, dataEntrada) <= 15 THEN "8-15 dias"
+                        ELSE "Mais de 15 dias"
+                    END as faixa'),
+                    DB::raw('COUNT(*) as quantidade'),
+                    DB::raw('ROUND(AVG(total), 2) as valor_medio')
+                )
+                ->whereNotNull('dataSaida')
+                ->where('situacao', '!=', 0)
+                ->whereBetween('dataEntrada', [$from, $to])
+                ->groupBy('faixa')
+                ->orderByRaw('FIELD(faixa, "0-1 dia", "2-3 dias", "4-7 dias", "8-15 dias", "Mais de 15 dias")')
+                ->get();
+
+            // Taxa de Cancelamento (Vendas)
+            $vendasStats = DB::table('vendas')
+                ->select(
+                    DB::raw('COUNT(*) as total_vendas'),
+                    DB::raw('SUM(CASE WHEN situacao = 2 THEN 1 ELSE 0 END) as vendas_canceladas'),
+                    DB::raw('SUM(CASE WHEN situacao != 2 THEN 1 ELSE 0 END) as vendas_concluidas'),
+                    DB::raw('SUM(CASE WHEN situacao = 2 THEN total ELSE 0 END) as valor_cancelado'),
+                    DB::raw('SUM(CASE WHEN situacao != 2 THEN total ELSE 0 END) as valor_concluido')
+                )
+                ->whereBetween('data', [$from, $to])
+                ->first();
+
+            $taxaCancelamentoVendas = $vendasStats->total_vendas > 0
+                ? round(($vendasStats->vendas_canceladas / $vendasStats->total_vendas) * 100, 2)
+                : 0;
+
+            // Taxa de Cancelamento (OS)
+            $osStats = DB::table('ordens_servicos')
+                ->select(
+                    DB::raw('COUNT(*) as total_os'),
+                    DB::raw('SUM(CASE WHEN situacao = 2 THEN 1 ELSE 0 END) as os_canceladas'),
+                    DB::raw('SUM(CASE WHEN situacao != 2 THEN 1 ELSE 0 END) as os_concluidas'),
+                    DB::raw('SUM(CASE WHEN situacao = 2 THEN total ELSE 0 END) as valor_cancelado'),
+                    DB::raw('SUM(CASE WHEN situacao != 2 THEN total ELSE 0 END) as valor_concluido')
+                )
+                ->whereBetween('dataEntrada', [$from, $to])
+                ->first();
+
+            $taxaCancelamentoOS = $osStats->total_os > 0
+                ? round(($osStats->os_canceladas / $osStats->total_os) * 100, 2)
+                : 0;
+
+            // Top 10 OS com maior lead time
+            $topLeadTime = DB::table('ordens_servicos as os')
+                ->leftJoin('clientes as c', 'os.cliente_id', '=', 'c.id')
+                ->select(
+                    'os.numero',
+                    'c.nome as cliente_nome',
+                    'os.dataEntrada',
+                    'os.dataSaida',
+                    DB::raw('DATEDIFF(os.dataSaida, os.dataEntrada) as lead_time_dias'),
+                    'os.total'
+                )
+                ->whereNotNull('os.dataSaida')
+                ->where('os.situacao', '!=', 0)
+                ->whereBetween('os.dataEntrada', [$from, $to])
+                ->orderBy('lead_time_dias', 'desc')
+                ->limit(10)
+                ->get();
+
+            // Vendas canceladas por cliente
+            $vendasCanceladasPorCliente = DB::table('vendas as v')
+                ->leftJoin('clientes as c', 'v.cliente_id', '=', 'c.id')
+                ->select(
+                    'c.nome as cliente_nome',
+                    DB::raw('COUNT(*) as total_canceladas'),
+                    DB::raw('SUM(v.total) as valor_total_cancelado')
+                )
+                ->where('v.situacao', 2)
+                ->whereBetween('v.data', [$from, $to])
+                ->groupBy('c.id', 'c.nome')
+                ->orderBy('total_canceladas', 'desc')
+                ->limit(20)
+                ->get();
+
+            // OS canceladas por cliente
+            $osCanceladasPorCliente = DB::table('ordens_servicos as os')
+                ->leftJoin('clientes as c', 'os.cliente_id', '=', 'c.id')
+                ->select(
+                    'c.nome as cliente_nome',
+                    DB::raw('COUNT(*) as total_canceladas'),
+                    DB::raw('SUM(os.total) as valor_total_cancelado')
+                )
+                ->where('os.situacao', 2)
+                ->whereBetween('os.dataEntrada', [$from, $to])
+                ->groupBy('c.id', 'c.nome')
+                ->orderBy('total_canceladas', 'desc')
+                ->limit(20)
+                ->get();
+
+            // Eficiência de produção - OS concluídas antes/depois do prazo
+            $eficienciaProducao = DB::table('ordens_servicos')
+                ->select(
+                    DB::raw('SUM(CASE WHEN DATEDIFF(dataSaida, dataEntrada) <= 3 THEN 1 ELSE 0 END) as rapidas'),
+                    DB::raw('SUM(CASE WHEN DATEDIFF(dataSaida, dataEntrada) BETWEEN 4 AND 7 THEN 1 ELSE 0 END) as moderadas'),
+                    DB::raw('SUM(CASE WHEN DATEDIFF(dataSaida, dataEntrada) > 7 THEN 1 ELSE 0 END) as lentas'),
+                    DB::raw('COUNT(*) as total')
+                )
+                ->whereNotNull('dataSaida')
+                ->where('situacao', '!=', 0)
+                ->whereBetween('dataEntrada', [$from, $to])
+                ->first();
+
+            $response = APIHelper::APIResponse(true, 200, null, [
+                'leadTime' => [
+                    'medio' => round($leadTimeData->lead_time_medio ?? 0, 2),
+                    'minimo' => $leadTimeData->lead_time_minimo ?? 0,
+                    'maximo' => $leadTimeData->lead_time_maximo ?? 0,
+                    'totalConcluidas' => $leadTimeData->total_concluidas ?? 0,
+                    'faixas' => $leadTimeFaixas,
+                    'topLeadTime' => $topLeadTime
+                ],
+                'taxaCancelamento' => [
+                    'vendas' => [
+                        'total' => $vendasStats->total_vendas ?? 0,
+                        'canceladas' => $vendasStats->vendas_canceladas ?? 0,
+                        'concluidas' => $vendasStats->vendas_concluidas ?? 0,
+                        'taxa' => $taxaCancelamentoVendas,
+                        'valorCancelado' => $vendasStats->valor_cancelado ?? 0,
+                        'valorConcluido' => $vendasStats->valor_concluido ?? 0,
+                        'porCliente' => $vendasCanceladasPorCliente
+                    ],
+                    'ordensServico' => [
+                        'total' => $osStats->total_os ?? 0,
+                        'canceladas' => $osStats->os_canceladas ?? 0,
+                        'concluidas' => $osStats->os_concluidas ?? 0,
+                        'taxa' => $taxaCancelamentoOS,
+                        'valorCancelado' => $osStats->valor_cancelado ?? 0,
+                        'valorConcluido' => $osStats->valor_concluido ?? 0,
+                        'porCliente' => $osCanceladasPorCliente
+                    ]
+                ],
+                'eficienciaProducao' => [
+                    'rapidas' => $eficienciaProducao->rapidas ?? 0,
+                    'moderadas' => $eficienciaProducao->moderadas ?? 0,
+                    'lentas' => $eficienciaProducao->lentas ?? 0,
+                    'total' => $eficienciaProducao->total ?? 0,
+                    'percentualRapidas' => $eficienciaProducao->total > 0
+                        ? round(($eficienciaProducao->rapidas / $eficienciaProducao->total) * 100, 2)
+                        : 0
+                ],
+                'parametros' => [
+                    'dataInicio' => $from,
+                    'dataFim' => $to,
+                ]
+            ]);
+
+            return response()->json($response, 200);
+        } catch (Exception $ex) {
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+            return response()->json($response, 500);
+        }
+    }
 }
