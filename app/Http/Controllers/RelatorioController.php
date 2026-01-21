@@ -1435,4 +1435,163 @@ class RelatorioController extends Controller
             return response()->json($response, 500);
         }
     }
+
+    public function analiseFornecedores(Request $request) {
+        try {
+            $from = $request->from;
+            $to = $request->to;
+
+            // Top Fornecedores por Volume de Compra
+            $topFornecedores = DB::table('compras as c')
+                ->leftJoin('fornecedores as f', 'c.fornecedor_id', '=', 'f.id')
+                ->select(
+                    'f.nome as fornecedor_nome',
+                    'f.id as fornecedor_id',
+                    DB::raw('COUNT(c.id) as total_compras'),
+                    DB::raw('SUM(c.total) as valor_total'),
+                    DB::raw('ROUND(AVG(c.total), 2) as ticket_medio')
+                )
+                ->whereBetween('c.dataEntrada', [$from, $to])
+                ->groupBy('f.id', 'f.nome')
+                ->orderBy('valor_total', 'desc')
+                ->limit(20)
+                ->get();
+
+            // Estatísticas gerais
+            $estatisticasGerais = DB::table('compras')
+                ->select(
+                    DB::raw('COUNT(DISTINCT fornecedor_id) as total_fornecedores_ativos'),
+                    DB::raw('COUNT(*) as total_compras'),
+                    DB::raw('SUM(total) as valor_total_compras'),
+                    DB::raw('ROUND(AVG(total), 2) as ticket_medio_geral')
+                )
+                ->whereBetween('dataEntrada', [$from, $to])
+                ->first();
+
+            // Análise de Preços por Produto (produtos comprados de múltiplos fornecedores)
+            $analisePrecos = DB::table('compras_produtos as cp')
+                ->join('compras as c', 'cp.compra_id', '=', 'c.id')
+                ->join('produtos as p', 'cp.produto_id', '=', 'p.id')
+                ->join('fornecedores as f', 'c.fornecedor_id', '=', 'f.id')
+                ->select(
+                    'p.nome as produto_nome',
+                    'p.codigoInterno as produto_codigo',
+                    'cp.produto_id',
+                    'f.nome as fornecedor_nome',
+                    'f.id as fornecedor_id',
+                    DB::raw('ROUND(AVG(cp.preco), 2) as preco_medio'),
+                    DB::raw('MIN(cp.preco) as preco_minimo'),
+                    DB::raw('MAX(cp.preco) as preco_maximo'),
+                    DB::raw('SUM(cp.quantidade) as quantidade_total')
+                )
+                ->whereBetween('c.dataEntrada', [$from, $to])
+                ->groupBy('cp.produto_id', 'p.nome', 'p.codigoInterno', 'f.id', 'f.nome')
+                ->havingRaw('COUNT(DISTINCT c.id) >= 1')
+                ->orderBy('quantidade_total', 'desc')
+                ->limit(50)
+                ->get();
+
+            // Agrupar análise de preços por produto
+            $produtosComMultiplosFornecedores = [];
+            foreach ($analisePrecos as $item) {
+                $produtoId = $item->produto_id;
+                if (!isset($produtosComMultiplosFornecedores[$produtoId])) {
+                    $produtosComMultiplosFornecedores[$produtoId] = [
+                        'produto_nome' => $item->produto_nome,
+                        'produto_codigo' => $item->produto_codigo,
+                        'fornecedores' => []
+                    ];
+                }
+                $produtosComMultiplosFornecedores[$produtoId]['fornecedores'][] = [
+                    'fornecedor_nome' => $item->fornecedor_nome,
+                    'preco_medio' => $item->preco_medio,
+                    'preco_minimo' => $item->preco_minimo,
+                    'preco_maximo' => $item->preco_maximo,
+                    'quantidade_total' => $item->quantidade_total
+                ];
+            }
+
+            // Filtrar apenas produtos com mais de 1 fornecedor
+            $produtosComMultiplosFornecedores = array_filter($produtosComMultiplosFornecedores, function($produto) {
+                return count($produto['fornecedores']) > 1;
+            });
+
+            // Pegar apenas os 20 primeiros
+            $produtosComMultiplosFornecedores = array_slice($produtosComMultiplosFornecedores, 0, 20);
+
+            // Prazo Médio de Entrega (usando intervalo entre dataEntrada da compra e created_at)
+            // Assumindo que created_at é quando o pedido foi feito e dataEntrada é quando chegou
+            $prazoEntrega = DB::table('compras as c')
+                ->join('fornecedores as f', 'c.fornecedor_id', '=', 'f.id')
+                ->select(
+                    'f.nome as fornecedor_nome',
+                    'f.id as fornecedor_id',
+                    DB::raw('ROUND(AVG(DATEDIFF(c.dataEntrada, DATE(c.created_at))), 2) as prazo_medio_dias'),
+                    DB::raw('MIN(DATEDIFF(c.dataEntrada, DATE(c.created_at))) as prazo_minimo'),
+                    DB::raw('MAX(DATEDIFF(c.dataEntrada, DATE(c.created_at))) as prazo_maximo'),
+                    DB::raw('COUNT(c.id) as total_compras')
+                )
+                ->whereBetween('c.dataEntrada', [$from, $to])
+                ->whereRaw('DATEDIFF(c.dataEntrada, DATE(c.created_at)) >= 0')
+                ->groupBy('f.id', 'f.nome')
+                ->having('total_compras', '>=', 2)
+                ->orderBy('prazo_medio_dias', 'asc')
+                ->limit(20)
+                ->get();
+
+            // Distribuição de fornecedores por faixa de prazo
+            $distribuicaoPrazos = DB::table('compras as c')
+                ->select(
+                    DB::raw('CASE
+                        WHEN DATEDIFF(c.dataEntrada, DATE(c.created_at)) <= 7 THEN "Até 7 dias"
+                        WHEN DATEDIFF(c.dataEntrada, DATE(c.created_at)) <= 15 THEN "8-15 dias"
+                        WHEN DATEDIFF(c.dataEntrada, DATE(c.created_at)) <= 30 THEN "16-30 dias"
+                        ELSE "Mais de 30 dias"
+                    END as faixa'),
+                    DB::raw('COUNT(*) as quantidade'),
+                    DB::raw('ROUND(AVG(c.total), 2) as valor_medio')
+                )
+                ->whereBetween('c.dataEntrada', [$from, $to])
+                ->whereRaw('DATEDIFF(c.dataEntrada, DATE(c.created_at)) >= 0')
+                ->groupBy('faixa')
+                ->orderByRaw('FIELD(faixa, "Até 7 dias", "8-15 dias", "16-30 dias", "Mais de 30 dias")')
+                ->get();
+
+            // Produtos mais comprados
+            $produtosMaisComprados = DB::table('compras_produtos as cp')
+                ->join('compras as c', 'cp.compra_id', '=', 'c.id')
+                ->join('produtos as p', 'cp.produto_id', '=', 'p.id')
+                ->select(
+                    'p.nome as produto_nome',
+                    'p.codigoInterno as produto_codigo',
+                    DB::raw('SUM(cp.quantidade) as quantidade_total'),
+                    DB::raw('COUNT(DISTINCT c.fornecedor_id) as numero_fornecedores'),
+                    DB::raw('ROUND(AVG(cp.preco), 2) as preco_medio'),
+                    DB::raw('SUM(cp.total) as valor_total')
+                )
+                ->whereBetween('c.dataEntrada', [$from, $to])
+                ->groupBy('cp.produto_id', 'p.nome', 'p.codigoInterno')
+                ->orderBy('quantidade_total', 'desc')
+                ->limit(20)
+                ->get();
+
+            $response = APIHelper::APIResponse(true, 200, null, [
+                'topFornecedores' => $topFornecedores,
+                'estatisticasGerais' => $estatisticasGerais,
+                'analisePrecos' => array_values($produtosComMultiplosFornecedores),
+                'prazoEntrega' => $prazoEntrega,
+                'distribuicaoPrazos' => $distribuicaoPrazos,
+                'produtosMaisComprados' => $produtosMaisComprados,
+                'parametros' => [
+                    'dataInicio' => $from,
+                    'dataFim' => $to,
+                ]
+            ]);
+
+            return response()->json($response, 200);
+        } catch (Exception $ex) {
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+            return response()->json($response, 500);
+        }
+    }
 }
