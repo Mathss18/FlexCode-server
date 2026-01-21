@@ -1594,4 +1594,134 @@ class RelatorioController extends Controller
             return response()->json($response, 500);
         }
     }
+
+    public function analiseDespesas(Request $request) {
+        try {
+            $from = $request->query('from');
+            $to = $request->query('to');
+
+            // Evolução mensal de despesas
+            $evolucaoMensal = DB::select("
+                SELECT
+                    DATE_FORMAT(data, '%Y-%m') as mes,
+                    DATE_FORMAT(data, '%m/%Y') as mes_formatado,
+                    SUM(valor) as total,
+                    COUNT(*) as quantidade,
+                    AVG(valor) as ticket_medio
+                FROM transacoes
+                WHERE tipo = 'despesa'
+                AND data BETWEEN ? AND ?
+                GROUP BY DATE_FORMAT(data, '%Y-%m'), DATE_FORMAT(data, '%m/%Y')
+                ORDER BY mes ASC
+            ", [$from, $to]);
+
+            // Despesas por categoria
+            $despesasPorCategoria = DB::select("
+                SELECT
+                    tipoFavorecido as categoria,
+                    SUM(valor) as total,
+                    COUNT(*) as quantidade,
+                    AVG(valor) as ticket_medio,
+                    ROUND((SUM(valor) / (SELECT SUM(valor) FROM transacoes WHERE tipo = 'despesa' AND data BETWEEN ? AND ?) * 100), 2) as percentual
+                FROM transacoes
+                WHERE tipo = 'despesa'
+                AND data BETWEEN ? AND ?
+                GROUP BY tipoFavorecido
+                ORDER BY total DESC
+            ", [$from, $to, $from, $to]);
+
+            // Evolução mensal por categoria
+            $evolucaoMensalCategoria = DB::select("
+                SELECT
+                    DATE_FORMAT(data, '%Y-%m') as mes,
+                    DATE_FORMAT(data, '%m/%Y') as mes_formatado,
+                    tipoFavorecido as categoria,
+                    SUM(valor) as total,
+                    COUNT(*) as quantidade
+                FROM transacoes
+                WHERE tipo = 'despesa'
+                AND data BETWEEN ? AND ?
+                GROUP BY DATE_FORMAT(data, '%Y-%m'), DATE_FORMAT(data, '%m/%Y'), tipoFavorecido
+                ORDER BY mes ASC, total DESC
+            ", [$from, $to]);
+
+            // Top 20 favorecidos com mais despesas
+            $topFavorecidos = DB::select("
+                SELECT
+                    favorecido_nome,
+                    tipoFavorecido as categoria,
+                    SUM(valor) as total,
+                    COUNT(*) as quantidade,
+                    AVG(valor) as ticket_medio,
+                    MIN(data) as primeira_transacao,
+                    MAX(data) as ultima_transacao
+                FROM transacoes
+                WHERE tipo = 'despesa'
+                AND data BETWEEN ? AND ?
+                AND favorecido_nome IS NOT NULL
+                GROUP BY favorecido_nome, tipoFavorecido
+                ORDER BY total DESC
+                LIMIT 20
+            ", [$from, $to]);
+
+            // Estatísticas gerais
+            $estatisticasGerais = DB::selectOne("
+                SELECT
+                    SUM(valor) as total_despesas,
+                    COUNT(*) as total_transacoes,
+                    AVG(valor) as ticket_medio,
+                    COUNT(DISTINCT favorecido_id) as total_favorecidos,
+                    COUNT(DISTINCT DATE_FORMAT(data, '%Y-%m')) as meses_com_despesas
+                FROM transacoes
+                WHERE tipo = 'despesa'
+                AND data BETWEEN ? AND ?
+            ", [$from, $to]);
+
+            // Despesas por situação
+            $despesasPorSituacao = DB::select("
+                SELECT
+                    situacao,
+                    SUM(valor) as total,
+                    COUNT(*) as quantidade,
+                    ROUND((SUM(valor) / (SELECT SUM(valor) FROM transacoes WHERE tipo = 'despesa' AND data BETWEEN ? AND ?) * 100), 2) as percentual
+                FROM transacoes
+                WHERE tipo = 'despesa'
+                AND data BETWEEN ? AND ?
+                GROUP BY situacao
+                ORDER BY total DESC
+            ", [$from, $to, $from, $to]);
+
+            // Organizar evolução mensal por categoria para o frontend
+            $evolucaoOrganizada = [];
+            foreach ($evolucaoMensalCategoria as $item) {
+                if (!isset($evolucaoOrganizada[$item->mes])) {
+                    $evolucaoOrganizada[$item->mes] = [
+                        'mes' => $item->mes,
+                        'mes_formatado' => $item->mes_formatado,
+                        'categorias' => []
+                    ];
+                }
+                $evolucaoOrganizada[$item->mes]['categorias'][] = [
+                    'categoria' => $item->categoria,
+                    'total' => $item->total,
+                    'quantidade' => $item->quantidade
+                ];
+            }
+
+            $data = [
+                'estatisticas' => $estatisticasGerais,
+                'evolucaoMensal' => $evolucaoMensal,
+                'despesasPorCategoria' => $despesasPorCategoria,
+                'evolucaoMensalCategoria' => array_values($evolucaoOrganizada),
+                'topFavorecidos' => $topFavorecidos,
+                'despesasPorSituacao' => $despesasPorSituacao
+            ];
+
+            $response = APIHelper::APIResponse(true, 200, $data);
+            return response()->json($response, 200);
+        } catch (Exception $ex) {
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+            return response()->json($response, 500);
+        }
+    }
 }
