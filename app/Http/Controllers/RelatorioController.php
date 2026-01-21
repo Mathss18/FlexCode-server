@@ -1600,6 +1600,7 @@ class RelatorioController extends Controller
             $from = $request->query('from');
             $to = $request->query('to');
             $searchTerm = $request->query('search', null);
+            $favorecidoId = $request->query('favorecido_id', null);
 
             // Evolução mensal de despesas (excluindo contas_bancarias)
             $evolucaoMensal = DB::select("
@@ -1715,9 +1716,12 @@ class RelatorioController extends Controller
                 ];
             }
 
-            // Busca por transação específica (se houver termo de busca)
+// Busca por transação específica (se houver favorecido_id)
             $transacaoPorMes = [];
-            if ($searchTerm) {
+            $sugestoesDespesas = [];
+
+            if ($favorecidoId) {
+                // Busca específica por favorecido selecionado
                 $transacaoPorMes = DB::select("
                     SELECT
                         DATE_FORMAT(data, '%Y-%m') as mes,
@@ -1729,13 +1733,32 @@ class RelatorioController extends Controller
                     WHERE tipo = 'despesa'
                     AND tipoFavorecido != 'contas_bancarias'
                     AND data BETWEEN ? AND ?
-                    AND (
-                        LOWER(title) LIKE LOWER(?)
-                        OR LOWER(observacao) LIKE LOWER(?)
-                        OR LOWER(favorecido_nome) LIKE LOWER(?)
-                    )
+                    AND favorecido_id = ?
                     GROUP BY DATE_FORMAT(data, '%Y-%m'), DATE_FORMAT(data, '%m/%Y')
                     ORDER BY mes ASC
+                ", [$from, $to, $favorecidoId]);
+            } elseif ($searchTerm) {
+                // Se só tiver termo de busca, retorna sugestões de favorecidos
+                $sugestoesDespesas = DB::select("
+                    SELECT DISTINCT
+                        favorecido_id,
+                        favorecido_nome,
+                        tipoFavorecido as categoria,
+                        COUNT(*) as total_transacoes,
+                        SUM(valor) as valor_total
+                    FROM transacoes
+                    WHERE tipo = 'despesa'
+                    AND tipoFavorecido != 'contas_bancarias'
+                    AND data BETWEEN ? AND ?
+                    AND favorecido_nome IS NOT NULL
+                    AND (
+                        LOWER(favorecido_nome) LIKE LOWER(?)
+                        OR LOWER(title) LIKE LOWER(?)
+                        OR LOWER(observacao) LIKE LOWER(?)
+                    )
+                    GROUP BY favorecido_id, favorecido_nome, tipoFavorecido
+                    ORDER BY valor_total DESC
+                    LIMIT 10
                 ", [$from, $to, "%{$searchTerm}%", "%{$searchTerm}%", "%{$searchTerm}%"]);
             }
 
@@ -1746,7 +1769,8 @@ class RelatorioController extends Controller
                 'evolucaoMensalCategoria' => array_values($evolucaoOrganizada),
                 'topFavorecidos' => $topFavorecidos,
                 'despesasPorSituacao' => $despesasPorSituacao,
-                'transacaoPorMes' => $transacaoPorMes
+                'transacaoPorMes' => $transacaoPorMes,
+                'sugestoesDespesas' => $sugestoesDespesas
             ];
 
             $response = APIHelper::APIResponse(true, 200, null, $data);
