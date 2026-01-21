@@ -1734,6 +1734,20 @@ class RelatorioController extends Controller
                         OR LOWER(observacao) LIKE LOWER(?)
                         OR LOWER(favorecido_nome) LIKE LOWER(?)
                     )
+                    GROUP BY DATE_FORMAT(data, '%Y-%m'), DATE_FORMAT(data, '%m/%Y')
+                    ORDER BY mes ASC
+                ", [$from, $to, "%{$searchTerm}%", "%{$searchTerm}%", "%{$searchTerm}%"]);
+            }
+
+            $data = [
+                'estatisticas' => $estatisticasGerais,
+                'evolucaoMensal' => $evolucaoMensal,
+                'despesasPorCategoria' => $despesasPorCategoria,
+                'evolucaoMensalCategoria' => array_values($evolucaoOrganizada),
+                'topFavorecidos' => $topFavorecidos,
+                'despesasPorSituacao' => $despesasPorSituacao,
+                'transacaoPorMes' => $transacaoPorMes
+            ];
 
             $response = APIHelper::APIResponse(true, 200, null, $data);
             return response()->json($response, 200);
