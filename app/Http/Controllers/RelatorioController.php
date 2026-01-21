@@ -1602,6 +1602,13 @@ class RelatorioController extends Controller
             $searchTerm = $request->query('search', null);
             $favorecidoId = $request->query('favorecido_id', null);
 
+            \Log::info('Análise de Despesas - Parâmetros:', [
+                'from' => $from,
+                'to' => $to,
+                'searchTerm' => $searchTerm,
+                'favorecidoId' => $favorecidoId
+            ]);
+
             // Evolução mensal de despesas (excluindo contas_bancarias)
             $evolucaoMensal = DB::select("
                 SELECT
@@ -1737,6 +1744,12 @@ class RelatorioController extends Controller
                     GROUP BY DATE_FORMAT(data, '%Y-%m'), DATE_FORMAT(data, '%m/%Y')
                     ORDER BY mes DESC
                 ", [$from, $to, $favorecidoId]);
+
+                \Log::info('Transações por mês encontradas:', [
+                    'favorecido_id' => $favorecidoId,
+                    'total_meses' => count($transacaoPorMes),
+                    'dados' => $transacaoPorMes
+                ]);
             } elseif ($searchTerm) {
                 // Se só tiver termo de busca, retorna sugestões de favorecidos
                 $sugestoesDespesas = DB::select("
