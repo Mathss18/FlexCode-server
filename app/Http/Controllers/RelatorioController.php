@@ -1301,7 +1301,7 @@ class RelatorioController extends Controller
                     DB::raw('SUM(CASE WHEN situacao = 2 THEN total ELSE 0 END) as valor_cancelado'),
                     DB::raw('SUM(CASE WHEN situacao != 2 THEN total ELSE 0 END) as valor_concluido')
                 )
-                ->whereBetween('dataVenda', [$from, $to])
+                ->whereBetween('dataEntrada', [$from, $to])
                 ->first();
 
             $taxaCancelamentoVendas = $vendasStats->total_vendas > 0
@@ -1351,7 +1351,7 @@ class RelatorioController extends Controller
                     DB::raw('SUM(v.total) as valor_total_cancelado')
                 )
                 ->where('v.situacao', 2)
-                ->whereBetween('v.dataVenda', [$from, $to])
+                ->whereBetween('v.dataEntrada', [$from, $to])
                 ->groupBy('c.id', 'c.nome')
                 ->orderBy('total_canceladas', 'desc')
                 ->limit(20)
