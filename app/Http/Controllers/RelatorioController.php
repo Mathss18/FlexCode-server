@@ -1092,4 +1092,145 @@ class RelatorioController extends Controller
             return response()->json($response, 500);
         }
     }
+
+    public function analiseProdutos(Request $request)
+    {
+        $from = date($request->query('startDate'));
+        $to = date($request->query('endDate'));
+
+        try {
+            // 1. PRODUTOS MAIS VENDIDOS - Por quantidade e valor
+            $produtosMaisVendidos = DB::table('vendas_produtos')
+                ->join('vendas', 'vendas_produtos.venda_id', '=', 'vendas.id')
+                ->join('produtos', 'vendas_produtos.produto_id', '=', 'produtos.id')
+                ->select(
+                    'produtos.id',
+                    'produtos.nome',
+                    'produtos.referencia',
+                    'produtos.preco as preco_atual',
+                    DB::raw('SUM(vendas_produtos.quantidade) as quantidade_vendida'),
+                    DB::raw('SUM(vendas_produtos.quantidade * vendas_produtos.precoUnitario) as valor_total_vendido'),
+                    DB::raw('AVG(vendas_produtos.precoUnitario) as preco_medio_venda'),
+                    DB::raw('COUNT(DISTINCT vendas.id) as numero_vendas')
+                )
+                ->whereBetween('vendas.dataEntrada', [$from, $to])
+                ->whereIn('vendas.situacao', [1, 3])
+                ->groupBy('produtos.id', 'produtos.nome', 'produtos.referencia', 'produtos.preco')
+                ->orderBy('quantidade_vendida', 'desc')
+                ->limit(50)
+                ->get();
+
+            // 2. MARGEM DE LUCRO - Produtos mais rentáveis
+            $margemLucro = DB::table('vendas_produtos')
+                ->join('vendas', 'vendas_produtos.venda_id', '=', 'vendas.id')
+                ->join('produtos', 'vendas_produtos.produto_id', '=', 'produtos.id')
+                ->select(
+                    'produtos.id',
+                    'produtos.nome',
+                    'produtos.referencia',
+                    'produtos.preco as preco_tabela',
+                    'produtos.custo as custo_produto',
+                    DB::raw('SUM(vendas_produtos.quantidade) as quantidade_vendida'),
+                    DB::raw('AVG(vendas_produtos.precoUnitario) as preco_medio_venda'),
+                    DB::raw('SUM(vendas_produtos.quantidade * vendas_produtos.precoUnitario) as valor_total_vendido'),
+                    DB::raw('SUM(vendas_produtos.quantidade * produtos.custo) as custo_total'),
+                    DB::raw('SUM((vendas_produtos.precoUnitario - produtos.custo) * vendas_produtos.quantidade) as lucro_bruto'),
+                    DB::raw('CASE
+                        WHEN AVG(vendas_produtos.precoUnitario) > 0
+                        THEN ((AVG(vendas_produtos.precoUnitario) - produtos.custo) / AVG(vendas_produtos.precoUnitario)) * 100
+                        ELSE 0
+                    END as margem_percentual')
+                )
+                ->whereBetween('vendas.dataEntrada', [$from, $to])
+                ->whereIn('vendas.situacao', [1, 3])
+                ->where('produtos.custo', '>', 0)
+                ->groupBy('produtos.id', 'produtos.nome', 'produtos.referencia', 'produtos.preco', 'produtos.custo')
+                ->orderBy('margem_percentual', 'desc')
+                ->get();
+
+            // Separar produtos por margem alta e baixa
+            $margemAlta = $margemLucro->filter(function($produto) {
+                return $produto->margem_percentual >= 30;
+            })->take(20);
+
+            $margemBaixa = $margemLucro->filter(function($produto) {
+                return $produto->margem_percentual > 0 && $produto->margem_percentual < 15;
+            })->sortBy('margem_percentual')->take(20)->values();
+
+            // 3. CURVA ABC - Classificação por valor
+            $curvaABC = DB::table('vendas_produtos')
+                ->join('vendas', 'vendas_produtos.venda_id', '=', 'vendas.id')
+                ->join('produtos', 'vendas_produtos.produto_id', '=', 'produtos.id')
+                ->select(
+                    'produtos.id',
+                    'produtos.nome',
+                    'produtos.referencia',
+                    DB::raw('SUM(vendas_produtos.quantidade * vendas_produtos.precoUnitario) as valor_total'),
+                    DB::raw('SUM(vendas_produtos.quantidade) as quantidade_total')
+                )
+                ->whereBetween('vendas.dataEntrada', [$from, $to])
+                ->whereIn('vendas.situacao', [1, 3])
+                ->groupBy('produtos.id', 'produtos.nome', 'produtos.referencia')
+                ->orderBy('valor_total', 'desc')
+                ->get();
+
+            // Calcular percentual acumulado e classificação ABC
+            $valorTotal = $curvaABC->sum('valor_total');
+            $acumulado = 0;
+            $curvaABC = $curvaABC->map(function($produto, $index) use (&$acumulado, $valorTotal) {
+                $percentual = ($produto->valor_total / $valorTotal) * 100;
+                $acumulado += $percentual;
+
+                // Classificação ABC
+                if ($acumulado <= 80) {
+                    $classificacao = 'A';
+                } elseif ($acumulado <= 95) {
+                    $classificacao = 'B';
+                } else {
+                    $classificacao = 'C';
+                }
+
+                return (object) [
+                    'id' => $produto->id,
+                    'nome' => $produto->nome,
+                    'referencia' => $produto->referencia,
+                    'valor_total' => $produto->valor_total,
+                    'quantidade_total' => $produto->quantidade_total,
+                    'percentual' => $percentual,
+                    'percentual_acumulado' => $acumulado,
+                    'classificacao' => $classificacao,
+                    'posicao' => $index + 1
+                ];
+            });
+
+            // Estatísticas gerais
+            $estatisticas = [
+                'total_produtos_vendidos' => $produtosMaisVendidos->count(),
+                'quantidade_total_vendida' => $produtosMaisVendidos->sum('quantidade_vendida'),
+                'faturamento_total' => $produtosMaisVendidos->sum('valor_total_vendido'),
+                'margem_media' => $margemLucro->avg('margem_percentual'),
+                'lucro_bruto_total' => $margemLucro->sum('lucro_bruto'),
+                'produtos_classe_a' => $curvaABC->where('classificacao', 'A')->count(),
+                'produtos_classe_b' => $curvaABC->where('classificacao', 'B')->count(),
+                'produtos_classe_c' => $curvaABC->where('classificacao', 'C')->count(),
+            ];
+
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso', [
+                'produtosMaisVendidos' => $produtosMaisVendidos,
+                'margemAlta' => $margemAlta->values(),
+                'margemBaixa' => $margemBaixa,
+                'curvaABC' => $curvaABC,
+                'estatisticas' => $estatisticas,
+                'parametros' => [
+                    'dataInicio' => $from,
+                    'dataFim' => $to,
+                ]
+            ]);
+
+            return response()->json($response, 200);
+        } catch (Exception $ex) {
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+            return response()->json($response, 500);
+        }
+    }
 }
