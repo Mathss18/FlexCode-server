@@ -1717,7 +1717,7 @@ class RelatorioController extends Controller
                 'despesasPorSituacao' => $despesasPorSituacao
             ];
 
-            $response = APIHelper::APIResponse(true, 200, $data);
+            $response = APIHelper::APIResponse(true, 200, null, $data);
             return response()->json($response, 200);
         } catch (Exception $ex) {
             $response = APIHelper::APIResponse(false, 500, null, null, $ex);
