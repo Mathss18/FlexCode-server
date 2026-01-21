@@ -1729,6 +1729,8 @@ class RelatorioController extends Controller
 
             if ($favorecidoId) {
                 // Debug: Ver todas as transações que serão contadas
+                $favorecidoNome = $request->query('favorecido_nome', null);
+
                 $debugTransacoes = DB::select("
                     SELECT id, data, title, favorecido_nome, favorecido_id, valor, tipo, tipoFavorecido
                     FROM transacoes
@@ -1736,10 +1738,12 @@ class RelatorioController extends Controller
                     AND tipoFavorecido != 'contas_bancarias'
                     AND data BETWEEN ? AND ?
                     AND favorecido_id = ?
+                    AND favorecido_nome = ?
                     ORDER BY data DESC
-                ", [$from, $to, $favorecidoId]);
+                ", [$from, $to, $favorecidoId, $favorecidoNome]);
 
                 \Log::info('DEBUG: Transações encontradas para favorecido_id ' . $favorecidoId, [
+                    'favorecido_nome' => $favorecidoNome,
                     'total' => count($debugTransacoes),
                     'transacoes' => $debugTransacoes
                 ]);
@@ -1757,9 +1761,10 @@ class RelatorioController extends Controller
                     AND tipoFavorecido != 'contas_bancarias'
                     AND data BETWEEN ? AND ?
                     AND favorecido_id = ?
+                    AND favorecido_nome = ?
                     GROUP BY DATE_FORMAT(data, '%Y-%m'), DATE_FORMAT(data, '%m/%Y')
                     ORDER BY mes DESC
-                ", [$from, $to, $favorecidoId]);
+                ", [$from, $to, $favorecidoId, $favorecidoNome]);
 
                 \Log::info('Transações por mês encontradas:', [
                     'favorecido_id' => $favorecidoId,
