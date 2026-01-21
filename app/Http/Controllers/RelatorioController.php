@@ -1693,6 +1693,10 @@ class RelatorioController extends Controller
                 FROM transacoes
                 WHERE tipo = 'despesa'
                 AND tipoFavorecido != 'contas_bancarias'
+                AND data BETWEEN ? AND ?
+                GROUP BY situacao
+                ORDER BY total DESC
+            ", [$from, $to, $from, $to]);
 
             // Organizar evolução mensal por categoria para o frontend
             $evolucaoOrganizada = [];
