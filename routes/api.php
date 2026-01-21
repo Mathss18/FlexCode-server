@@ -356,6 +356,8 @@ Route::middleware(['jwt', 'check.jwt.tenant'])->group(function () {
     //============================ NOTA FISCAL ==============================
     Route::get('notas-fiscais', [NotaFiscalController::class, 'index']);
 
+    Route::get('notas-fiscais-mini', [NotaFiscalController::class, 'indexMini']);
+
     Route::get('notas-fiscais/{id}', [NotaFiscalController::class, 'show']);
 
     Route::post('notas-fiscais', [NotaFiscalController::class, 'store']);

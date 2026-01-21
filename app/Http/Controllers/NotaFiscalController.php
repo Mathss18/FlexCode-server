@@ -17,6 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use Illuminate\Pagination\Paginator;
 
 class NotaFiscalController extends Controller
 {
@@ -28,6 +29,49 @@ class NotaFiscalController extends Controller
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', $notasFiscais);
             return response()->json($response, 200);
         } catch (Exception  $ex) {
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+            return response()->json($response, 500);
+        }
+    }
+
+    public function indexMini(Request $request)
+    {
+        $itemsPerPage = $request->get('itemsPerPage', 10);
+        $currentPage = $request->get('currentPage', 1);
+        $searchText = $request->get('searchText', "");
+
+        try {
+            Paginator::currentPageResolver(function () use ($currentPage) {
+                return $currentPage;
+            });
+
+            $query = NotaFiscal::with('venda', 'transportadora', 'forma_pagamento')->orderBy('id', 'desc');
+
+            // Add search condition if searchText is provided
+            if (!empty($searchText)) {
+                $query->where(function ($q) use ($searchText) {
+                    $q->where('nNF', 'like', '%' . $searchText . '%')
+                        ->orWhere('chaveNF', 'like', '%' . $searchText . '%')
+                        ->orWhere('favorecido_nome', 'like', '%' . $searchText . '%')
+                        ->orWhere('protocolo', 'like', '%' . $searchText . '%')
+                        ->orWhere('situacao', 'like', '%' . $searchText . '%')
+                        ->orWhere('totalFinal', 'like', '%' . $searchText . '%');
+                });
+            }
+
+            $notasFiscais = $query->paginate($itemsPerPage);
+
+            $responseData = [
+                'data' => $notasFiscais->items(),
+                'totalItems' => $notasFiscais->total(),
+                'currentPage' => $notasFiscais->currentPage(),
+                'perPage' => $notasFiscais->perPage(),
+                'lastPage' => $notasFiscais->lastPage()
+            ];
+
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso', $responseData);
+            return response()->json($response, 200);
+        } catch (\Exception $ex) {
             $response = APIHelper::APIResponse(false, 500, null, null, $ex);
             return response()->json($response, 500);
         }
