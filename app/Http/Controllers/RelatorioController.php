@@ -1141,4 +1141,116 @@ class RelatorioController extends Controller
             return response()->json($response, 500);
         }
     }
+
+    public function analiseFinanceira(Request $request)
+    {
+        $from = date($request->query('startDate'));
+        $to = date($request->query('endDate'));
+
+        try {
+            $hoje = date('Y-m-d');
+
+            // 1. TRANSAÇÕES EM ATRASO - Parcelas abertas com data vencida
+            $transacoesEmAtraso = DB::table('transacoes')
+                ->select(
+                    'transacoes.id',
+                    'transacoes.data as data_vencimento',
+                    'transacoes.valor',
+                    'transacoes.observacao',
+                    'transacoes.favorecido_nome as cliente_nome',
+                    'transacoes.favorecido_id as cliente_id',
+                    'transacoes.venda_id',
+                    DB::raw("DATEDIFF('$hoje', transacoes.data) as dias_atraso")
+                )
+                ->where('transacoes.tipo', 'rendimento')
+                ->where('transacoes.situacao', 'aberta')
+                ->where('transacoes.data', '<', $hoje)
+                ->whereBetween('transacoes.data', [$from, $to])
+                ->whereNotNull('transacoes.favorecido_id')
+                ->orderBy('dias_atraso', 'desc')
+                ->get();
+
+            // 2. INADIMPLÊNCIA POR CLIENTE - Agrupar transações por cliente
+            $inadimplenciaPorCliente = DB::table('transacoes')
+                ->select(
+                    'transacoes.favorecido_id as cliente_id',
+                    'transacoes.favorecido_nome as cliente_nome',
+                    DB::raw('COUNT(transacoes.id) as total_parcelas_atrasadas'),
+                    DB::raw('SUM(transacoes.valor) as valor_total_atraso'),
+                    DB::raw("MAX(DATEDIFF('$hoje', transacoes.data)) as maior_atraso_dias"),
+                    DB::raw("MIN(transacoes.data) as vencimento_mais_antigo")
+                )
+                ->where('transacoes.tipo', 'rendimento')
+                ->where('transacoes.situacao', 'aberta')
+                ->where('transacoes.data', '<', $hoje)
+                ->whereBetween('transacoes.data', [$from, $to])
+                ->whereNotNull('transacoes.favorecido_id')
+                ->groupBy('transacoes.favorecido_id', 'transacoes.favorecido_nome')
+                ->orderBy('valor_total_atraso', 'desc')
+                ->get();
+
+            // 3. FAIXAS DE ATRASO - Classificar por dias de atraso
+            $faixasAtraso = [
+                'ate_30_dias' => $transacoesEmAtraso->filter(function($t) {
+                    return $t->dias_atraso <= 30;
+                }),
+                '31_a_60_dias' => $transacoesEmAtraso->filter(function($t) {
+                    return $t->dias_atraso > 30 && $t->dias_atraso <= 60;
+                }),
+                '61_a_90_dias' => $transacoesEmAtraso->filter(function($t) {
+                    return $t->dias_atraso > 60 && $t->dias_atraso <= 90;
+                }),
+                'acima_90_dias' => $transacoesEmAtraso->filter(function($t) {
+                    return $t->dias_atraso > 90;
+                }),
+            ];
+
+            $faixasResumo = [
+                'ate_30_dias' => [
+                    'quantidade' => $faixasAtraso['ate_30_dias']->count(),
+                    'valor_total' => $faixasAtraso['ate_30_dias']->sum('valor'),
+                ],
+                '31_a_60_dias' => [
+                    'quantidade' => $faixasAtraso['31_a_60_dias']->count(),
+                    'valor_total' => $faixasAtraso['31_a_60_dias']->sum('valor'),
+                ],
+                '61_a_90_dias' => [
+                    'quantidade' => $faixasAtraso['61_a_90_dias']->count(),
+                    'valor_total' => $faixasAtraso['61_a_90_dias']->sum('valor'),
+                ],
+                'acima_90_dias' => [
+                    'quantidade' => $faixasAtraso['acima_90_dias']->count(),
+                    'valor_total' => $faixasAtraso['acima_90_dias']->sum('valor'),
+                ],
+            ];
+
+            // Estatísticas gerais
+            $estatisticas = [
+                'total_transacoes_atrasadas' => $transacoesEmAtraso->count(),
+                'valor_total_inadimplencia' => $transacoesEmAtraso->sum('valor'),
+                'total_clientes_inadimplentes' => $inadimplenciaPorCliente->count(),
+                'maior_atraso_dias' => $transacoesEmAtraso->max('dias_atraso') ?: 0,
+                'ticket_medio_atraso' => $transacoesEmAtraso->count() > 0
+                    ? $transacoesEmAtraso->sum('valor') / $transacoesEmAtraso->count()
+                    : 0,
+            ];
+
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso', [
+                'transacoesEmAtraso' => $transacoesEmAtraso,
+                'inadimplenciaPorCliente' => $inadimplenciaPorCliente,
+                'faixasResumo' => $faixasResumo,
+                'estatisticas' => $estatisticas,
+                'parametros' => [
+                    'dataInicio' => $from,
+                    'dataFim' => $to,
+                    'dataConsulta' => $hoje,
+                ]
+            ]);
+
+            return response()->json($response, 200);
+        } catch (Exception $ex) {
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+            return response()->json($response, 500);
+        }
+    }
 }
