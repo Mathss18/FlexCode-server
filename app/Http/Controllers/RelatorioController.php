@@ -973,4 +973,123 @@ class RelatorioController extends Controller
 
         return $CSS_COLOR_NAMES[$index];
     }
+
+    public function analiseClientes(Request $request)
+    {
+        try {
+            $from = $request->query('startDate');
+            $to = $request->query('endDate');
+            $diasInatividade = $request->query('diasInatividade', 90);
+
+            // 1. Top Clientes por Faturamento
+            $topClientes = DB::table('vendas')
+                ->join('clientes', 'vendas.cliente_id', '=', 'clientes.id')
+                ->select(
+                    'clientes.id',
+                    'clientes.nome',
+                    DB::raw('COUNT(vendas.id) as total_vendas'),
+                    DB::raw('SUM(vendas.total) as faturamento_total'),
+                    DB::raw('AVG(vendas.total) as ticket_medio'),
+                    DB::raw('MAX(vendas.dataEntrada) as ultima_compra')
+                )
+                ->whereBetween('vendas.dataEntrada', [$from, $to])
+                ->whereIn('vendas.situacao', [1, 3]) // Realizada ou Parcial
+                ->groupBy('clientes.id', 'clientes.nome')
+                ->orderBy('faturamento_total', 'desc')
+                ->limit(20)
+                ->get();
+
+            // 2. Clientes Inativos
+            $dataLimite = date('Y-m-d', strtotime("-{$diasInatividade} days"));
+
+            $clientesInativos = DB::table('clientes')
+                ->leftJoin('vendas', function($join) use ($dataLimite) {
+                    $join->on('clientes.id', '=', 'vendas.cliente_id')
+                         ->where('vendas.dataEntrada', '>=', $dataLimite)
+                         ->whereIn('vendas.situacao', [1, 3]);
+                })
+                ->select(
+                    'clientes.id',
+                    'clientes.nome',
+                    'clientes.email',
+                    'clientes.telefone',
+                    DB::raw('MAX(v2.dataEntrada) as ultima_compra'),
+                    DB::raw('COUNT(v2.id) as total_compras_historico')
+                )
+                ->leftJoin('vendas as v2', 'clientes.id', '=', 'v2.cliente_id')
+                ->whereNull('vendas.id')
+                ->groupBy('clientes.id', 'clientes.nome', 'clientes.email', 'clientes.telefone')
+                ->having('total_compras_historico', '>', 0)
+                ->orderBy('ultima_compra', 'asc')
+                ->limit(50)
+                ->get();
+
+            // 3. Ticket Médio por Cliente (todos os clientes que compraram no período)
+            $ticketMedio = DB::table('vendas')
+                ->join('clientes', 'vendas.cliente_id', '=', 'clientes.id')
+                ->select(
+                    'clientes.id',
+                    'clientes.nome',
+                    DB::raw('COUNT(vendas.id) as total_vendas'),
+                    DB::raw('SUM(vendas.total) as total_gasto'),
+                    DB::raw('AVG(vendas.total) as ticket_medio')
+                )
+                ->whereBetween('vendas.dataEntrada', [$from, $to])
+                ->whereIn('vendas.situacao', [1, 3])
+                ->groupBy('clientes.id', 'clientes.nome')
+                ->orderBy('ticket_medio', 'desc')
+                ->get();
+
+            // 4. Análise de Recorrência
+            $recorrencia = DB::table('vendas')
+                ->join('clientes', 'vendas.cliente_id', '=', 'clientes.id')
+                ->select(
+                    'clientes.id',
+                    'clientes.nome',
+                    DB::raw('COUNT(vendas.id) as total_vendas'),
+                    DB::raw('SUM(vendas.total) as total_gasto'),
+                    DB::raw('MIN(vendas.dataEntrada) as primeira_compra'),
+                    DB::raw('MAX(vendas.dataEntrada) as ultima_compra'),
+                    DB::raw('DATEDIFF(MAX(vendas.dataEntrada), MIN(vendas.dataEntrada)) as dias_entre_primeira_ultima'),
+                    DB::raw('CASE
+                        WHEN COUNT(vendas.id) > 1
+                        THEN DATEDIFF(MAX(vendas.dataEntrada), MIN(vendas.dataEntrada)) / (COUNT(vendas.id) - 1)
+                        ELSE 0
+                    END as intervalo_medio_dias')
+                )
+                ->whereBetween('vendas.dataEntrada', [$from, $to])
+                ->whereIn('vendas.situacao', [1, 3])
+                ->groupBy('clientes.id', 'clientes.nome')
+                ->having('total_vendas', '>', 1)
+                ->orderBy('total_vendas', 'desc')
+                ->get();
+
+            // Estatísticas gerais
+            $estatisticas = [
+                'total_clientes_ativos' => $topClientes->count(),
+                'total_clientes_inativos' => $clientesInativos->count(),
+                'faturamento_total_periodo' => $topClientes->sum('faturamento_total'),
+                'ticket_medio_geral' => $ticketMedio->avg('ticket_medio'),
+                'cliente_mais_recorrente' => $recorrencia->first(),
+            ];
+
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso', [
+                'topClientes' => $topClientes,
+                'clientesInativos' => $clientesInativos,
+                'ticketMedio' => $ticketMedio,
+                'recorrencia' => $recorrencia,
+                'estatisticas' => $estatisticas,
+                'parametros' => [
+                    'dataInicio' => $from,
+                    'dataFim' => $to,
+                    'diasInatividade' => $diasInatividade
+                ]
+            ]);
+
+            return response()->json($response, 200);
+        } catch (Exception $ex) {
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+            return response()->json($response, 500);
+        }
+    }
 }
