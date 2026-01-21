@@ -1108,8 +1108,8 @@ class RelatorioController extends Controller
                     'produtos.nome',
                     'produtos.valorCusto as preco_atual',
                     DB::raw('SUM(vendas_produtos.quantidade) as quantidade_vendida'),
-                    DB::raw('SUM(vendas_produtos.quantidade * vendas_produtos.precoUnitario) as valor_total_vendido'),
-                    DB::raw('AVG(vendas_produtos.precoUnitario) as preco_medio_venda'),
+                    DB::raw('SUM(vendas_produtos.quantidade * vendas_produtos.preco) as valor_total_vendido'),
+                    DB::raw('AVG(vendas_produtos.preco) as preco_medio_venda'),
                     DB::raw('COUNT(DISTINCT vendas.id) as numero_vendas')
                 )
                 ->whereBetween('vendas.dataEntrada', [$from, $to])
@@ -1129,13 +1129,13 @@ class RelatorioController extends Controller
                     'produtos.valorCusto as preco_tabela',
                     'produtos.custoFinal as custo_produto',
                     DB::raw('SUM(vendas_produtos.quantidade) as quantidade_vendida'),
-                    DB::raw('AVG(vendas_produtos.precoUnitario) as preco_medio_venda'),
-                    DB::raw('SUM(vendas_produtos.quantidade * vendas_produtos.precoUnitario) as valor_total_vendido'),
+                    DB::raw('AVG(vendas_produtos.preco) as preco_medio_venda'),
+                    DB::raw('SUM(vendas_produtos.quantidade * vendas_produtos.preco) as valor_total_vendido'),
                     DB::raw('SUM(vendas_produtos.quantidade * produtos.custoFinal) as custo_total'),
-                    DB::raw('SUM((vendas_produtos.precoUnitario - produtos.custoFinal) * vendas_produtos.quantidade) as lucro_bruto'),
+                    DB::raw('SUM((vendas_produtos.preco - produtos.custoFinal) * vendas_produtos.quantidade) as lucro_bruto'),
                     DB::raw('CASE
-                        WHEN AVG(vendas_produtos.precoUnitario) > 0
-                        THEN ((AVG(vendas_produtos.precoUnitario) - produtos.custoFinal) / AVG(vendas_produtos.precoUnitario)) * 100
+                        WHEN AVG(vendas_produtos.preco) > 0
+                        THEN ((AVG(vendas_produtos.preco) - produtos.custoFinal) / AVG(vendas_produtos.preco)) * 100
                         ELSE 0
                     END as margem_percentual')
                 )
@@ -1162,7 +1162,7 @@ class RelatorioController extends Controller
                 ->select(
                     'produtos.id',
                     'produtos.nome',
-                    DB::raw('SUM(vendas_produtos.quantidade * vendas_produtos.precoUnitario) as valor_total'),
+                    DB::raw('SUM(vendas_produtos.quantidade * vendas_produtos.preco) as valor_total'),
                     DB::raw('SUM(vendas_produtos.quantidade) as quantidade_total')
                 )
                 ->whereBetween('vendas.dataEntrada', [$from, $to])
