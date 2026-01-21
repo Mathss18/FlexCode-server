@@ -1599,8 +1599,9 @@ class RelatorioController extends Controller
         try {
             $from = $request->query('from');
             $to = $request->query('to');
+            $searchTerm = $request->query('search', null);
 
-            // Evolução mensal de despesas
+            // Evolução mensal de despesas (excluindo contas_bancarias)
             $evolucaoMensal = DB::select("
                 SELECT
                     DATE_FORMAT(data, '%Y-%m') as mes,
@@ -1610,27 +1611,29 @@ class RelatorioController extends Controller
                     AVG(valor) as ticket_medio
                 FROM transacoes
                 WHERE tipo = 'despesa'
+                AND tipoFavorecido != 'contas_bancarias'
                 AND data BETWEEN ? AND ?
                 GROUP BY DATE_FORMAT(data, '%Y-%m'), DATE_FORMAT(data, '%m/%Y')
                 ORDER BY mes ASC
             ", [$from, $to]);
 
-            // Despesas por categoria
+            // Despesas por categoria (excluindo contas_bancarias)
             $despesasPorCategoria = DB::select("
                 SELECT
                     tipoFavorecido as categoria,
                     SUM(valor) as total,
                     COUNT(*) as quantidade,
                     AVG(valor) as ticket_medio,
-                    ROUND((SUM(valor) / (SELECT SUM(valor) FROM transacoes WHERE tipo = 'despesa' AND data BETWEEN ? AND ?) * 100), 2) as percentual
+                    ROUND((SUM(valor) / (SELECT SUM(valor) FROM transacoes WHERE tipo = 'despesa' AND tipoFavorecido != 'contas_bancarias' AND data BETWEEN ? AND ?) * 100), 2) as percentual
                 FROM transacoes
                 WHERE tipo = 'despesa'
+                AND tipoFavorecido != 'contas_bancarias'
                 AND data BETWEEN ? AND ?
                 GROUP BY tipoFavorecido
                 ORDER BY total DESC
             ", [$from, $to, $from, $to]);
 
-            // Evolução mensal por categoria
+            // Evolução mensal por categoria (excluindo contas_bancarias)
             $evolucaoMensalCategoria = DB::select("
                 SELECT
                     DATE_FORMAT(data, '%Y-%m') as mes,
@@ -1640,12 +1643,13 @@ class RelatorioController extends Controller
                     COUNT(*) as quantidade
                 FROM transacoes
                 WHERE tipo = 'despesa'
+                AND tipoFavorecido != 'contas_bancarias'
                 AND data BETWEEN ? AND ?
                 GROUP BY DATE_FORMAT(data, '%Y-%m'), DATE_FORMAT(data, '%m/%Y'), tipoFavorecido
                 ORDER BY mes ASC, total DESC
             ", [$from, $to]);
 
-            // Top 20 favorecidos com mais despesas
+            // Top 20 favorecidos com mais despesas (excluindo contas_bancarias)
             $topFavorecidos = DB::select("
                 SELECT
                     favorecido_nome,
@@ -1657,6 +1661,7 @@ class RelatorioController extends Controller
                     MAX(data) as ultima_transacao
                 FROM transacoes
                 WHERE tipo = 'despesa'
+                AND tipoFavorecido != 'contas_bancarias'
                 AND data BETWEEN ? AND ?
                 AND favorecido_nome IS NOT NULL
                 GROUP BY favorecido_nome, tipoFavorecido
@@ -1664,7 +1669,7 @@ class RelatorioController extends Controller
                 LIMIT 20
             ", [$from, $to]);
 
-            // Estatísticas gerais
+            // Estatísticas gerais (excluindo contas_bancarias)
             $estatisticasGerais = DB::selectOne("
                 SELECT
                     SUM(valor) as total_despesas,
@@ -1674,22 +1679,20 @@ class RelatorioController extends Controller
                     COUNT(DISTINCT DATE_FORMAT(data, '%Y-%m')) as meses_com_despesas
                 FROM transacoes
                 WHERE tipo = 'despesa'
+                AND tipoFavorecido != 'contas_bancarias'
                 AND data BETWEEN ? AND ?
             ", [$from, $to]);
 
-            // Despesas por situação
+            // Despesas por situação (excluindo contas_bancarias)
             $despesasPorSituacao = DB::select("
                 SELECT
                     situacao,
                     SUM(valor) as total,
                     COUNT(*) as quantidade,
-                    ROUND((SUM(valor) / (SELECT SUM(valor) FROM transacoes WHERE tipo = 'despesa' AND data BETWEEN ? AND ?) * 100), 2) as percentual
+                    ROUND((SUM(valor) / (SELECT SUM(valor) FROM transacoes WHERE tipo = 'despesa' AND tipoFavorecido != 'contas_bancarias' AND data BETWEEN ? AND ?) * 100), 2) as percentual
                 FROM transacoes
                 WHERE tipo = 'despesa'
-                AND data BETWEEN ? AND ?
-                GROUP BY situacao
-                ORDER BY total DESC
-            ", [$from, $to, $from, $to]);
+                AND tipoFavorecido != 'contas_bancarias'
 
             // Organizar evolução mensal por categoria para o frontend
             $evolucaoOrganizada = [];
@@ -1708,13 +1711,34 @@ class RelatorioController extends Controller
                 ];
             }
 
+            // Busca por transação específica (se houver termo de busca)
+            $transacaoPorMes = [];
+            if ($searchTerm) {
+                $transacaoPorMes = DB::select("
+                    SELECT
+                        DATE_FORMAT(data, '%Y-%m') as mes,
+                        DATE_FORMAT(data, '%m/%Y') as mes_formatado,
+                        SUM(valor) as total,
+                        COUNT(*) as quantidade,
+                        AVG(valor) as ticket_medio
+                    FROM transacoes
+                    WHERE tipo = 'despesa'
+                    AND tipoFavorecido != 'contas_bancarias'
+                    AND data BETWEEN ? AND ?
+                    AND (title LIKE ? OR observacao LIKE ? OR favorecido_nome LIKE ?)
+                    GROUP BY DATE_FORMAT(data, '%Y-%m'), DATE_FORMAT(data, '%m/%Y')
+                    ORDER BY mes ASC
+                ", [$from, $to, "%{$searchTerm}%", "%{$searchTerm}%", "%{$searchTerm}%"]);
+            }
+
             $data = [
                 'estatisticas' => $estatisticasGerais,
                 'evolucaoMensal' => $evolucaoMensal,
                 'despesasPorCategoria' => $despesasPorCategoria,
                 'evolucaoMensalCategoria' => array_values($evolucaoOrganizada),
                 'topFavorecidos' => $topFavorecidos,
-                'despesasPorSituacao' => $despesasPorSituacao
+                'despesasPorSituacao' => $despesasPorSituacao,
+                'transacaoPorMes' => $transacaoPorMes
             ];
 
             $response = APIHelper::APIResponse(true, 200, null, $data);
