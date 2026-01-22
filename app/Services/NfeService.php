@@ -708,7 +708,8 @@ class NfeService
                 "success" => $this->success,
                 "error" => $this->error,
                 "tagErrors" => null,
-                "tagDOM" => null
+                "tagDOM" => null,
+                "vNF" => $icmsTotal->vNF
             ];
         } catch (\Throwable $th) {
             $this->error = $th;

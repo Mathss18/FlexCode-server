@@ -168,7 +168,7 @@ class NotaFiscalController extends Controller
                 $notasFiscais->tipoFavorecido = $request->input('clienteFornecedor_id')['tipo'];
                 $notasFiscais->chaveNF = $resp['chave'];
                 $notasFiscais->protocolo = $resp['protocolo'];
-                $notasFiscais->totalFinal = $request->input('totalFinal');
+                $notasFiscais->totalFinal = $resp['vNF']; // Valor total da NF com IPI (ICMSTot.vNF)
                 $notasFiscais->totalProdutos = $request->input('totalProdutos');
                 $notasFiscais->desconto = $request->input('desconto');
                 $notasFiscais->frete = $request->input('frete');
