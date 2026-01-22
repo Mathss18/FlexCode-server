@@ -55,7 +55,7 @@ class VendaController extends Controller
                     $q->where('numero', 'like', '%' . $searchText . '%')
                         ->orWhere('situacao', 'like', '%' . $searchText . '%')
                         ->orWhere('observacao', 'like', '%' . $searchText . '%')
-                        ->orWhere('totalFinal', 'like', '%' . $searchText . '%')
+                        ->orWhere('total', 'like', '%' . $searchText . '%')
                         ->orWhereHas('cliente', function ($q2) use ($searchText) {
                             $q2->where('nome', 'like', '%' . $searchText . '%');
                         });
