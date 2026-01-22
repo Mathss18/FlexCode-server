@@ -191,11 +191,50 @@ class NotaFiscalController extends Controller
                 $notasFiscais->save();
                 if($notasFiscais->venda_id){
                     $numeroNfe = $notasFiscais->nNF;
-                    DB::table('transacoes')->where('venda_id','=',$notasFiscais->venda_id)->update(
-                        [
-                            'observacao' => DB::raw("CONCAT(observacao,' NFe: $numeroNfe')")
-                        ],$numeroNfe
-                    );
+
+                    // Buscar transações da venda ordenadas por data de vencimento
+                    $transacoes = DB::table('transacoes')
+                        ->where('venda_id', '=', $notasFiscais->venda_id)
+                        ->orderBy('data', 'ASC')
+                        ->get();
+
+                    $parcelas = $request->input('parcelas');
+                    $parcelasManual = $request->input('parcelasManual', 0);
+
+                    if ($parcelasManual == 1) {
+                        // Se o usuário ajustou manualmente, usar os valores informados
+                        foreach ($transacoes as $index => $transacao) {
+                            if (isset($parcelas[$index])) {
+                                DB::table('transacoes')
+                                    ->where('id', $transacao->id)
+                                    ->update([
+                                        'valor' => number_format((float)$parcelas[$index]['valorParcela'], 2, '.', ''),
+                                        'observacao' => DB::raw("CONCAT(observacao,' NFe: $numeroNfe')")
+                                    ]);
+                            }
+                        }
+                    } else {
+                        // Recalcular automaticamente os valores das parcelas com base no valor final da NFe
+                        $vNF = $notasFiscais->totalFinal;
+                        $numParcelas = count($parcelas);
+                        $valorParcela = floor(($vNF / $numParcelas) * 100) / 100;
+                        $somaParcelas = $valorParcela * $numParcelas;
+                        $diferenca = round($vNF - $somaParcelas, 2);
+
+                        foreach ($transacoes as $index => $transacao) {
+                            // Se for a última parcela, adiciona a diferença de arredondamento
+                            $valorAtualizado = ($index == $numParcelas - 1)
+                                ? number_format($valorParcela + $diferenca, 2, '.', '')
+                                : number_format($valorParcela, 2, '.', '');
+
+                            DB::table('transacoes')
+                                ->where('id', $transacao->id)
+                                ->update([
+                                    'valor' => $valorAtualizado,
+                                    'observacao' => DB::raw("CONCAT(observacao,' NFe: $numeroNfe')")
+                                ]);
+                        }
+                    }
                 }
                 $response = APIHelper::APIResponse(true, 200, 'Sucesso ao emitir NF-e', $notasFiscais);
                 return response()->json($response, 200);
