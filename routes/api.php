@@ -218,6 +218,8 @@ Route::middleware(['jwt', 'check.jwt.tenant'])->group(function () {
 
     Route::get('ordens-servicos-mini', [OrdemServicoController::class, 'indexMini']);
 
+    Route::get('ordens-servicos-simple', [OrdemServicoController::class, 'indexSimple']);
+
     Route::get('ordens-servicos/{id}', [OrdemServicoController::class, 'show']);
 
     Route::get('ordens-servicos-proximo', [OrdemServicoController::class, 'getNextId']);

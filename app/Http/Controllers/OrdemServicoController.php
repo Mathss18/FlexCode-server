@@ -29,8 +29,53 @@ class OrdemServicoController extends Controller
 
     public function indexMini(Request $request)
     {
+        $itemsPerPage = $request->get('itemsPerPage', 10);
+        $currentPage = $request->get('currentPage', 1);
+        $searchText = $request->get('searchText', "");
+
         try {
-            // Retorna apenas campos essenciais sem paginação (mais rápido)
+            Paginator::currentPageResolver(function () use ($currentPage) {
+                return $currentPage;
+            });
+
+            // Seleciona apenas campos essenciais e cliente.nome (paginado para página de ordens de serviço)
+            $query = OrdemServico::select('id', 'numero', 'venda_id', 'situacao', 'cliente_id', 'dataEntrada', 'dataSaida')
+                ->with(['cliente:id,nome'])
+                ->orderBy('id', 'desc');
+
+            // Add search condition if searchText is provided
+            if (!empty($searchText)) {
+                $query->where(function ($q) use ($searchText) {
+                    $q->where('numero', 'like', '%' . $searchText . '%')
+                        ->orWhere('situacao', 'like', '%' . $searchText . '%')
+                        ->orWhereHas('cliente', function ($q2) use ($searchText) {
+                            $q2->where('nome', 'like', '%' . $searchText . '%');
+                        });
+                });
+            }
+
+            $ordensServicos = $query->paginate($itemsPerPage);
+
+            $responseData = [
+                'data' => $ordensServicos->items(),
+                'totalItems' => $ordensServicos->total(),
+                'currentPage' => $ordensServicos->currentPage(),
+                'perPage' => $ordensServicos->perPage(),
+                'lastPage' => $ordensServicos->lastPage()
+            ];
+
+            $response = APIHelper::APIResponse(true, 200, 'Sucesso', $responseData);
+            return response()->json($response, 200);
+        } catch (\Exception $ex) {
+            $response = APIHelper::APIResponse(false, 500, null, null, $ex);
+            return response()->json($response, 500);
+        }
+    }
+
+    public function indexSimple(Request $request)
+    {
+        try {
+            // Retorna apenas campos essenciais sem paginação para página de vendas (mais rápido)
             $ordensServicos = OrdemServico::select('id', 'numero', 'venda_id', 'situacao', 'cliente_id')
                 ->with(['cliente:id,nome'])
                 ->orderBy('id', 'desc')
