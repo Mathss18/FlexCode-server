@@ -18,7 +18,7 @@ class OrdemServicoFuncionarioController extends Controller
     {
         //$ordemServicoFuncionario = OrdemServicoFuncionario::paginate(15);
         try {
-            $ordemServicoFuncionario = OrdemServicoFuncionario::with(['ordem_servico.produtos', 'funcionario', 'ordem_servico.cliente', 'ordem_servico.servicos'])->orderBy('id', 'desc')->get();
+            $ordemServicoFuncionario = OrdemServicoFuncionario::with(['ordem_servico.produtos', 'funcionario', 'ordem_servico.cliente', 'ordem_servico.servicos'])->orderBy('dataFinalizado', 'desc')->get();
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', $ordemServicoFuncionario);
             return response()->json($response, 200);
         } catch (Exception  $ex) {
@@ -39,6 +39,7 @@ class OrdemServicoFuncionarioController extends Controller
         }
     }
 
+    // Nao está sendo mais utilizado
     public function showAbertas($idUsuario)
     {
         try {
@@ -52,6 +53,7 @@ class OrdemServicoFuncionarioController extends Controller
         }
     }
 
+    // Estamos buscando as ordens de serviço com status 0 (abertas) e status 1 (fazendo)
     public function showFazendo($idUsuario)
     {
         try {
