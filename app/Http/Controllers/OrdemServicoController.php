@@ -39,7 +39,7 @@ class OrdemServicoController extends Controller
             });
 
             // Seleciona apenas campos essenciais e cliente.nome (paginado para página de ordens de serviço)
-            $query = OrdemServico::select('id', 'numero', 'venda_id', 'situacao', 'cliente_id', 'dataEntrada', 'dataSaida')
+            $query = OrdemServico::select('id', 'numero', 'venda_id', 'situacao', 'cliente_id', 'dataEntrada', 'dataSaida', 'horaEntrada', 'horaSaida')
                 ->with(['cliente:id,nome'])
                 ->orderBy('id', 'desc');
 
@@ -231,6 +231,16 @@ class OrdemServicoController extends Controller
 
         try {
             $ordensServicos->save();
+
+            // Se a OS for cancelada (situacao = 3), remove todas as associações
+            if ($ordensServicos->situacao == 3) {
+                $ordensServicos->produtos()->detach();
+                $ordensServicos->servicos()->detach();
+                $ordensServicos->funcionarios()->detach();
+
+                $response = APIHelper::APIResponse(true, 200, 'Ordem de serviço cancelada - associações removidas', $ordensServicos);
+                return response()->json($response, 200);
+            }
 
             // Cadastra os produtos da ordem de serviço
             if ($produtos) {
