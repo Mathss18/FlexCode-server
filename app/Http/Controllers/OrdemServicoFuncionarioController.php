@@ -56,7 +56,11 @@ class OrdemServicoFuncionarioController extends Controller
     {
         try {
             $funcionario = Funcionario::where('usuario_id', $idUsuario)->first();
-            $ordemServicoFuncionario = OrdemServicoFuncionario::with(['ordem_servico.produtos', 'funcionario', 'ordem_servico.cliente', 'ordem_servico.servicos'])->where('funcionario_id', $funcionario->id)->where('status', 1)->get();
+            // Busca tarefas com status 0 (abertas) e status 1 (fazendo)
+            $ordemServicoFuncionario = OrdemServicoFuncionario::with(['ordem_servico.produtos', 'funcionario', 'ordem_servico.cliente', 'ordem_servico.servicos'])
+                ->where('funcionario_id', $funcionario->id)
+                ->whereIn('status', [0, 1])
+                ->get();
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', $ordemServicoFuncionario);
             return response()->json($response, 200);
         } catch (Exception  $ex) {
