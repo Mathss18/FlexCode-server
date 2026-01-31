@@ -18,7 +18,7 @@ class OrdemServicoFuncionarioController extends Controller
     {
         //$ordemServicoFuncionario = OrdemServicoFuncionario::paginate(15);
         try {
-            $ordemServicoFuncionario = OrdemServicoFuncionario::with(['ordem_servico.produtos', 'funcionario', 'ordem_servico.cliente', 'ordem_servico.servicos'])->orderBy('dataFinalizado', 'desc')->get();
+            $ordemServicoFuncionario = OrdemServicoFuncionario::with(['ordem_servico.produtos', 'funcionario', 'ordem_servico.cliente', 'ordem_servico.servicos'])->get();
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', $ordemServicoFuncionario);
             return response()->json($response, 200);
         } catch (Exception  $ex) {
@@ -75,7 +75,7 @@ class OrdemServicoFuncionarioController extends Controller
     {
         try {
             $funcionario = Funcionario::where('usuario_id', $idUsuario)->first();
-            $ordemServicoFuncionario = OrdemServicoFuncionario::with(['ordem_servico.produtos', 'funcionario', 'ordem_servico.cliente', 'ordem_servico.servicos'])->where('funcionario_id', $funcionario->id)->where('status', 2)->get();
+            $ordemServicoFuncionario = OrdemServicoFuncionario::with(['ordem_servico.produtos', 'funcionario', 'ordem_servico.cliente', 'ordem_servico.servicos'])->where('funcionario_id', $funcionario->id)->where('status', 2)->orderBy('dataFinalizado', 'desc')->get();
             $response = APIHelper::APIResponse(true, 200, 'Sucesso', $ordemServicoFuncionario);
             return response()->json($response, 200);
         } catch (Exception  $ex) {
