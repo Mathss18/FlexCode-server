@@ -38,10 +38,10 @@ class DashboardController extends Controller
         $from = date('Y-m-01', strtotime("-12 months")) . ' 00:00:00';
         $to = date('Y-m-t', strtotime("-1 months")) . ' 23:59:59';
 
-        $query = "SELECT MONTH(v.updated_at) as mes, YEAR(v.updated_at) as ano, SUM(v.total) as total 
-                  FROM vendas v 
-                  WHERE v.situacao = 1 
-                  AND v.updated_at BETWEEN :from AND :to 
+        $query = "SELECT MONTH(v.updated_at) as mes, YEAR(v.updated_at) as ano, SUM(v.total) as total
+                  FROM vendas v
+                  WHERE v.situacao = 1
+                  AND v.updated_at BETWEEN :from AND :to
                   GROUP BY YEAR(v.updated_at), MONTH(v.updated_at)";
 
         $transacoes = DB::select(DB::raw($query), ['from' => $from, 'to' => $to]);
@@ -82,10 +82,21 @@ class DashboardController extends Controller
 
         // Calculate the average daily balance for the current month
         $currentDay = date('j'); // Current day of the month
-        $averageMonthly = $totalSum / count($dados); // To avoid division by zero
+
+        // Guard against empty datasets to avoid division by zero and undefined offsets
+        if (count($dados) === 0 || count($dadosCurrentMonth) === 0) {
+            return 0; // No data available to compute percentage difference
+        }
+
+        $averageMonthly = $totalSum / count($dados);
         $averageDailyCurrentMonth = ($averageMonthly / 30) * $currentDay;
 
-        return 100 - ($averageDailyCurrentMonth/$dadosCurrentMonth[0]['balancoFinal']) * 100;
+        $balancoFinal = isset($dadosCurrentMonth[0]['balancoFinal']) ? (float)$dadosCurrentMonth[0]['balancoFinal'] : 0;
+        if ($balancoFinal == 0) {
+            return 0; // Avoid division by zero
+        }
+
+        return 100 - ($averageDailyCurrentMonth / $balancoFinal) * 100;
     }
 
     public function despesasAbertasHoje()
@@ -141,9 +152,9 @@ class DashboardController extends Controller
         $currentYear = date('Y');
 
         $vendasMelhorMes = DB::select(DB::raw("
-            SELECT YEAR(v.updated_at) as year, MONTH(v.updated_at) as month, SUM(v.total) as total 
+            SELECT YEAR(v.updated_at) as year, MONTH(v.updated_at) as month, SUM(v.total) as total
             FROM vendas v
-            WHERE v.situacao = 1 
+            WHERE v.situacao = 1
                 AND YEAR(v.updated_at) = '{$currentYear}'
             GROUP BY year, month
             ORDER BY total DESC
@@ -170,17 +181,17 @@ class DashboardController extends Controller
 
         // Select the total amount of sales from last year.
         $vendasAnoPassado = DB::select(DB::raw("
-        SELECT SUM(v.total) as total 
+        SELECT SUM(v.total) as total
         FROM vendas v
-        WHERE v.situacao = 1 
+        WHERE v.situacao = 1
             AND YEAR(v.updated_at) = '{$lastYear}'
     "));
 
         // Select the total amount of sales from this year.
         $vendasAnoAtual = DB::select(DB::raw("
-        SELECT SUM(v.total) as total 
+        SELECT SUM(v.total) as total
         FROM vendas v
-        WHERE v.situacao = 1 
+        WHERE v.situacao = 1
             AND YEAR(v.updated_at) = '{$currentYear}'
     "));
 
