@@ -191,6 +191,7 @@ class NotaFiscalController extends Controller
                 $notasFiscais->save();
                 if($notasFiscais->venda_id){
                     $numeroNfe = $notasFiscais->nNF;
+                    $tipoFormaPagamento = $request->input('tipoFormaPagamento', '0'); // Padrão: à vista (0)
 
                     // Buscar transações da venda ordenadas por data de vencimento
                     $transacoes = DB::table('transacoes')
@@ -201,7 +202,29 @@ class NotaFiscalController extends Controller
                     $parcelas = $request->input('parcelas');
                     $parcelasManual = $request->input('parcelasManual', 0);
 
-                    if ($parcelasManual == 1) {
+                    // Se for "sem cobrança" (tipo 2), normalmente não haverá transações
+                    // Mas caso existam, zera os valores e adiciona observação
+                    if ($tipoFormaPagamento == '2') {
+                        foreach ($transacoes as $transacao) {
+                            DB::table('transacoes')
+                                ->where('id', $transacao->id)
+                                ->update([
+                                    'valor' => 0,
+                                    'observacao' => DB::raw("CONCAT(observacao,' NFe: $numeroNfe (Sem Cobrança)')")
+                                ]);
+                        }
+                    } elseif (!$parcelas || count($parcelas) == 0) {
+                        // Pagamento à vista - atualizar todas as transações com o valor total e adicionar número da NFe
+                        $vNF = $notasFiscais->totalFinal;
+                        foreach ($transacoes as $transacao) {
+                            DB::table('transacoes')
+                                ->where('id', $transacao->id)
+                                ->update([
+                                    'valor' => number_format((float)$vNF, 2, '.', ''),
+                                    'observacao' => DB::raw("CONCAT(observacao,' NFe: $numeroNfe')")
+                                ]);
+                        }
+                    } elseif ($parcelasManual == 1) {
                         // Se o usuário ajustou manualmente, usar os valores informados
                         foreach ($transacoes as $index => $transacao) {
                             if (isset($parcelas[$index])) {

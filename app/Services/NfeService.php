@@ -619,24 +619,23 @@ class NfeService
 
         //====================TAG DETALHE PAGAMENTO===================
         $totalFinalFormaPag = 0;
-        if ($dados['parcelasManual'] == 1) {
-            if (count($dados['parcelas']) >= 1) {
-                $tipoFormaPag = '01';
-                $totalFinalFormaPag = $dados['totalFinal'];
-            } else {
-                $tipoFormaPag = '90';
-                $totalFinalFormaPag = 0;
-            }
+        $tipoFormaPagamento = $dados['tipoFormaPagamento'] ?? '0'; // Padrão: à vista (0)
+        
+        if ($tipoFormaPagamento == '2') {
+            // Sem cobrança (nota de remessa, etc) - tipo 2
+            $tipoFormaPag = '90';
+            $totalFinalFormaPag = 0;
         } else {
-            if (count($dados['parcelas']) >= 1) {
-                $tipoFormaPag = '01';
+            // À vista (0) ou A prazo (1) - ambos geram cobrança
+            $tipoFormaPag = '01';
+            if ($dados['parcelasManual'] == 1) {
+                $totalFinalFormaPag = isset($dados['totalFinal']) ? $dados['totalFinal'] : $icmsTotal->vNF;
+            } else {
                 // Usa o vNF para garantir que o total do pagamento seja igual ao valor da NF-e
                 $totalFinalFormaPag = $icmsTotal->vNF;
-            } else {
-                $tipoFormaPag = '90';
-                $totalFinalFormaPag = 0;
             }
         }
+        
         $detPag = new stdClass();
         $detPag->tPag = $tipoFormaPag;
         $detPag->vPag = number_format($totalFinalFormaPag, 2, '.', '');
